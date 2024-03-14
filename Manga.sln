@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Manga.Server", "Manga.Server\Manga.Server.csproj", "{8A206D79-CE4A-4E09-852B-DA02711FCB32}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "manga.client", "manga.client\manga.client.esproj", "{4924C934-7216-4844-8024-1CAADE4DBD87}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A206D79-CE4A-4E09-852B-DA02711FCB32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A206D79-CE4A-4E09-852B-DA02711FCB32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A206D79-CE4A-4E09-852B-DA02711FCB32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A206D79-CE4A-4E09-852B-DA02711FCB32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4924C934-7216-4844-8024-1CAADE4DBD87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4924C934-7216-4844-8024-1CAADE4DBD87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4924C934-7216-4844-8024-1CAADE4DBD87}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4924C934-7216-4844-8024-1CAADE4DBD87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4924C934-7216-4844-8024-1CAADE4DBD87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4924C934-7216-4844-8024-1CAADE4DBD87}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {760F708F-26E5-44E9-BDB6-46EC8C76B274}
+	EndGlobalSection
+EndGlobal
