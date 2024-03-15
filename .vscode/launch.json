@@ -14,7 +14,7 @@
         {
             "name": "SWA: Run manga.client",
             "request": "launch",
-            "type": "pwa-chrome",
+            "type": "chrome",
             "url": "http://localhost:4280",
             "preLaunchTask": "swa: start manga.client",
             "webRoot": "${workspaceFolder}/manga.client",
