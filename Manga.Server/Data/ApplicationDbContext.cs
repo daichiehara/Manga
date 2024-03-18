@@ -20,5 +20,6 @@ namespace Manga.Server.Data
         public DbSet<SellImage>? SellImage { get; set; }
         public DbSet<Reply>? Reply { get; set; }
         public DbSet<Report>? Report { get; set; }
+        public DbSet<Request>? Request { get; set; }
     }
 }

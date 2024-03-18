@@ -49,16 +49,15 @@ namespace Manga.Server.Controllers
         [HttpGet("HomeData")]
         public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync()
         {
-            // 仮のユーザーID - 実際には認証情報から取得する必要があります
-            var currentUserId = _userManager.GetUserId(User);
-            if (currentUserId == null)
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
             {
-                return NotFound();
+                return Unauthorized();
             }
 
             // 現在のユーザーのOwnedListのタイトルリストを取得
             var ownedTitles = await _context.OwnedList
-                                             .Where(o => o.UserAccountId == currentUserId)
+                                             .Where(o => o.UserAccountId == userId)
                                              .Select(o => o.Title)
                                              .ToListAsync();
 
@@ -79,6 +78,7 @@ namespace Manga.Server.Controllers
 
                 var dto = new HomeDto
                 {
+                    SellId = sell.SellId,
                     SellTitle = sell.Title,
                     WishTitles = wishTitles,
                     SellImage = sell.SellImages

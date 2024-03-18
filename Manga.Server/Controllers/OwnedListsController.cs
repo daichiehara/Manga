@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Manga.Server.Data;
 using Manga.Server.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Manga.Server.Controllers
 {
@@ -15,10 +16,12 @@ namespace Manga.Server.Controllers
     public class OwnedListsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<UserAccount> _userManager;
 
-        public OwnedListsController(ApplicationDbContext context)
+        public OwnedListsController(ApplicationDbContext context, UserManager<UserAccount> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/OwnedLists
@@ -100,9 +103,38 @@ namespace Manga.Server.Controllers
             return NoContent();
         }
 
-        private bool OwnedListExists(int id)
+        [HttpGet("OwnList")]
+        public async Task<ActionResult<OwnedListDto>> GetUserLists()
         {
-            return _context.OwnedList.Any(e => e.OwnedListId == id);
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var ownedLists = await _context.OwnedList
+                                           .Where(o => o.UserAccountId == userId)
+                                           .Select(o => new ItemDto { Id = o.OwnedListId, Title = o.Title })
+                                           .ToListAsync();
+
+            var sells = await _context.Sell
+                                      .Where(s => s.UserAccountId == userId)
+                                      .Select(s => new ItemDto { Id = s.SellId, Title = s.Title })
+                                      .ToListAsync();
+
+            var dto = new OwnedListDto
+            {
+                OwnedLists = ownedLists,
+                Sells = sells
+            };
+
+            return Ok(dto);
         }
+
+
+        private bool OwnedListExists(int id)
+            {
+                return _context.OwnedList.Any(e => e.OwnedListId == id);
+            }
     }
 }
