@@ -1,21 +1,20 @@
-import SearchBar from './components/SearchBar';
-import MangaListItem from './components/MangaListItem';
-import MyBottomNavigation from './components/MyBottomNavigation';
+import React from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route
+} from 'react-router-dom';
+import MainSearch from './pages/MainSearch';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div>
-      <SearchBar onSearch={(query) => console.log(query)} />
-      {/* ここにダミーデータを使って MangaListItem をいくつか表示する */}
-      <MangaListItem
-        imageUrl="url_to_some_image"
-        title="マンガのタイトル"
-        description="簡単な説明"
-      />
-      {/* 他の MangaListItem コンポーネントも同様に追加 */}
-      <MyBottomNavigation />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainSearch />} />
+        {/* 他のルートをここに追加 */}
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
