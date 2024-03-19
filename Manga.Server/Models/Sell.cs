@@ -23,6 +23,7 @@ namespace Manga.Server.Models
 
         public virtual ICollection<SellImage> SellImages { get; set; }
         public virtual ICollection<Reply> Replys { get; set; }
+        public virtual ICollection<MyList> MyLists { get; set; }
     }
 
     public enum SendDay

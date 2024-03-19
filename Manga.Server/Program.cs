@@ -1,6 +1,7 @@
 using Manga.Server.Data;
 using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,9 +21,28 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<UserAccount>()
-    .AddRoles<IdentityRole>() // Add this
+
+builder.Services.AddDefaultIdentity<UserAccount>(options =>
+{
+    // パスワードの複雑さ要件
+    options.Password.RequireDigit = true; // 数字が少なくとも1つ含まれている必要がある
+    options.Password.RequiredLength = 6; // パスワードの最小長
+    options.Password.RequireNonAlphanumeric = false;
+    options.User.RequireUniqueEmail = true; // ユーザーのメールアドレスが一意であること
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+/*
+builder.Services.AddIdentityApiEndpoints<UserAccount>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddIdentity<UserAccount, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddIdentityApiEndpoints<UserAccount>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+*/
+
 
 var app = builder.Build();
 
@@ -43,5 +63,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+app.MapIdentityApi<UserAccount>();
 
 app.Run();

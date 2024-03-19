@@ -28,5 +28,6 @@ namespace Manga.Server.Models
         public virtual ICollection<OwnedList> OwnedLists { get; set; }
         public virtual ICollection<Sell> Sells { get; set; }
         public virtual ICollection<Reply> Replys { get; set; }
+        public virtual ICollection<MyList> MyLists { get; set; }
     }
 }

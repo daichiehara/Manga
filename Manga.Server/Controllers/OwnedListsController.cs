@@ -114,12 +114,12 @@ namespace Manga.Server.Controllers
 
             var ownedLists = await _context.OwnedList
                                            .Where(o => o.UserAccountId == userId)
-                                           .Select(o => new ItemDto { Id = o.OwnedListId, Title = o.Title })
+                                           .Select(o => new ItemDto { ItemId = o.OwnedListId, Title = o.Title })
                                            .ToListAsync();
 
             var sells = await _context.Sell
                                       .Where(s => s.UserAccountId == userId)
-                                      .Select(s => new ItemDto { Id = s.SellId, Title = s.Title })
+                                      .Select(s => new ItemDto { ItemId = s.SellId, Title = s.Title })
                                       .ToListAsync();
 
             var dto = new OwnedListDto

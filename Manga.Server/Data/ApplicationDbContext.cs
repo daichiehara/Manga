@@ -21,5 +21,6 @@ namespace Manga.Server.Data
         public DbSet<Reply>? Reply { get; set; }
         public DbSet<Report>? Report { get; set; }
         public DbSet<Request>? Request { get; set; }
+        public DbSet<MyList>? MyList { get; set; }
     }
 }
