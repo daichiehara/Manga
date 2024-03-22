@@ -6,17 +6,28 @@ namespace Manga.Server.Models
     {
         public int SellId { get; set; }
 
+        [Required]
         [Display(Name = "作品タイトル")]
         public string Title { get; set;}
 
+        [Required]
         [Display(Name = "発送元の地域")]
         public SendPrefecture SendPrefecture { get; set;}
 
+        [Required]
         [Display(Name = "発送までの日数")]
         public SendDay SendDay { get; set; }
 
         [Display(Name = "出品日時")]
         public DateTime SellTime { get; set;}
+
+        [Required]
+        [Display(Name = "商品状態")]
+        public BookState BookState { get; set;}
+
+        [Required]
+        [Display(Name = "全巻巻数")]
+        public int NumberOfBooks { get; set;}
 
         public string UserAccountId { get; set; }
         public virtual UserAccount UserAccount { get; set; }
@@ -34,6 +45,20 @@ namespace Manga.Server.Models
         Send2to3Days = 2,
         [Display(Name = "4～7日で発送")]
         Send4to7Days = 3,
+    }
+
+    public enum BookState
+    {
+        [Display(Name = "未使用に近い")]
+        Unused = 1,
+        [Display(Name = "目立った傷や汚れなし")]
+        Dirt1 = 2,
+        [Display(Name = "やや傷や汚れあり")]
+        Dirt2 = 3,
+        [Display(Name = "傷や汚れあり")]
+        Dirt3 = 4,
+        [Display(Name = "全体的に状態が悪い")]
+        Bad = 5,
     }
 
     public enum SendPrefecture

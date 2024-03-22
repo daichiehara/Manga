@@ -25,12 +25,40 @@ namespace Manga.Server.Controllers
         }
 
         // GET: api/OwnedLists
+        /*
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OwnedList>>> GetOwnedList()
         {
             return await _context.OwnedList.ToListAsync();
         }
+        */
+        [HttpGet]
+        public async Task<ActionResult<OwnedListDto>> GetUserLists()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
 
+            var ownedLists = await _context.OwnedList
+                                           .Where(o => o.UserAccountId == userId)
+                                           .Select(o => new ItemDto { ItemId = o.OwnedListId, Title = o.Title })
+                                           .ToListAsync();
+
+            var sells = await _context.Sell
+                                      .Where(s => s.UserAccountId == userId)
+                                      .Select(s => new ItemDto { ItemId = s.SellId, Title = s.Title })
+                                      .ToListAsync();
+
+            var dto = new OwnedListDto
+            {
+                OwnedLists = ownedLists,
+                Sells = sells
+            };
+
+            return Ok(dto);
+        }
         // GET: api/OwnedLists/5
         [HttpGet("{id}")]
         public async Task<ActionResult<OwnedList>> GetOwnedList(int id)
@@ -102,35 +130,6 @@ namespace Manga.Server.Controllers
 
             return NoContent();
         }
-
-        [HttpGet("OwnList")]
-        public async Task<ActionResult<OwnedListDto>> GetUserLists()
-        {
-            var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
-            var ownedLists = await _context.OwnedList
-                                           .Where(o => o.UserAccountId == userId)
-                                           .Select(o => new ItemDto { ItemId = o.OwnedListId, Title = o.Title })
-                                           .ToListAsync();
-
-            var sells = await _context.Sell
-                                      .Where(s => s.UserAccountId == userId)
-                                      .Select(s => new ItemDto { ItemId = s.SellId, Title = s.Title })
-                                      .ToListAsync();
-
-            var dto = new OwnedListDto
-            {
-                OwnedLists = ownedLists,
-                Sells = sells
-            };
-
-            return Ok(dto);
-        }
-
 
         private bool OwnedListExists(int id)
             {

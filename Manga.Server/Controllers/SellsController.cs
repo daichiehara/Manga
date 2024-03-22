@@ -26,27 +26,14 @@ namespace Manga.Server.Controllers
         }
 
         // GET: api/Sells
+        /*
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Sell>>> GetSell()
         {
             return await _context.Sell.ToListAsync();
         }
-
-        // GET: api/Sells/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Sell>> GetSell(int id)
-        {
-            var sell = await _context.Sell.FindAsync(id);
-
-            if (sell == null)
-            {
-                return NotFound();
-            }
-
-            return sell;
-        }
-
-        [HttpGet("HomeData")]
+        */
+        [HttpGet]
         public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync()
         {
             var userId = _userManager.GetUserId(User);
@@ -80,6 +67,7 @@ namespace Manga.Server.Controllers
                 {
                     SellId = sell.SellId,
                     SellTitle = sell.Title,
+                    NumberOfBooks = sell.NumberOfBooks,
                     WishTitles = wishTitles,
                     SellImage = sell.SellImages
                                     .OrderBy(si => si.Order)
@@ -91,9 +79,19 @@ namespace Manga.Server.Controllers
 
             return homeDtos;
         }
+        // GET: api/Sells/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Sell>> GetSell(int id)
+        {
+            var sell = await _context.Sell.FindAsync(id);
 
+            if (sell == null)
+            {
+                return NotFound();
+            }
 
-
+            return sell;
+        }
 
         // PUT: api/Sells/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

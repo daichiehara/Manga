@@ -25,12 +25,34 @@ namespace Manga.Server.Controllers
         }
 
         // GET: api/WishLists
+        /*
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WishList>>> GetWishList()
         {
             return await _context.WishList.ToListAsync();
         }
+        */
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ItemDto>>> GetWishLists()
+        {
+            // 認証されたユーザーのIDを取得する
+            var userId = _userManager.GetUserId(User); // UserManagerを使用してユーザーIDを取得
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
 
+            var wishLists = await _context.WishList
+                .Where(w => w.UserAccountId == userId) // 特定のユーザーに紐付けられたWishListのみをフィルタリング
+                .Select(w => new ItemDto
+                {
+                    ItemId = w.WishListId,
+                    Title = w.Title
+                })
+                .ToListAsync();
+
+            return Ok(wishLists);
+        }
         // GET: api/WishLists/5
         [HttpGet("{id}")]
         public async Task<ActionResult<WishList>> GetWishList(int id)
@@ -102,29 +124,6 @@ namespace Manga.Server.Controllers
 
             return NoContent();
         }
-
-        [HttpGet("WishList")]
-        public async Task<ActionResult<IEnumerable<ItemDto>>> GetWishLists()
-        {
-            // 認証されたユーザーのIDを取得する
-            var userId = _userManager.GetUserId(User); // UserManagerを使用してユーザーIDを取得
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
-            var wishLists = await _context.WishList
-                .Where(w => w.UserAccountId == userId) // 特定のユーザーに紐付けられたWishListのみをフィルタリング
-                .Select(w => new ItemDto
-                {
-                    ItemId = w.WishListId,
-                    Title = w.Title
-                })
-                .ToListAsync();
-
-            return Ok(wishLists);
-        }
-
         private bool WishListExists(int id)
         {
             return _context.WishList.Any(e => e.WishListId == id);
