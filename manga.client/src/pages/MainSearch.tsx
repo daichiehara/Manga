@@ -3,7 +3,7 @@ import TabsComponent from '../components/common/TabsComponent';
 import NavigationBar from '../components/navigation/NavigationBar';
 import MangaListItem from '../components/manga/MangaListItem';
 import Header from '../components/common/Header';
-import MangaImage1 from '../assets/images/MangaImage1.jpg';
+//import MangaImage1 from '../assets/images/MangaImage1.jpg';
 
 const MainSearch: React.FC = () => {
     const [selectedTab] = useState(0);
@@ -13,7 +13,7 @@ const MainSearch: React.FC = () => {
       const fetchMangaData = async () => {
         try {
           console.log('APIリクエストを送信中...');
-          const response = await fetch(`/api/Sells`);
+          const response = await fetch(`https://localhost:7103/api/Sells`);
           console.log('レスポンス受信:', response.status, response.statusText);
           const data = await response.json();
           console.log('取得したデータ:', data);

@@ -13,6 +13,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// CORSオリジン設定
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()   // すべてのオリジンからのアクセスを許可
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 // Add services to the container.
 string? connectionString = builder.Configuration.GetConnectionString("ApplicationDbContext");
 
@@ -65,5 +78,8 @@ app.MapControllers();
 app.MapFallbackToFile("/index.html");
 
 app.MapIdentityApi<UserAccount>();
+
+// CORS ミドルウェアを有効にする
+app.UseCors("AllowAll");
 
 app.Run();
