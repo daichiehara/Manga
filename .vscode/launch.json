@@ -3,7 +3,7 @@
     // 既存の属性の説明をホバーして表示します。
     // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [
+    /*"configurations": [
         {
             "type": "chrome",
             "request": "launch",
@@ -21,4 +21,21 @@
             "timeout": 30000
         }
     ]
+    */
+    "configurations": [
+        {
+          "type": "edge",
+          "request": "launch",
+          "name": "localhost (Edge)",
+          "url": "https://localhost:5173",
+          "webRoot": "${workspaceFolder}"
+        },
+        {
+          "type": "chrome",
+          "request": "launch",
+          "name": "localhost (Chrome)",
+          "url": "https://localhost:5173",
+          "webRoot": "${workspaceFolder}"
+        }
+      ]
 }
