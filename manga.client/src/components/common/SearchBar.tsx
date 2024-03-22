@@ -14,7 +14,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   };
 
   return (
-    <Paper component="form" sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '100%' }}>
+    <Paper component="form" sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '80%', boxShadow: '0px 4px 4px -1px rgba(0,0,0,0.2)' }}>
       <InputBase
         sx={{ ml: 1, flex: 1 }}
         placeholder="欲しい漫画を探す"

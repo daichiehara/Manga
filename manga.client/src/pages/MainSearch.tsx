@@ -1,43 +1,50 @@
-import React, { useState } from 'react';
-import { Box, Tab, Tabs } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import TabsComponent from '../components/common/TabsComponent';
 import NavigationBar from '../components/navigation/NavigationBar';
 import MangaListItem from '../components/manga/MangaListItem';
-import SearchBar from '../components/common/SearchBar';
-
-// 仮のマンガデータ
-const mangaData = [
-    {
-      imageUrl: '/path/to/image1.jpg',
-      title: 'ONE PIECE',
-      description: '海賊の冒険物語',
-    },
-    // 他のマンガのデータを追加...
-  ];  
+import Header from '../components/common/Header';
+import MangaImage1 from '../assets/images/MangaImage1.jpg';
 
 const MainSearch: React.FC = () => {
-    const [selectedTab, setSelectedTab] = useState(0);
+    const [selectedTab] = useState(0);
+    const [mangaData, setMangaData] = useState([]);
+
+    useEffect(() => {
+      const fetchMangaData = async () => {
+        try {
+          console.log('APIリクエストを送信中...');
+          const response = await fetch(`/api/Sells`);
+          console.log('レスポンス受信:', response.status, response.statusText);
+          const data = await response.json();
+          console.log('取得したデータ:', data);
+          setMangaData(data);
+        } catch (error) {
+          console.error('データの取得に失敗しました:', error);
+        }
+      };
+  
+      fetchMangaData();
+    }, []); // 空の依存配列を指定して、コンポーネントのマウント時にのみ実行
 
     const handleSearch = (query: string) => {
       console.log(query); // ここで検索処理を実装します。今はコンソールに表示するだけです。
     };
 
-    const handleTabChange = (_: React.ChangeEvent<{}>, newValue: number) => {
-        setSelectedTab(newValue);
-      };
-
     return (
       <>
-        <SearchBar onSearch={handleSearch} />
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="basic tabs example">
-            <Tab label="Recommend" />
-            <Tab label="MyList" />
-          </Tabs>
-        </Box>
+        <Header onSearch={handleSearch} />
+        <TabsComponent />
+        <div style={{ marginTop: 120/* Tabsの高さに合わせて調整 */ }}></div>
+        {/* メインコンテンツ */}
         {selectedTab === 0 && (
-          // "Recommend" タブのコンテンツ
-          mangaData.map(manga => (
-            <MangaListItem key={manga.title} {...manga} />
+          mangaData.map((manga, index) => (
+            <MangaListItem 
+              key={index}
+              sellImage={manga.sellImage} 
+              sellTitle={manga.sellTitle} 
+              numberOfBooks={manga.numberOfBooks}
+              wishTitles={manga.wishTitles} // 修正
+            />
           ))
         )}
         {selectedTab === 1 && (
@@ -45,7 +52,7 @@ const MainSearch: React.FC = () => {
           <div>MyList content goes here...</div>
         )}
         <NavigationBar />
-        </>
+      </>
   );
 };
 

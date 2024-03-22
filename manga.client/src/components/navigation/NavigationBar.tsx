@@ -14,6 +14,7 @@ const NavigationBar: React.FC = () => {
       value={value}
       onChange={(_, newValue) => setValue(newValue)}
       showLabels
+      sx={{ width: '100%', position: 'fixed', bottom: 0 }}
     >
       <BottomNavigationAction label="探す" icon={<SearchIcon />} />
       <BottomNavigationAction label="通知" icon={<NotificationsIcon />} />
