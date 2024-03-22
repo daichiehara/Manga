@@ -37,10 +37,6 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync()
         {
             var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
 
             // 現在のユーザーのOwnedListのタイトルリストを取得
             var ownedTitles = await _context.OwnedList

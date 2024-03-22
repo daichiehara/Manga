@@ -29,6 +29,9 @@ namespace Manga.Server.Models
         [Display(Name = "全巻巻数")]
         public int NumberOfBooks { get; set;}
 
+        [Display(Name = "メッセージ")]
+        public string SellMessage { get; set;}
+
         public string UserAccountId { get; set; }
         public virtual UserAccount UserAccount { get; set; }
 
