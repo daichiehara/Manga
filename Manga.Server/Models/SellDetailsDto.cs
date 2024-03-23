@@ -33,6 +33,7 @@ namespace Manga.Server.Models
         [Display(Name = "ユーザーアイコン")]
         public string ProfileIcon { get; set; }
 
+        public List<string> ImageUrls { get; set; } = new List<string>();
         public List<WishTitleInfo> WishTitles { get; set; } = new List<WishTitleInfo>();
     }
 }

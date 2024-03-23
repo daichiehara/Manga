@@ -1,3 +1,4 @@
+using Manga.Server;
 using Manga.Server.Data;
 using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity;
@@ -44,7 +45,8 @@ builder.Services.AddDefaultIdentity<UserAccount>(options =>
     options.User.RequireUniqueEmail = true; // ユーザーのメールアドレスが一意であること
 })
 .AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<ApplicationDbContext>();
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddErrorDescriber<IdentityErrorDescriberJP>();
 
 
 /*

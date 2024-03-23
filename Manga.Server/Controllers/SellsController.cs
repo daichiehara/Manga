@@ -96,6 +96,7 @@ namespace Manga.Server.Controllers
             var userId = _userManager.GetUserId(User); // 現在のユーザーIDを取得
             var sell = await _context.Sell
                 .Include(s => s.UserAccount)
+                .Include(s => s.SellImages)
                 .FirstOrDefaultAsync(s => s.SellId == id);
 
             if (sell == null)
@@ -135,6 +136,7 @@ namespace Manga.Server.Controllers
                 SellMessage = sell.SellMessage,
                 UserName = sell.UserAccount.UserName,
                 ProfileIcon = sell.UserAccount.ProfileIcon,
+                ImageUrls = sell.SellImages.Select(si => si.ImageUrl).ToList(),
                 WishTitles = wishTitles
             };
 

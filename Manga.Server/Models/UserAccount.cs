@@ -6,6 +6,10 @@ namespace Manga.Server.Models
 {
     public class UserAccount : IdentityUser
     {
+        [Required]
+        [Display(Name = "ユーザー名")]
+        public string NickName {  get; set; }
+
         [Display(Name = "郵便番号")]
         public string? PostalCode {  get; set; }
 
