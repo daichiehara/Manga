@@ -75,6 +75,7 @@ namespace Manga.Server.Controllers
 
             return homeDtos;
         }
+        /*
         // GET: api/Sells/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Sell>> GetSell(int id)
@@ -88,6 +89,58 @@ namespace Manga.Server.Controllers
 
             return sell;
         }
+        */
+        [HttpGet("{id}")]
+        public async Task<ActionResult<SellDetailsDto>> GetSellDetails(int id)
+        {
+            var userId = _userManager.GetUserId(User); // 現在のユーザーIDを取得
+            var sell = await _context.Sell
+                .Include(s => s.UserAccount)
+                .FirstOrDefaultAsync(s => s.SellId == id);
+
+            if (sell == null)
+            {
+                return NotFound();
+            }
+
+            // 出品者のWishListを取得
+            var wishLists = await _context.WishList
+                .Where(w => w.UserAccountId == sell.UserAccountId)
+                .ToListAsync();
+
+            // 現在のユーザーのMyListに含まれるタイトルのリストを取得
+            var userMyListTitles = await _context.MyList
+                .Where(m => m.UserAccountId == userId && m.SellId != null)
+                .Select(m => m.Sell.Title)
+                .ToListAsync();
+
+            // WishListからWishTitleInfoリストを作成
+            var wishTitles = wishLists
+                .Select(wl => new WishTitleInfo
+                {
+                    Title = wl.Title,
+                    IsOwned = userMyListTitles.Contains(wl.Title) // MyListに含まれていればtrue
+                })
+                .ToList();
+
+            var dto = new SellDetailsDto
+            {
+                SellId = sell.SellId,
+                Title = sell.Title,
+                SendPrefecture = sell.SendPrefecture,
+                SendDay = sell.SendDay,
+                SellTime = sell.SellTime,
+                BookState = sell.BookState,
+                NumberOfBooks = sell.NumberOfBooks,
+                SellMessage = sell.SellMessage,
+                UserName = sell.UserAccount.UserName,
+                ProfileIcon = sell.UserAccount.ProfileIcon,
+                WishTitles = wishTitles
+            };
+
+            return dto;
+        }
+
 
         // PUT: api/Sells/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
