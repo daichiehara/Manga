@@ -128,14 +128,15 @@ namespace Manga.Server.Controllers
             {
                 SellId = sell.SellId,
                 Title = sell.Title,
-                SendPrefecture = sell.SendPrefecture,
-                SendDay = sell.SendDay,
+                SendPrefecture = sell.SendPrefecture.GetDisplayName(),
+                SendDay = sell.SendDay.GetDisplayName(),
                 SellTime = sell.SellTime,
-                BookState = sell.BookState,
+                BookState = sell.BookState.GetDisplayName(),
                 NumberOfBooks = sell.NumberOfBooks,
                 SellMessage = sell.SellMessage,
-                UserName = sell.UserAccount.UserName,
+                UserName = sell.UserAccount.NickName,
                 ProfileIcon = sell.UserAccount.ProfileIcon,
+                HasIdVerificationImage = !string.IsNullOrEmpty(sell.UserAccount.IdVerificationImage),
                 ImageUrls = sell.SellImages.Select(si => si.ImageUrl).ToList(),
                 WishTitles = wishTitles
             };

@@ -6,7 +6,6 @@ namespace Manga.Server.Models
 {
     public class UserAccount : IdentityUser
     {
-        [Required]
         [Display(Name = "ユーザー名")]
         public string NickName {  get; set; }
 

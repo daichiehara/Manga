@@ -10,16 +10,16 @@ namespace Manga.Server.Models
         public string Title { get; set; }
 
         [Display(Name = "発送元の地域")]
-        public SendPrefecture SendPrefecture { get; set; }
+        public string SendPrefecture { get; set; }
 
         [Display(Name = "発送までの日数")]
-        public SendDay SendDay { get; set; }
+        public string SendDay { get; set; }
 
         [Display(Name = "出品日時")]
         public DateTime SellTime { get; set; }
 
         [Display(Name = "商品状態")]
-        public BookState BookState { get; set; }
+        public string BookState { get; set; }
 
         [Display(Name = "全巻巻数")]
         public int NumberOfBooks { get; set; }
@@ -32,6 +32,9 @@ namespace Manga.Server.Models
 
         [Display(Name = "ユーザーアイコン")]
         public string ProfileIcon { get; set; }
+
+        [Display(Name = "本人確認画像")]
+        public bool HasIdVerificationImage { get; set; }
 
         public List<string> ImageUrls { get; set; } = new List<string>();
         public List<WishTitleInfo> WishTitles { get; set; } = new List<WishTitleInfo>();
