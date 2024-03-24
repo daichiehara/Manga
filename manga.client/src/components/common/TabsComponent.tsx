@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-import { Tabs, Tab} from '@mui/material';
+import React from 'react';
+import { Tabs, Tab } from '@mui/material';
 
-const TabsComponent: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState(0);
+interface TabsComponentProps {
+  selectedTab: number;
+  onTabChange: (event: React.SyntheticEvent, newValue: number) => void;
+}
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
-  };
-
+const TabsComponent: React.FC<TabsComponentProps> = ({ selectedTab, onTabChange }) => {
   return (
     <div
       style={{
@@ -27,14 +26,14 @@ const TabsComponent: React.FC = () => {
       }}
     >
       <Tabs 
-            value={selectedTab} 
-            onChange={handleTabChange} 
-            aria-label="basic tabs example"
-          >
-            <Tab label="Recommended" /> {/* Translated 'おすすめ' to 'Recommended' */}
-            <Tab label="My List" /> {/* Translated 'マイリスト' to 'My List' */}
-          </Tabs>
-      </div>
+        value={selectedTab} 
+        onChange={onTabChange} 
+        aria-label="basic tabs example"
+      >
+        <Tab label="Recommendations" />
+        <Tab label="My List" />
+      </Tabs>
+    </div>
   );
 };
 

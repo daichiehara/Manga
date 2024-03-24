@@ -17,7 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   return (
     <AppBar position="fixed" sx={{
         mb: 2, // 下のマージン
-        backgroundColor: 'blue !important', // グラデーションの背景色
+        background: 'linear-gradient(to right, #E97132, #F2CFEE)', // グラデーションの背景色
         boxShadow: 'none',
       }}>
       <Toolbar sx={{mt: 0.5, mb: 0.5, 

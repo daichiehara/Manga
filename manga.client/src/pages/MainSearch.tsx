@@ -6,7 +6,7 @@ import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 
 const MainSearch: React.FC = () => {
-    const [selectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(0);
     const [mangaData, setMangaData] = useState([]);
 
     useEffect(() => {
@@ -31,16 +31,22 @@ const MainSearch: React.FC = () => {
       console.log(query); // ここで検索処理を実装します。今はコンソールに表示するだけです。
     };
 
+    // タブが変更されたときに呼び出される関数
+    const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+      setSelectedTab(newValue);
+    };
+
     return (
       <>
         <Header onSearch={handleSearch} />
-        <TabsComponent />
+        <TabsComponent selectedTab={selectedTab} onTabChange={handleTabChange} />
         <div style={{ marginTop: 120/* Tabsの高さに合わせて調整 */ }}></div>
         {/* メインコンテンツ */}
         {selectedTab === 0 && (
           mangaData.map((manga, index) => (
             <MangaListItem 
               key={index}
+              sellId={manga.sellID}
               sellImage={manga.sellImage} 
               sellTitle={manga.sellTitle} 
               numberOfBooks={manga.numberOfBooks}
