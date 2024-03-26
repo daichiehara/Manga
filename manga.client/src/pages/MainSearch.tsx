@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TabsComponent from '../components/common/TabsComponent';
 import NavigationBar from '../components/navigation/NavigationBar';
-import MangaListItem from '../components/manga/MangaListItem';
+import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 
@@ -43,14 +43,14 @@ const MainSearch: React.FC = () => {
         <div style={{ marginTop: 120/* Tabsの高さに合わせて調整 */ }}></div>
         {/* メインコンテンツ */}
         {selectedTab === 0 && (
-          mangaData.map((manga, index) => (
+          mangaData.map((item, index) => (
             <MangaListItem 
               key={index}
-              sellId={manga.sellID}
-              sellImage={manga.sellImage} 
-              sellTitle={manga.sellTitle} 
-              numberOfBooks={manga.numberOfBooks}
-              wishTitles={manga.wishTitles} // 修正
+              sellId={item.sellId}
+              sellImage={item.sellImage} 
+              sellTitle={item.sellTitle} 
+              numberOfBooks={item.numberOfBooks}
+              wishTitles={item.wishTitles} // 修正
             />
           ))
         )}

@@ -49,7 +49,7 @@ interface MangaListItemProps {
 
 const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles }) => {
   return (
-    <Link to={`/manga/${sellId}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/item/${sellId}`} style={{ textDecoration: 'none' }}>
       <Card 
         sx={{ 
           display: 'flex', 
