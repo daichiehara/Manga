@@ -96,7 +96,7 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
           </Typography>
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
             <Typography variant="subtitle1" component="div">
-            <span style={{ fontWeight: "bold", color: "#8ED974" }}>
+            <span style={{ fontWeight: "bold", color: "#49AFFE" }}>
               欲しい
             </span>
             </Typography>
