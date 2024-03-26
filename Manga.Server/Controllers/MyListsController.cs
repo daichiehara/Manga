@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Manga.Server.Data;
 using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Manga.Server.Controllers
 {
@@ -147,7 +148,7 @@ namespace Manga.Server.Controllers
             return CreatedAtAction("GetMyList", new { id = myList.MyListId }, myList);
         }
         */
-
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<MyList>> AddToMyList(int sellId)
         {

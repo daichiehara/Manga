@@ -44,7 +44,20 @@ namespace Manga.Server.Controllers
                                              .Select(o => o.Title)
                                              .ToListAsync();
 
-            var sells = await _context.Sell.Include(s => s.SellImages).ToListAsync();
+            // 現在のユーザーのSellのタイトルリストも取得
+            var sellTitles = await _context.Sell
+                                            .Where(s => s.UserAccountId == userId)
+                                            .Select(s => s.Title)
+                                            .ToListAsync();
+
+            // 両方のリストを結合
+            var userTitles = ownedTitles.Union(sellTitles).ToList();
+
+            var sells = await _context.Sell
+                          .Include(s => s.SellImages)
+                          .OrderByDescending(s => s.SellTime)
+                          .ToListAsync();
+
             var homeDtos = new List<HomeDto>();
 
             foreach (var sell in sells)
@@ -54,8 +67,7 @@ namespace Manga.Server.Controllers
                                                .Select(w => new WishTitleInfo
                                                {
                                                    Title = w.Title,
-                                                   // タイトルが現在のユーザーのOwnedListに含まれる場合、IsOwnedをtrueに設定
-                                                   IsOwned = ownedTitles.Contains(w.Title)
+                                                   IsOwned = userTitles.Contains(w.Title)
                                                })
                                                .ToListAsync();
 
@@ -109,18 +121,27 @@ namespace Manga.Server.Controllers
                 .Where(w => w.UserAccountId == sell.UserAccountId)
                 .ToListAsync();
 
-            // 現在のユーザーのMyListに含まれるタイトルのリストを取得
-            var userMyListTitles = await _context.MyList
-                .Where(m => m.UserAccountId == userId && m.SellId != null)
-                .Select(m => m.Sell.Title)
+            // 現在のユーザーのOwnedListに含まれるタイトルのリストを取得
+            var ownedTitles = await _context.OwnedList
+                .Where(m => m.UserAccountId == userId)
+                .Select(m => m.Title)
                 .ToListAsync();
+
+            // 現在のユーザーのSellのタイトルリストも取得
+            var sellTitles = await _context.Sell
+                                            .Where(s => s.UserAccountId == userId)
+                                            .Select(s => s.Title)
+                                            .ToListAsync();
+
+            // 両方のリストを結合
+            var userTitles = ownedTitles.Union(sellTitles).ToList();
 
             // WishListからWishTitleInfoリストを作成
             var wishTitles = wishLists
                 .Select(wl => new WishTitleInfo
                 {
                     Title = wl.Title,
-                    IsOwned = userMyListTitles.Contains(wl.Title) // MyListに含まれていればtrue
+                    IsOwned = userTitles.Contains(wl.Title)
                 })
                 .ToList();
 
@@ -137,7 +158,7 @@ namespace Manga.Server.Controllers
                 UserName = sell.UserAccount.NickName,
                 ProfileIcon = sell.UserAccount.ProfileIcon,
                 HasIdVerificationImage = !string.IsNullOrEmpty(sell.UserAccount.IdVerificationImage),
-                ImageUrls = sell.SellImages.Select(si => si.ImageUrl).ToList(),
+                ImageUrls = sell.SellImages.OrderBy(si => si.Order).Select(si => si.ImageUrl).ToList(),
                 WishTitles = wishTitles
             };
 
@@ -202,6 +223,53 @@ namespace Manga.Server.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("Request")]
+        public async Task<ActionResult<ExchangeRequestDto>> GetMatchingTitles(int sellId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var sell = await _context.Sell.Include(s => s.UserAccount).FirstOrDefaultAsync(s => s.SellId == sellId);
+            if (sell == null)
+            {
+                return NotFound();
+            }
+
+            var wishListTitles = await _context.WishList
+                .Where(w => w.UserAccountId == sell.UserAccountId)
+                .Select(w => w.Title)
+                .ToListAsync();
+
+            // SellとOwnedListの両方からタイトルを取得し、どちらからのタイトルかも記録します
+            var sellTitles = await _context.Sell
+                .Where(s => s.UserAccountId == userId)
+                .Select(s => new TitleInfo { Title = s.Title, IsFromSell = true })
+                .ToListAsync();
+
+            var ownedListTitles = await _context.OwnedList
+                .Where(o => o.UserAccountId == userId)
+                .Select(o => new TitleInfo { Title = o.Title, IsFromSell = false })
+                .ToListAsync();
+
+            // 両リストを結合
+            var userTitles = sellTitles.Union(ownedListTitles).ToList();
+
+            // WishListとマッチングするタイトルを見つけます
+            var matchingTitles = userTitles.Where(ut => wishListTitles.Contains(ut.Title)).ToList();
+
+            var dto = new ExchangeRequestDto
+            {
+                SellId = sellId,
+                MatchingTitles = matchingTitles
+            };
+
+            return dto;
+        }
+
 
         private bool SellExists(int id)
         {
