@@ -8,6 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using Manga.Server.Data;
 using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Net.Http;
+using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Security.Policy;
+using System.Web;
+using System.Xml;
+using System.Xml.XPath;
 
 namespace Manga.Server.Controllers
 {
@@ -17,12 +25,15 @@ namespace Manga.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserAccount> _userManager;
+        private readonly HttpClient _httpClient;
+        private readonly ILogger<SellsController> _logger;
 
-
-        public SellsController(ApplicationDbContext context, UserManager<UserAccount> userManager)
+        public SellsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IHttpClientFactory httpClientFactory, ILogger<SellsController> logger)
         {
             _context = context;
             _userManager = userManager;
+            _httpClient = httpClientFactory.CreateClient();
+            _logger = logger;
         }
 
         // GET: api/Sells
@@ -270,6 +281,103 @@ namespace Manga.Server.Controllers
             return dto;
         }
 
+        /*
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchMangaTitles(string query)
+        {
+
+            try
+            {
+
+                var encodedQuery = Uri.EscapeDataString(query);
+
+                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve&query=title%20any%20%22{encodedQuery}%22&recordSchema=dcndl&maximumRecords=10";
+
+                using var response = await _httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    _logger.LogInformation("Response XML: {ResponseBody}", responseBody);
+
+                    var xdoc = XDocument.Parse(responseBody);
+
+                    try
+                    {
+                        var ns = XNamespace.Get("http://ndl.go.jp/dcndl/terms/");
+                        var dcTermsNs = XNamespace.Get("http://purl.org/dc/terms/");
+
+                        var titles = xdoc.Descendants(ns + "BibResource")
+                            .Elements(dcTermsNs + "title")
+                            .Select(e => e.Value)
+                            .ToList();
+
+                        _logger.LogInformation("Titles: {@Titles}", titles);
+
+                        return Ok(titles);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred while parsing the XML response.");
+                        return StatusCode(500, "An error occurred while parsing the XML response.");
+                    }
+
+                }
+                else
+                {
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    _logger.LogError("Error occurred while fetching data from API. Status code: {StatusCode}, Error body: {ErrorBody}", response.StatusCode, errorBody);
+                    return StatusCode((int)response.StatusCode, "An error occurred while fetching data from the API.");
+                }
+
+            }
+            catch (Exception ex)
+
+            {
+                _logger.LogError(ex, "An error occurred while processing the request.");
+                return StatusCode(500, "An internal server error occurred.");
+            }
+
+        }
+        */
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchTitles(string title)
+        {
+            try
+            {
+                var encodedTitle = Uri.EscapeDataString(title);
+                var encodedNdc = 726.1;
+                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/opensearch?title={encodedTitle}&ndc={encodedNdc}&cnt=30";
+
+                using var client = new HttpClient();
+                var response = await client.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var xml = await response.Content.ReadAsStringAsync();
+                    var doc = XDocument.Parse(xml);
+                    var nsm = new XmlNamespaceManager(new NameTable());
+                    nsm.AddNamespace("dc", "http://purl.org/dc/elements/1.1/");
+
+                    var titles = doc.XPathSelectElements("//item/title", nsm)
+                        .Select(e => e.Value)
+                        .ToList();
+
+                    return Ok(titles);
+                }
+                else
+                {
+                    return StatusCode((int)response.StatusCode, "An error occurred while fetching data from the API.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing the request.");
+                return StatusCode(500, "An internal server error occurred.");
+            }
+        }
 
         private bool SellExists(int id)
         {

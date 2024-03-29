@@ -48,6 +48,8 @@ builder.Services.AddDefaultIdentity<UserAccount>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddErrorDescriber<IdentityErrorDescriberJP>();
 
+builder.Services.AddHttpClient();
+
 
 /*
 builder.Services.AddIdentityApiEndpoints<UserAccount>()
