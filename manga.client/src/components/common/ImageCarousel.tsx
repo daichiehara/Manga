@@ -16,7 +16,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title }) => {
     const swiperRef = useRef<SwiperClass>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    const handleSlideChange = (swiper) => {
+    const handleSlideChange = (swiper: SwiperClass) => {
         setCurrentSlide(swiper.realIndex);
     };
 
@@ -41,7 +41,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title }) => {
             spaceBetween={10}
             slidesPerView={1}
             onSlideChange={handleSlideChange}
-            onSwiper={(swiper) => { swiperRef.current = swiper; }}
+            onSwiper={(swiper) => {swiperRef.current = swiper;}}
         >
             {imageUrls.map((url, index) => (
             <SwiperSlide key={index}style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>

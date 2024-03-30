@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Chip } from '@mui/material';
 import { Link } from 'react-router-dom';
+import WishListDisplay from './WishListDisplay';
 /*
 interface MangaListItemProps {
   imageUrl: string;
@@ -100,9 +101,11 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
               欲しい
             </span>
             </Typography>
-            {wishTitles.map((item, index) => (
-              <Chip key={index} label={item.title} sx={{ mb: 0.5 }} />
-            ))}
+            
+              {wishTitles && (
+                <WishListDisplay wishTitles={wishTitles} />
+              )}
+            
           </div>
         </CardContent>
       </Card>
