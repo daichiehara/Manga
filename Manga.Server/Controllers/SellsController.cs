@@ -347,9 +347,11 @@ namespace Manga.Server.Controllers
         {
             try
             {
-                var encodedTitle = Uri.EscapeDataString(title);
+                //var encodedTitle = Uri.EscapeDataString(title);
                 var encodedNdc = 726.1;
-                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/opensearch?title={encodedTitle}&ndc={encodedNdc}&cnt=30";
+                var dpid = "iss-ndl-opac";
+                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/opensearch?dpid={dpid}&title={title}&any={title}&ndc={encodedNdc}&cnt=500";
+
 
                 using var client = new HttpClient();
                 var response = await client.GetAsync(apiUrl);
@@ -361,11 +363,15 @@ namespace Manga.Server.Controllers
                     var nsm = new XmlNamespaceManager(new NameTable());
                     nsm.AddNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
-                    var titles = doc.XPathSelectElements("//item/title", nsm)
-                        .Select(e => e.Value)
+                    var titleCounts = doc.XPathSelectElements("//item/title", nsm)
+                        .Select(e => NormalizeTitle(e.Value.TrimEnd('.')))
+                        .OrderBy(t => t.Length)
+                        .GroupBy(t => t, StringComparer.OrdinalIgnoreCase)
+                        .Select(g => new { Title = g.OrderByDescending(t => t).First(), Count = g.Count() })
+                        .OrderByDescending(x => x.Count)
                         .ToList();
 
-                    return Ok(titles);
+                    return Ok(titleCounts);
                 }
                 else
                 {
@@ -377,6 +383,11 @@ namespace Manga.Server.Controllers
                 _logger.LogError(ex, "An error occurred while processing the request.");
                 return StatusCode(500, "An internal server error occurred.");
             }
+        }
+
+        private string NormalizeTitle(string title)
+        {
+            return title.Replace("★", "・").Replace("☆", "・");
         }
 
         private bool SellExists(int id)
