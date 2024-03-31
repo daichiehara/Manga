@@ -113,6 +113,7 @@ namespace Manga.Server.Controllers
             return sell;
         }
         */
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<SellDetailsDto>> GetSellDetails(int id)
         {
@@ -156,6 +157,21 @@ namespace Manga.Server.Controllers
                 })
                 .ToList();
 
+            var replies = await _context.Reply
+                .Where(r => r.SellId == id)
+                .OrderByDescending(r => r.Created) // 最新の返信から
+                .Take(3) // 上位3件のみ
+                .Select(r => new ReplyDto
+                {
+                    ReplyId = r.ReplyId,
+                    NickName = r.UserAccount.NickName,
+                    ProfileIcon = r.UserAccount.ProfileIcon,
+                    Message = r.Message,
+                    Created = r.Created,
+                    IsCurrentUser = r.UserAccountId == userId
+                })
+                .ToListAsync();
+
             var dto = new SellDetailsDto
             {
                 SellId = sell.SellId,
@@ -170,11 +186,13 @@ namespace Manga.Server.Controllers
                 ProfileIcon = sell.UserAccount.ProfileIcon,
                 HasIdVerificationImage = !string.IsNullOrEmpty(sell.UserAccount.IdVerificationImage),
                 ImageUrls = sell.SellImages.OrderBy(si => si.Order).Select(si => si.ImageUrl).ToList(),
-                WishTitles = wishTitles
+                WishTitles = wishTitles,
+                Replies = replies
             };
 
             return dto;
         }
+        
 
 
         // PUT: api/Sells/5

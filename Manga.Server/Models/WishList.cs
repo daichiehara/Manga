@@ -6,6 +6,7 @@ namespace Manga.Server.Models
     {
         public int WishListId { get; set; }
 
+        [Required(ErrorMessage = "タイトルを選択してください。")]
         [Display(Name = "作品タイトル")]
         public string Title { get; set; }
 
