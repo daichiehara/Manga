@@ -10,9 +10,11 @@ import Typography from '@mui/material/Typography';
 interface ImageCarouselProps {
     imageUrls: string[];
     title: string;
+    onImageClick: (index: number) => void;
+    
 }
 
-const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title }) => {
+const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title, onImageClick }) => {
     const swiperRef = useRef<SwiperClass>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -44,7 +46,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title }) => {
             onSwiper={(swiper) => {swiperRef.current = swiper;}}
         >
             {imageUrls.map((url, index) => (
-            <SwiperSlide key={index}style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <SwiperSlide key={index}style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }} onClick={() => onImageClick(index)}>
                 <img src={url} alt={`${title} Volume ${index + 1}`} style={{ maxWidth: '100%', maxHeight: '100%', height: '30rem', objectFit: 'contain', background: '#f5f5f5'}} />
                 
             </SwiperSlide>

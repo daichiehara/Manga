@@ -11,6 +11,7 @@ import ActionButton from '../components/common/ActionButton';
 import LoadingComponent from '../components/common/LoadingComponent';
 import ErrorDisplay from '../components/common/ErrorDisplay';
 import SellerInfo from '../components/common/SellerInfo';
+import ImageModal from '../components/common/ImageModal';
 
 /**
  * MangaDetail コンポーネント
@@ -41,14 +42,23 @@ interface MangaDetail {
 const MangaDetail = () => {
   const { sellId } = useParams();
   const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
 
   const handleBack = () => {
     navigate(-1); // 前のページに戻る
   };
-
   console.log(sellId);
+
+  const handleImageClick = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   const handleExchangeRequest = () => {
     // Implementation of the exchange request logic
@@ -87,8 +97,18 @@ const MangaDetail = () => {
       <BackButton handleBack={handleBack} />
       <Box sx={{ flexGrow: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', minHeight: '100vh', pb: 10 }}>
         <Grid container spacing={0} style={{ padding: 0, margin:0, marginBottom: 0}}>
-          {/* Image Carousel Integration */}
-          <ImageCarousel imageUrls={mangaDetail.imageUrls} title={mangaDetail.title} />
+            {/* Image Carousel Integration */}
+            <ImageCarousel 
+              imageUrls={mangaDetail.imageUrls} 
+              title={mangaDetail.title}
+              onImageClick={handleImageClick}
+            />
+            <ImageModal
+              isOpen={isModalOpen}
+              images={mangaDetail.imageUrls}
+              currentIndex={currentImageIndex}
+              onClose={handleCloseModal}
+            />
 
           <Grid item xs={12} md={6}style={{ padding: 0, margin:0 }}>
 
