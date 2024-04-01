@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import TabsComponent from '../components/common/TabsComponent';
-import NavigationBar from '../components/navigation/NavigationBar';
+
 import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
+import MenuBar from '../components/menu/MenuBar';
 
 interface MainSearch {
   sellId: number;
@@ -50,8 +51,9 @@ const MainSearch: React.FC = () => {
   return (
     <>
       <Header onSearch={handleSearch} />
+      <div style={{ marginTop: 120,/* Tabsの高さに合わせて調整 */ paddingBottom:'6rem'}}>
       <TabsComponent selectedTab={selectedTab} onTabChange={handleTabChange} />
-      <div style={{ marginTop: 120/* Tabsの高さに合わせて調整 */ }}></div>
+      
       {/* メインコンテンツ */}
       {selectedTab === 0 && (
         mangaData.map((item, index) => (
@@ -69,7 +71,8 @@ const MainSearch: React.FC = () => {
         // "MyList" タブのコンテンツ
         <div>MyList content goes here...</div>
       )}
-      <NavigationBar />
+      </div>
+      <MenuBar />
     </>
   );
 };

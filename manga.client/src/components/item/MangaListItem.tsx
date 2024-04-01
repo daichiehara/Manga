@@ -84,7 +84,7 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
           />
         </div>
         <CardContent sx={{ 
-          pl:1.3, pt:3,
+          pl:1.3, pt:3, 
           width: '55%',  // 右側のテキスト領域を55%に設定
           height: `auto`,
           display: 'flex', 
