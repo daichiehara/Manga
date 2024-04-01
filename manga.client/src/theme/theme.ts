@@ -18,6 +18,9 @@ const theme = createTheme({
       // 他の背景色も必要に応じて設定可能です（例：paper: '#ffffff'）
     }
   },
+  typography: {
+    fontFamily: 'Yu Gothic, "YuGothic", "游ゴシック体", "游ゴシック Medium", "游ゴシック", sans-serif',
+  },
 
 });
 

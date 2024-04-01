@@ -23,7 +23,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title, onImage
     };
 
     return (
-      <div style={{ display: 'flex', justifyContent: 'center',  padding: 0, margin:0, marginBottom: 0, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'center',  padding: 0, margin:0, marginBottom: 0, overflow: 'hidden', backgroundColor:`#F2F2F2`}}>
         {/* カスタムナビゲーションボタン */}
         <IconButton
           sx={{ position: 'absolute', top: '28%', left: 0, zIndex: 1000, transform: 'translateY(-50%)', backgroundColor: 'rgba(0, 0, 0, 0.2)', // 透明度を調整

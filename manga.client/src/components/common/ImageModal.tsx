@@ -14,6 +14,7 @@ interface ImageModalProps {
   onClose: () => void;
 }
 
+
 const ImageModal: React.FC<ImageModalProps> = ({ isOpen, images, currentIndex, onClose }) => {
   const [swiperRef, setSwiperRef] = useState<SwiperClass | null>(null);
 
@@ -40,10 +41,13 @@ const ImageModal: React.FC<ImageModalProps> = ({ isOpen, images, currentIndex, o
           onSwiper={setSwiperRef}
           onSlideChange={handleSlideChange}
           style={{ width: '100%', height: '100%' }}
+          zoom={true}
         >
           {images.map((url, index) => (
             <SwiperSlide key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <img src={url} alt={`Image ${index}`} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              <div className="swiper-zoom-container">
+                <img src={url} alt={`Image ${index}`} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              </div>
             </SwiperSlide>
           ))}
         </Swiper>

@@ -120,14 +120,14 @@ const MangaDetail = () => {
             />
 
             <Paper elevation={0} sx={{ pt: 0.5, pb: 1, pl: 3.5, pr: 3.5, border: 'none' }}>
-              <Typography variant="body1" gutterBottom sx={{pt:1.5, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
+              <Typography variant="body1" gutterBottom sx={{pt:1.5, pb:1, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
                 この人が欲しい漫画
               </Typography>
               {mangaDetail && (
                 <WishListDisplay wishTitles={mangaDetail.wishTitles} />
               )}
 
-              <Typography variant="body1" gutterBottom sx={{pt:1.5, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
+              <Typography variant="body1" gutterBottom sx={{mt:1, pt:1.5, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
                 {`出品物の説明`}
               </Typography>
               <Typography variant="body1" sx={{ mt: 2 }}>

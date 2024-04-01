@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardMedia, CardContent, Typography, Chip } from '@mui/material';
+import { Card, CardMedia, CardContent, Typography, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 import WishListDisplay from './WishListDisplay';
 /*
@@ -63,6 +63,7 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
           boxShadow: 'none' // カードの影を無くす（オプション）
         }}
       >
+        
         <div style={{
           width: '45%',  // 左側の画像の領域を45%に設定
           height: '100%',
@@ -83,30 +84,37 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
           />
         </div>
         <CardContent sx={{ 
+          pl:1.3, pt:3,
           width: '55%',  // 右側のテキスト領域を55%に設定
+          height: `auto`,
           display: 'flex', 
           flexDirection: 'column',
-          justifyContent: 'flex-start' // コンテンツを上寄せにする
+          justifyContent: 'flex-start', // コンテンツを上寄せにする
+          overflow: 'auto'
         }}>
-          <Typography component="div" variant="subtitle2">
-            {sellTitle}
-            {' '}全巻{' '}
-            <span style={{ fontSize: 'smaller' }}>
-              ({numberOfBooks}巻)
-            </span>
+          
+          <Grid container spacing={0} alignItems="center" sx={{}}>
+              <Typography variant="body1" gutterBottom sx={{ fontWeight: 548 }}>
+                {sellTitle}
+              </Typography>
+              <Typography variant="body1" gutterBottom sx={{pl:2, color: '#E97132', fontWeight: 'bold' }}>
+                全巻
+              </Typography>
+          </Grid>
+          <Typography variant="body1" gutterBottom sx={{pl:0.5, color: '#757575'}}>
+            {numberOfBooks}巻
           </Typography>
-          <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
-            <Typography variant="subtitle1" component="div">
-            <span style={{ fontWeight: "bold", color: "#49AFFE" }}>
-              欲しい
-            </span>
+
+          
+            <Typography variant="subtitle1" component="div" gutterBottom sx={{pl:0.5, color: "#49AFFE"}}>
+              相手の欲しい漫画リスト
             </Typography>
             
               {wishTitles && (
                 <WishListDisplay wishTitles={wishTitles} />
               )}
             
-          </div>
+          
         </CardContent>
       </Card>
     </Link>
