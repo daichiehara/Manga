@@ -12,6 +12,8 @@ import LoadingComponent from '../components/common/LoadingComponent';
 import ErrorDisplay from '../components/common/ErrorDisplay';
 import SellerInfo from '../components/common/SellerInfo';
 import ImageModal from '../components/common/ImageModal';
+import RecentCommentsDisplay from '../components/item/RecentCommentsDisplay'; 
+import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply インターフェイスのインポート
 
 /**
  * MangaDetail コンポーネント
@@ -37,6 +39,7 @@ interface MangaDetail {
     sendPrefecture: string;
     sendDay: string;
     hasIdVerificationImage: boolean;
+    replies: Reply[]; 
   }  
 
 const MangaDetail = () => {
@@ -119,7 +122,7 @@ const MangaDetail = () => {
               sellTime={mangaDetail.sellTime}
             />
 
-            <Paper elevation={0} sx={{ pt: 0.5, pb: 1, pl: 3.5, pr: 3.5, border: 'none' }}>
+            <Paper elevation={0} sx={{ pt: 0.5, pb: 1, pl: 2.0, pr: 2.0, border: 'none' }}>
               <Typography variant="body1" gutterBottom sx={{pt:1.5, pb:1, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
                 この人が欲しい漫画
               </Typography>
@@ -152,6 +155,10 @@ const MangaDetail = () => {
                 userName={mangaDetail.userName} 
                 hasIdVerificationImage={mangaDetail.hasIdVerificationImage} 
               />
+
+              {/* Add the Recent Comments section */}
+              {mangaDetail.replies && <RecentCommentsDisplay replies={mangaDetail.replies} />}
+
             </Paper>
           </Grid>
         </Grid>

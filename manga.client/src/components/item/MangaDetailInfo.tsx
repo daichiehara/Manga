@@ -14,7 +14,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({ title, numberOfBooks,
   const formattedSellTime = dayjs(sellTime).format('YYYY年MM月DD日');
 
   return (
-    <Paper elevation={0} sx={{ pt: 2.3, pb: 1, pl: 3.5, pr: 1, border: 'none' }}>
+    <Paper elevation={0} sx={{ pt: 1, pb: 1, pl: 2.0, pr: 1, border: 'none' }}>
       <Grid container spacing={0} alignItems="center" sx={{pt:1}}>
         
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 548 }}>
@@ -35,13 +35,12 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({ title, numberOfBooks,
           <Typography variant="body1" sx={{ color: 'black', fontWeight: 548 }}>
             巻
           </Typography>
-        </Grid>
-        
+        </Grid>   
       </Grid>
-      <Typography variant="h6" sx={{ pt: 2, pb: 1, color: '#156082', fontWeight: 548, fontSize: '1.0rem' }}>
-            {bookState}
-          </Typography>
-      <Typography variant="h6" gutterBottom sx={{ pt: 2, pb: 2, color: '#757575' }}>
+      <Typography variant="subtitle1" sx={{ pt: 2, pb: 0.5, color: '#156082'}}>
+        {bookState}
+      </Typography>
+      <Typography variant="subtitle1" gutterBottom sx={{ pt: 0.5, pb: 2, color: '#757575' }}>
         {`${formattedSellTime}に出品`}
       </Typography>
     </Paper>
