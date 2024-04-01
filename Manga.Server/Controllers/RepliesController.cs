@@ -48,11 +48,11 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<ReplyDto>>> GetRepliesForSell(int sellId)
+        public async Task<ActionResult<IEnumerable<ReplyDto>>> GetRepliesForSell(int id)
         {
             var userId = _userManager.GetUserId(User);
             var replies = await _context.Reply
-                .Where(r => r.SellId == sellId)
+                .Where(r => r.SellId == id)
                 .OrderByDescending(r => r.Created)
                 .Select(r => new ReplyDto
                 {
