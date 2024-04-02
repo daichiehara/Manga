@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import TabsComponent from '../components/common/TabsComponent';
-
 import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
