@@ -10,7 +10,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme/theme';
 import MainNotification from './pages/MainNotification';
 import MainMyBook from './pages/MainMyBook';
-import MainSell from './pages/MSell';
+import MainSell from './pages/MSell.tsx';
 import MainMyPage from './pages/MainMyPage';
 
 const App: React.FC = () => {
