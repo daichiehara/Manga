@@ -31,7 +31,7 @@ const MainSearch: React.FC = () => {
         console.log('取得したデータ:', data);
         setMangaData(data);
       } catch (error) {
-        console.error('データの取得に失敗しました:', error);
+        console.error('データ取得に失敗しました:', error);
       }
     };
 
