@@ -9,7 +9,7 @@ const MainMyPage: React.FC = () => {
   const handleLogin = () => {
     // ここでログイン処理を行い、成功したらリダイレクト
     // 例: navigate('/dashboard');
-    navigate('/destinationPage'); // ここにリダイレクト先のパスを指定
+    navigate('/login-page'); // ここにリダイレクト先のパスを指定
   };
 
   

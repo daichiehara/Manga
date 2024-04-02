@@ -12,6 +12,7 @@ import MainNotification from './pages/MainNotification';
 import MainMyBook from './pages/MainMyBook';
 import MainSell from './pages/MSell';
 import MainMyPage from './pages/MainMyPage';
+import LoginPage from './pages/LoginPage';
 
 const App: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const App: React.FC = () => {
           <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
           <Route path="/main-sell" element={<MainSell />} /> {/* マイ本棚のルート */}
           <Route path="/main-page" element={<MainMyPage />} /> {/* マイページのルート */}
+          <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
           {/* 他のルートをここに追加 */}
         </Routes>
       </Router>
