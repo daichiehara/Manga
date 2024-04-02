@@ -98,6 +98,45 @@ namespace Manga.Server.Controllers
 
             return homeDtos;
         }
+
+        [HttpGet("SearchByTitle")]
+        public async Task<ActionResult<List<HomeDto>>> SearchSellsByTitleAsync([FromQuery] string title)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // 現在のユーザーのownedTitlesのリストを取得
+            var ownedTitles = await _context.OwnedList
+                                            .Where(o => o.UserAccountId == userId)
+                                            .Select(o => o.Title)
+                                            .ToListAsync();
+
+            // タイトルで直接一致、またはownedTitlesに含まれるSellのレコードを取得
+            var sells = await _context.Sell
+                                      .Include(s => s.SellImages)
+                                      .Where(s => s.Title.Contains(title) || ownedTitles.Contains(s.Title))
+                                      .OrderByDescending(s => s.SellTime) // 投稿日時の新しい順にソート
+                                      .ToListAsync();
+
+            // sellsに基づいてHomeDtoのリストを作成
+            var homeDtos = sells.Select(sell => new HomeDto
+            {
+                SellId = sell.SellId,
+                SellTitle = sell.Title,
+                NumberOfBooks = sell.NumberOfBooks,
+                WishTitles = _context.WishList
+                                     .Where(w => w.UserAccountId == sell.UserAccountId && ownedTitles.Contains(w.Title))
+                                     .Select(w => new WishTitleInfo
+                                     {
+                                         Title = w.Title,
+                                         IsOwned = ownedTitles.Contains(w.Title)
+                                     })
+                                     .ToList(),
+                SellImage = sell.SellImages.OrderBy(si => si.Order).FirstOrDefault()?.ImageUrl
+            }).ToList();
+
+            return homeDtos;
+        }
+
         /*
         // GET: api/Sells/5
         [HttpGet("{id}")]
@@ -113,7 +152,7 @@ namespace Manga.Server.Controllers
             return sell;
         }
         */
-        
+
         [HttpGet("{id}")]
         public async Task<ActionResult<SellDetailsDto>> GetSellDetails(int id)
         {
@@ -168,9 +207,12 @@ namespace Manga.Server.Controllers
                     ProfileIcon = r.UserAccount.ProfileIcon,
                     Message = r.Message,
                     Created = r.Created,
-                    IsCurrentUser = r.UserAccountId == userId
                 })
                 .ToListAsync();
+
+            var replyCount = await _context.Reply
+                .Where(r => r.SellId == id)
+                .CountAsync();
 
             var dto = new SellDetailsDto
             {
@@ -187,7 +229,8 @@ namespace Manga.Server.Controllers
                 HasIdVerificationImage = !string.IsNullOrEmpty(sell.UserAccount.IdVerificationImage),
                 ImageUrls = sell.SellImages.OrderBy(si => si.Order).Select(si => si.ImageUrl).ToList(),
                 WishTitles = wishTitles,
-                Replies = replies
+                Replies = replies,
+                ReplyCount = replyCount,
             };
 
             return dto;

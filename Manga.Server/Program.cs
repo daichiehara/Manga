@@ -35,8 +35,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-
+/*
 builder.Services.AddDefaultIdentity<UserAccount>(options =>
+{
+    // パスワードの複雑さ要件
+    options.Password.RequireDigit = true; // 数字が少なくとも1つ含まれている必要がある
+    options.Password.RequiredLength = 6; // パスワードの最小長
+    options.Password.RequireNonAlphanumeric = false;
+    options.User.RequireUniqueEmail = true; // ユーザーのメールアドレスが一意であること
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddErrorDescriber<IdentityErrorDescriberJP>();
+*/
+
+builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 {
     // パスワードの複雑さ要件
     options.Password.RequireDigit = true; // 数字が少なくとも1つ含まれている必要がある

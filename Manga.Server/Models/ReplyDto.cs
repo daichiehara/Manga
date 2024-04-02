@@ -18,6 +18,6 @@ namespace Manga.Server.Models
         [Display(Name = "プロフィールアイコン")]
         public string? ProfileIcon { get; set; }
 
-        public bool IsCurrentUser { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

@@ -16,6 +16,8 @@ namespace Manga.Server.Models
         [Display(Name = "投稿日時")]
         public DateTime Created { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public string UserAccountId { get; set; }
         public virtual UserAccount UserAccount { get; set; }
         public int SellId { get; set; }
