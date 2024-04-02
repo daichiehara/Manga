@@ -5,10 +5,13 @@ import MenuBar from '../components/menu/MenuBar';
 import Header from '../components/common/Header';
 
 const MSell: React.FC = () => {
+  const handleSearch = (query: string) => {
+    console.log(query); // ここで検索処理を実装します。今はコンソールに表示するだけです。
+  };
 
   return (
     <>
-      <Header  />
+      <Header onSearch={handleSearch} />
       
       {/* メインコンテンツエリア */}
       {/* 見出し */}
