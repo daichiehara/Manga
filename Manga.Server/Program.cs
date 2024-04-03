@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -64,6 +65,12 @@ builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddErrorDescriber<IdentityErrorDescriberJP>();
 
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddConsole();
+    // 他のロギングプロバイダーを追加することもできます
+});
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme =
@@ -84,7 +91,10 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
     };
+    options.EventsType = typeof(CustomJwtBearerEvents);
 });
+
+builder.Services.AddTransient<CustomJwtBearerEvents>();
 
 builder.Services.AddHttpClient();
 

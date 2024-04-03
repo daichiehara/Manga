@@ -62,12 +62,20 @@ namespace Manga.Server.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                return Unauthorized(new { message = "Invalid email or password" });
+                var errorResponse = new
+                {
+                    errors = new Dictionary<string, string[]>
+                    {
+                        { "Message", new[] { "メールアドレスもしくはパスワードが間違っています。" } }
+                    }
+                };
+                return Unauthorized(errorResponse);
             }
 
             var token = GenerateJwtToken(user);
             return Ok(new { Token = token });
         }
+
 
         private string GenerateJwtToken(UserAccount user)
         {
