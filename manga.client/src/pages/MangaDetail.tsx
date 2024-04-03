@@ -163,7 +163,9 @@ const MangaDetail = () => {
           </Grid>
         </Grid>
       </Box>
+      <Box sx={{ px: 2, py:2, position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: '0px 8px 12px 10px rgba(0, 0, 0, 0.25)' }}>
       <ActionButton label="交換を希望する" onClick={handleExchangeRequest} />
+      </Box>
     </Box>
   );
 };
