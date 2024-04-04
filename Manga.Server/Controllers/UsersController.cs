@@ -154,14 +154,17 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpPost("RefreshToken")]
-        public async Task<IActionResult> RefreshToken([FromBody] JwtDto request)
+        public async Task<IActionResult> RefreshToken()
         {
+            // HTTPリクエストのCookieからリフレッシュトークンを取得
+            var accessToken = Request.Cookies["AccessToken"];
+            var refreshToken = Request.Cookies["RefreshToken"];
             // リフレッシュトークンの検証
-            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
+            var principal = GetPrincipalFromExpiredToken(accessToken);
             var username = principal.Identity.Name; // アクセストークンからユーザー名を取得
             var user = await _userManager.FindByNameAsync(username);
 
-            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 return BadRequest("Invalid client request");
             }
@@ -244,7 +247,7 @@ namespace Manga.Server.Controllers
         [Authorize]
         public IActionResult Protected()
         {
-            return Ok("Succese!");
+            return Ok("Success!");
         }
     }
 }
