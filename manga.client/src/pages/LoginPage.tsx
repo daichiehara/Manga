@@ -8,8 +8,14 @@ type LoginFormInputs = {
   password: string;
 };
 
+type ApiErrors = {
+    email?: string;
+    password?: string;
+    message?: string; // Add this line
+  };
+
 const Login: React.FC = () => {
-  const [apiErrors, setApiErrors] = useState<{ email?: string, password?: string }>({});
+  const [apiErrors, setApiErrors] = useState<ApiErrors>({}); 
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(false);
   const { register, handleSubmit } = useForm<LoginFormInputs>();
 
@@ -30,13 +36,24 @@ const Login: React.FC = () => {
     .catch(error => {
       setIsLoginSuccessful(false);
       if (error.response && error.response.data && error.response.data.errors) {
-        let newErrors = {};
-        if (error.response.data.errors.Email) {
-          newErrors = { ...newErrors, email: error.response.data.errors.Email[0] };
+        const errors = error.response.data.errors;
+        let newErrors: ApiErrors = {};
+      
+        // Email error
+        if (errors.Email) {
+          newErrors.email = errors.Email[0];
         }
-        if (error.response.data.errors.Password) {
-          newErrors = { ...newErrors, password: error.response.data.errors.Password[0] };
+      
+        // Password error
+        if (errors.Password) {
+          newErrors.password = errors.Password[0];
         }
+      
+        // General message error
+        if (errors.Message) {
+          newErrors.message = errors.Message[0];
+        }
+      
         setApiErrors(newErrors);
       }
     });
@@ -44,7 +61,7 @@ const Login: React.FC = () => {
 
   return (
     <Box sx={{p:3, boxShadow:"none", border:'none'}}>
-      <Typography variant="h5">Login</Typography>
+      <Typography variant="h5">ログイン</Typography>
       {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
@@ -66,7 +83,8 @@ const Login: React.FC = () => {
           error={!!apiErrors.password}
           helperText={apiErrors.password}
         />
-       
+        <Typography 
+            variant="subtitle2">{apiErrors.message}</Typography>
 
         <Button type="submit" variant="contained" color="primary" fullWidth sx={{my:1, background: 'linear-gradient(to right, #FCCF31, #F55555)'}}>
           Login
