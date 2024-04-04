@@ -25,6 +25,7 @@ const Login: React.FC = () => {
     axios.post('http://localhost:5227/api/Users/Login', {
       Email: data.email,
       Password: data.password
+
     }, {
       headers: {
         'Content-Type': 'application/json'
@@ -34,35 +35,38 @@ const Login: React.FC = () => {
       setIsLoginSuccessful(true);
     })
     .catch(error => {
-      setIsLoginSuccessful(false);
-      if (error.response && error.response.data && error.response.data.errors) {
-        const errors = error.response.data.errors;
-        let newErrors: ApiErrors = {};
+        setIsLoginSuccessful(false);
+        if (error.response && error.response.data) {
+          let newErrors: ApiErrors = {};
       
-        // Email error
-        if (errors.Email) {
-          newErrors.email = errors.Email[0];
+          // Handle field-specific errors
+          const fieldErrors = error.response.data.errors;
+          if (fieldErrors) {
+            if (fieldErrors.Email) {
+              newErrors.email = fieldErrors.Email[0];
+            }
+            if (fieldErrors.Password) {
+              newErrors.password = fieldErrors.Password[0];
+            }
+          }
+      
+          // Handle general message error
+          const messageError = error.response.data.messageerrors;
+          if (messageError && messageError.Message) {
+            newErrors.message = messageError.Message[0];
+          }
+      
+          console.log('API Errors:', newErrors);
+          setApiErrors(newErrors);
         }
-      
-        // Password error
-        if (errors.Password) {
-          newErrors.password = errors.Password[0];
-        }
-      
-        // General message error
-        if (errors.Message) {
-          newErrors.message = errors.Message[0];
-        }
-      
-        setApiErrors(newErrors);
-      }
-    });
+      });
   };
 
   return (
     <Box sx={{p:3, boxShadow:"none", border:'none'}}>
       <Typography variant="h5">ログイン</Typography>
       {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
+      {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
           label="メールアドレス"
@@ -84,7 +88,9 @@ const Login: React.FC = () => {
           helperText={apiErrors.password}
         />
         <Typography 
-            variant="subtitle2">{apiErrors.message}</Typography>
+            variant="subtitle2">
+
+                {apiErrors.message}</Typography>
 
         <Button type="submit" variant="contained" color="primary" fullWidth sx={{my:1, background: 'linear-gradient(to right, #FCCF31, #F55555)'}}>
           Login
