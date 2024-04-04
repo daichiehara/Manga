@@ -117,7 +117,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
     };
     options.EventsType = typeof(CustomJwtBearerEvents);
 });

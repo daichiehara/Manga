@@ -1,4 +1,5 @@
-﻿using Manga.Server.Models;
+﻿using Azure.Core;
+using Manga.Server.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -72,8 +73,6 @@ namespace Manga.Server.Controllers
                     }
                 };
                 return Unauthorized(errorResponse);
-                
-                //return Unauthorized(new { error = "メールアドレスもしくはパスワードが間違っています。" });
             }
 
             var token = GenerateJwtToken(user);
@@ -83,6 +82,12 @@ namespace Manga.Server.Controllers
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30);
             // データベースに変更を保存
             await _userManager.UpdateAsync(user);
+
+            // アクセストークンをHTTP Only Cookieにセット
+            SetTokenCookie("AccessToken", token, 30); // 15分間有効
+
+            // リフレッシュトークンを別のHTTP Only Cookieにセット
+            SetTokenCookie("RefreshToken", refreshToken, 1440); // 1日間有効
 
             return Ok(new { AccessToken = token, RefreshToken = refreshToken });
         }
@@ -121,11 +126,125 @@ namespace Manga.Server.Controllers
             }
         }
 
+        /*
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] JwtDto request)
+        {
+            // リフレッシュトークンの検証
+            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
+            var username = principal.Identity.Name; // アクセストークンからユーザー名を取得
+            var user = await _userManager.FindByNameAsync(username);
+
+            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return BadRequest("Invalid client request");
+            }
+
+            var newAccessToken = GenerateJwtToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            await _userManager.UpdateAsync(user);
+
+            return new ObjectResult(new
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            });
+        }
+        */
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] JwtDto request)
+        {
+            // リフレッシュトークンの検証
+            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
+            var username = principal.Identity.Name; // アクセストークンからユーザー名を取得
+            var user = await _userManager.FindByNameAsync(username);
+
+            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return BadRequest("Invalid client request");
+            }
+
+            // 新しいアクセストークンとリフレッシュトークンを生成
+            var newAccessToken = GenerateJwtToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+
+            // トークン更新処理
+            user.RefreshToken = newRefreshToken;
+            await _userManager.UpdateAsync(user);
+
+            // アクセストークンをHTTP Only Cookieに設定
+            var accessTokenCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                //Secure = true,
+                //SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddMinutes(15) // アクセストークンの有効期限
+            };
+            Response.Cookies.Append("AccessToken", newAccessToken, accessTokenCookieOptions);
+
+            // リフレッシュトークンを別のHTTP Only Cookieに設定
+            var refreshTokenCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
+                Expires = DateTime.UtcNow.AddDays(30) // リフレッシュトークンの有効期限
+            };
+            Response.Cookies.Append("RefreshToken", newRefreshToken, refreshTokenCookieOptions);
+
+            // トークンが正常に更新されたことをクライアントに通知
+            return Ok(new { message = "トークンが正常に更新されました。" });
+        }
+
+
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false, // アクセストークン失効時はオーディエンスの検証をスキップ
+                ValidateIssuer = false, // アクセストークン失効時は発行者の検証をスキップ
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SigningKey"])),
+                ValidateLifetime = false // アクセストークンが失効していてもOK
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public void SetTokenCookie(string key, string token, int expireMinutes)
+        {
+            // Cookieオプションの設定
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, // JavaScriptからのアクセスを禁止
+                Expires = DateTime.UtcNow.AddMinutes(expireMinutes), // 有効期限の設定
+                //Secure = true, // HTTPSを通じてのみCookieを送信
+                SameSite = SameSiteMode.None // SameSite属性の設定
+                //SameSite = SameSiteMode.Strict, // または None + Secure, クロスオリジンの場合
+            };
+
+            // Cookieにトークンを保存
+            Response.Cookies.Append(key, token, cookieOptions);
+        }
+
+
         [HttpGet("protected")]
         [Authorize]
         public IActionResult Protected()
         {
-            return Ok();
+            return Ok("Succese!");
         }
     }
 }
