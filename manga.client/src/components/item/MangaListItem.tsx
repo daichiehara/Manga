@@ -2,43 +2,6 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 import WishListDisplay from './WishListDisplay';
-/*
-interface MangaListItemProps {
-  imageUrl: string;
-  title: string;
-  numberOfBooks?: number;
-  sellList: string[];
-  wantList: string[];
-}
-
-const MangaListItem: React.FC<MangaListItemProps> = ({ imageUrl, title, numberOfBooks, wantList }) => {
-  return (
-    <Card sx={{ display: 'flex', margin: 2, alignItems: 'center', padding: 1 }}>
-      <CardMedia
-        component="img"
-        sx={{ width: 151, height: 151 }}
-        image={imageUrl}
-        alt={`Cover of ${title}`}
-      />
-      <CardContent sx={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column' }}>
-        <Typography component="div" variant="h5">
-          {title} 全巻 {numberOfBooks}巻
-        </Typography>
-        <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
-          <Typography variant="subtitle1" color="text.secondary" component="div">
-            欲しい
-          </Typography>
-          {wantList.map((item, index) => (
-            <Chip key={index} label={item} sx={{ mb: 0.5 }} />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-export default MangaListItem;
-*/
 
 interface MangaListItemProps {
   sellId: number;
@@ -55,7 +18,7 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
         sx={{ 
           display: 'flex', 
           margin: 0.5, 
-          height: '180px', 
+          height: '13rem', 
           alignItems: 'center', 
           padding: 1,
           border: '0.05px solid rgba(0, 0, 0, 0.1)',// ここで境界線を追加し、薄い灰色に設定
@@ -84,12 +47,12 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
           />
         </div>
         <CardContent sx={{ 
-          pl:1.3, pt:3, 
+          pl:1.3, pt:4, 
           width: '55%',  // 右側のテキスト領域を55%に設定
           height: `auto`,
           display: 'flex', 
           flexDirection: 'column',
-          justifyContent: 'flex-start', // コンテンツを上寄せにする
+          justifyContent: 'center', 
           overflow: 'auto'
         }}>
           
@@ -106,7 +69,7 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
           </Typography>
 
           
-            <Typography variant="subtitle1" component="div" gutterBottom sx={{pl:0.5, color: "#49AFFE"}}>
+            <Typography variant="subtitle1" component="div" gutterBottom sx={{pl:0.5, color: "#49AFFE",}}>
               相手の欲しい漫画リスト
             </Typography>
             
