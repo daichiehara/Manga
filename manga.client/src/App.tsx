@@ -10,25 +10,31 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme/theme';
 import MainNotification from './pages/MainNotification';
 import MainMyBook from './pages/MainMyBook';
-import MainSell from './pages/MSell.tsx';
+import MSell from './pages/MSell.tsx';
 import MainMyPage from './pages/MainMyPage';
 import LoginPage from './pages/LoginPage';
+import { AuthProvider } from './components/common/AuthContext.tsx';
+import TestRefreshToken from './pages/TestRefreshToken.tsx';
 
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<MainSearch />} />
-          <Route path="/item/:sellId" element={<MangaDetail />} />
-          <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
-          <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
-          <Route path="/main-sell" element={<MainSell />} /> {/* マイ本棚のルート */}
-          <Route path="/main-page" element={<MainMyPage />} /> {/* マイページのルート */}
-          <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
-          {/* 他のルートをここに追加 */}
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<MainSearch />} />
+            <Route path="/item/:sellId" element={<MangaDetail />} />
+            <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
+            <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
+            <Route path="/main-sell" element={<MSell />} />
+            <Route path="/main-page" element={<MainMyPage />} /> {/* マイページのルート */}
+            <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
+            <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
+            
+            {/* 他のルートをここに追加 */}
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 };
