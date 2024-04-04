@@ -27,6 +27,12 @@ namespace Manga.Server.Models
         [Display(Name = "アイコン")]
         public string? ProfileIcon {  get; set; }
 
+        [Display(Name = "リフレッシュトークン")]
+        public string? RefreshToken { get; set; }
+
+        [Display(Name = "リフレッシュトークンの有効期限")]
+        public DateTime? RefreshTokenExpiryTime { get; set; }
+
         public virtual ICollection<WishList> WishLists { get; set; }
         public virtual ICollection<OwnedList> OwnedLists { get; set; }
         public virtual ICollection<Sell> Sells { get; set; }

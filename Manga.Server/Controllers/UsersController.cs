@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Manga.Server.Controllers
@@ -62,18 +63,28 @@ namespace Manga.Server.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
+                
                 var errorResponse = new
                 {
-                    errors = new Dictionary<string, string[]>
+                    messageerrors = new Dictionary<string, string[]>
                     {
                         { "Message", new[] { "メールアドレスもしくはパスワードが間違っています。" } }
                     }
                 };
                 return Unauthorized(errorResponse);
+                
+                //return Unauthorized(new { error = "メールアドレスもしくはパスワードが間違っています。" });
             }
 
             var token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
+            var refreshToken = GenerateRefreshToken();
+            // ユーザーアカウントにリフレッシュトークンを保存
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30);
+            // データベースに変更を保存
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { AccessToken = token, RefreshToken = refreshToken });
         }
 
 
@@ -97,6 +108,17 @@ namespace Manga.Server.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private string GenerateRefreshToken()
+        {
+            // ランダムな文字列を生成する簡単な方法です。
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
         }
 
         [HttpGet("protected")]
