@@ -36,28 +36,29 @@ const Login: React.FC = () => {
     })
     .catch(error => {
         setIsLoginSuccessful(false);
-        if (error.response && error.response.data && error.response.data.errors) {
-          const errors = error.response.data.errors;
+        if (error.response && error.response.data) {
           let newErrors: ApiErrors = {};
       
-          // Email error
-          if (errors.Email) {
-            newErrors.email = errors.Email[0];
-          }
-        
-          // Password error
-          if (errors.Password) {
-            newErrors.password = errors.Password[0];
-          }
-        
-          // General message error
-          if (errors.Message) {
-            newErrors.message = errors.Message[0];
+          // Handle field-specific errors
+          const fieldErrors = error.response.data.errors;
+          if (fieldErrors) {
+            if (fieldErrors.Email) {
+              newErrors.email = fieldErrors.Email[0];
+            }
+            if (fieldErrors.Password) {
+              newErrors.password = fieldErrors.Password[0];
+            }
           }
       
-          console.log('API Errors:', newErrors); 
+          // Handle general message error
+          const messageError = error.response.data.messageerrors;
+          if (messageError && messageError.Message) {
+            newErrors.message = messageError.Message[0];
+          }
+      
+          console.log('API Errors:', newErrors);
           setApiErrors(newErrors);
-        } 
+        }
       });
   };
 
