@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-builder.Services.AddSwaggerGen(option => { option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { In = ParameterLocation.Header, Description = "Please enter a valid token", Name = "Authorization", Type = SecuritySchemeType.Http, BearerFormat = "JWT", Scheme = "Bearer" }); option.AddSecurityRequirement(new OpenApiSecurityRequirement { { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new string[] { } } }); });
+
 // CORSオリジン設定
 builder.Services.AddCors(options =>
 {
@@ -29,6 +28,34 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         });
+});
+
+builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen(option => { option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { In = ParameterLocation.Header, Description = "Please enter a valid token", Name = "Authorization", Type = SecuritySchemeType.Http, BearerFormat = "JWT", Scheme = "Bearer" }); option.AddSecurityRequirement(new OpenApiSecurityRequirement { { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new string[] { } } }); });
+builder.Services.AddSwaggerGen(option => {
+    // Bearer認証スキームを定義
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header, // トークンはヘッダーで送信
+        Description = "Please enter a valid token", // Swagger UIに表示される説明
+        Name = "Authorization", // ヘッダーの名前
+        Type = SecuritySchemeType.Http, // 認証スキームのタイプ
+        BearerFormat = "JWT", // トークンのフォーマット
+        Scheme = "Bearer" // スキーム名
+    });
+
+    // 定義したBearer認証スキームを要件として追加
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+            new OpenApiSecurityScheme {
+                Reference = new OpenApiReference {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer" // SecurityDefinitionで定義したスキームID
+                }
+            }, new string[] { }
+        }
+    });
 });
 
 // Add services to the container.
@@ -70,6 +97,7 @@ builder.Services.AddLogging(loggingBuilder =>
     loggingBuilder.AddConsole();
     // 他のロギングプロバイダーを追加することもできます
 });
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -123,8 +151,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+//逆にしてはならない。
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

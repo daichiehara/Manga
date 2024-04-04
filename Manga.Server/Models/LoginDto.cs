@@ -5,7 +5,7 @@ namespace Manga.Server.Models
     public class LoginDto
     {
         [Required(ErrorMessage = "メールアドレスを入力してください。")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "有効なメールアドレスではありません。")]
         public string Email {  get; set; }
         
         [Required(ErrorMessage = "パスワードを入力してください。")]
