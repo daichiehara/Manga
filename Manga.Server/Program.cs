@@ -174,6 +174,6 @@ app.MapFallbackToFile("/index.html");
 app.MapIdentityApi<UserAccount>();
 
 // CORS ミドルウェアを有効にする
-app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigins");
 
 app.Run();
