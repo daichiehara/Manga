@@ -20,11 +20,22 @@ builder.Services.AddControllers();
 // CORSオリジン設定
 builder.Services.AddCors(options =>
 {
+    /*
     options.AddPolicy(
         "AllowAll",
         builder =>
         {
             builder.AllowAnyOrigin()   // すべてのオリジンからのアクセスを許可
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
+        });
+    */
+    options.AddPolicy(
+        "AllowSpecificOrigins",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5227", "https://localhost:7103")
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
