@@ -5,12 +5,11 @@ import PublishIcon from '@mui/icons-material/Publish';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import MenuBar from '../components/menu/MenuBar';
 
-interface ActionButtonProps {
-  label: string;
-  onClick: () => void;
-}
-
-const MSell: React.FC<ActionButtonProps> = ({ label, onClick }) => {
+const MSell: React.FC= () => {
+  const onClick = () => {
+    console.log('Button clicked!');
+    // Add your logic here
+  };
 
   return (
     <>
@@ -32,7 +31,6 @@ const MSell: React.FC<ActionButtonProps> = ({ label, onClick }) => {
         right: 50, // 画面の右から20pxの位置
       }}
     >
-      {label}
     </Button>
 
       {/* メインコンテンツエリア */}
