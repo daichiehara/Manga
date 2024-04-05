@@ -84,10 +84,10 @@ namespace Manga.Server.Controllers
             await _userManager.UpdateAsync(user);
 
             // アクセストークンをHTTP Only Cookieにセット
-            SetTokenCookie("AccessToken", token, 30); // 15分間有効
+            SetTokenCookie("accessToken", token, 30); // 15分間有効
 
             // リフレッシュトークンを別のHTTP Only Cookieにセット
-            //SetTokenCookie("RefreshToken", refreshToken, 1440); // 1日間有効
+            SetTokenCookie("RefreshToken", refreshToken, 1440); // 1日間有効
 
             return Ok(new { AccessToken = token, RefreshToken = refreshToken });
         }
@@ -105,8 +105,8 @@ namespace Manga.Server.Controllers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Audience"],
+                //issuer: _configuration["JWT:Issuer"],
+                //audience: _configuration["JWT:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
@@ -157,7 +157,7 @@ namespace Manga.Server.Controllers
         public async Task<IActionResult> RefreshToken()
         {
             // HTTPリクエストのCookieからリフレッシュトークンを取得
-            var accessToken = Request.Cookies["AccessToken"];
+            var accessToken = Request.Cookies["accessToken"];
             var refreshToken = Request.Cookies["RefreshToken"];
             // リフレッシュトークンの検証
             var principal = GetPrincipalFromExpiredToken(accessToken);
@@ -186,7 +186,7 @@ namespace Manga.Server.Controllers
                 SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(15) // アクセストークンの有効期限
             };
-            Response.Cookies.Append("AccessToken", newAccessToken, accessTokenCookieOptions);
+            Response.Cookies.Append("accessToken", newAccessToken, accessTokenCookieOptions);
 
             // リフレッシュトークンを別のHTTP Only Cookieに設定
             var refreshTokenCookieOptions = new CookieOptions
@@ -240,7 +240,7 @@ namespace Manga.Server.Controllers
             };
 
             // Cookieにトークンを保存
-            Response.Cookies.Append(key, token, cookieOptions);
+            Response.Cookies.Append(key, "Bearer" + token, cookieOptions);
         }
 
 

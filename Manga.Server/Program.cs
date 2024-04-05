@@ -121,7 +121,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddCookie(x => 
 {
-    x.Cookie.Name = "AccessToken";
+    x.Cookie.Name = "accessToken";
 }).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
@@ -143,7 +143,7 @@ builder.Services.AddAuthentication(options =>
         OnMessageReceived = context =>
         {
             // リクエストのCookieからトークンを取得
-            context.Token = context.Request.Cookies["AccessToken"];
+            context.Token = context.Request.Cookies["accessToken"];
             return Task.CompletedTask;
         }
     };
