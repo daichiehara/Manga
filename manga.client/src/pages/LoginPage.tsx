@@ -25,6 +25,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
 
+  /*
   useEffect(() => {
     axios.get('http://localhost:5227/api/Users/protected', { withCredentials: true })
       .then(response => {
@@ -35,7 +36,7 @@ const Login: React.FC = () => {
         console.error("An error occurred:", error);
       });
   }, []);
-
+  */
 
   const onSubmit = (data: LoginFormInputs) => {
     setApiErrors({}); // Clear previous errors

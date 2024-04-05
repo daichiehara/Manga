@@ -10,7 +10,7 @@ const Test: React.FC = () => {
         console.log(response.data); // これはAPIからのレスポンスのデータを表示します
       })
       .catch(error => {
-        console.error("An error occurred:", error);
+        console.error("An error testrefresh:", error);
       });
   }, []);
 

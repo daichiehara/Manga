@@ -119,8 +119,12 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme =
     options.DefaultSignInScheme =
     options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddCookie(x => 
+{
+    x.Cookie.Name = "AccessToken";
 }).AddJwtBearer(options =>
 {
+    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -138,10 +142,7 @@ builder.Services.AddAuthentication(options =>
         OnMessageReceived = context =>
         {
             // リクエストのCookieからトークンを取得
-            if (context.Request.Cookies.ContainsKey("AccessToken"))
-            {
-                context.Token = context.Request.Cookies["AccessToken"];
-            }
+            context.Token = context.Request.Cookies["AccessToken"];
             return Task.CompletedTask;
         }
     };
