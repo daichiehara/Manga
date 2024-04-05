@@ -4,13 +4,13 @@ import axios from 'axios';
 
 const Test: React.FC = () => {
   useEffect(() => {
-    axios.get('http://localhost:5227/api/Users/protected', { withCredentials: true })
+    axios.get('https://localhost:7103/api/Users/protected', { withCredentials: true })
       .then(response => {
         console.log("Success!");
         console.log(response.data); // これはAPIからのレスポンスのデータを表示します
       })
       .catch(error => {
-        console.error("An error occurred:", error);
+        console.error("An error testrefresh:", error);
       });
   }, []);
 

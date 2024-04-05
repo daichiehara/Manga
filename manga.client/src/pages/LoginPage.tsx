@@ -26,10 +26,14 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
 
+<<<<<<< HEAD
   const handleBack = () => {
     navigate(-1); // 前のページに戻る
   };
 
+=======
+  /*
+>>>>>>> origin/master
   useEffect(() => {
     axios.get('http://localhost:5227/api/Users/protected', { withCredentials: true })
       .then(response => {
@@ -40,13 +44,13 @@ const Login: React.FC = () => {
         console.error("An error occurred:", error);
       });
   }, []);
-
+  */
 
   const onSubmit = (data: LoginFormInputs) => {
     setApiErrors({}); // Clear previous errors
     setIsLoading(true); 
 
-    axios.post('http://localhost:5227/api/Users/Login', {
+    axios.post('https://localhost:7103/api/Users/Login', {
       Email: data.email,
       Password: data.password
 

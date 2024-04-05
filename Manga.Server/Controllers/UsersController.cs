@@ -84,7 +84,7 @@ namespace Manga.Server.Controllers
             await _userManager.UpdateAsync(user);
 
             // アクセストークンをHTTP Only Cookieにセット
-            SetTokenCookie("AccessToken", token, 30); // 15分間有効
+            SetTokenCookie("accessToken", token, 30); // 15分間有効
 
             // リフレッシュトークンを別のHTTP Only Cookieにセット
             SetTokenCookie("RefreshToken", refreshToken, 1440); // 1日間有効
@@ -105,8 +105,8 @@ namespace Manga.Server.Controllers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Audience"],
+                //issuer: _configuration["JWT:Issuer"],
+                //audience: _configuration["JWT:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
@@ -157,7 +157,7 @@ namespace Manga.Server.Controllers
         public async Task<IActionResult> RefreshToken()
         {
             // HTTPリクエストのCookieからリフレッシュトークンを取得
-            var accessToken = Request.Cookies["AccessToken"];
+            var accessToken = Request.Cookies["accessToken"];
             var refreshToken = Request.Cookies["RefreshToken"];
             // リフレッシュトークンの検証
             var principal = GetPrincipalFromExpiredToken(accessToken);
@@ -181,19 +181,20 @@ namespace Manga.Server.Controllers
             var accessTokenCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                //Secure = true,
+                Secure = true,
                 //SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
                 SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(15) // アクセストークンの有効期限
             };
-            Response.Cookies.Append("AccessToken", newAccessToken, accessTokenCookieOptions);
+            Response.Cookies.Append("accessToken", newAccessToken, accessTokenCookieOptions);
 
             // リフレッシュトークンを別のHTTP Only Cookieに設定
             var refreshTokenCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
+                //SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(30) // リフレッシュトークンの有効期限
             };
             Response.Cookies.Append("RefreshToken", newRefreshToken, refreshTokenCookieOptions);
@@ -233,13 +234,13 @@ namespace Manga.Server.Controllers
             {
                 HttpOnly = true, // JavaScriptからのアクセスを禁止
                 Expires = DateTime.UtcNow.AddMinutes(expireMinutes), // 有効期限の設定
-                //Secure = true, // HTTPSを通じてのみCookieを送信
+                Secure = true, // HTTPSを通じてのみCookieを送信
                 SameSite = SameSiteMode.None // SameSite属性の設定
                 //SameSite = SameSiteMode.Strict, // または None + Secure, クロスオリジンの場合
             };
 
             // Cookieにトークンを保存
-            Response.Cookies.Append(key, token, cookieOptions);
+            Response.Cookies.Append(key, "Bearer " + token, cookieOptions);
         }
 
 
@@ -248,6 +249,12 @@ namespace Manga.Server.Controllers
         public IActionResult Protected()
         {
             return Ok("Success!");
+        }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok(Request.Cookies["accessToken"]);
         }
     }
 }
