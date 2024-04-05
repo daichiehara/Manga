@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
 import { useAuth } from '../components/common/AuthContext'; 
+
 
 type LoginFormInputs = {
   email: string;
@@ -22,6 +24,18 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
+
+  useEffect(() => {
+    axios.get('http://localhost:5227/api/Users/protected', { withCredentials: true })
+      .then(response => {
+        console.log("Success!");
+        console.log(response.data); // これはAPIからのレスポンスのデータを表示します
+      })
+      .catch(error => {
+        console.error("An error occurred:", error);
+      });
+  }, []);
+
 
   const onSubmit = (data: LoginFormInputs) => {
     setApiErrors({}); // Clear previous errors
@@ -104,6 +118,7 @@ const Login: React.FC = () => {
         {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : 'Login'}
         </Button>
       </form>
+      
     </Box>
   );
 };
