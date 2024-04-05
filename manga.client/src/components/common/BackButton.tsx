@@ -12,8 +12,8 @@ const BackButton: React.FC<BackButtonProps> = ({ handleBack, ...rest }) => (
     {...rest}
     sx={{
       position: 'fixed',
-      top: 16,
-      left: 16,
+      top: `1.2rem`,
+      left: `1.2rem`,
       zIndex: 1000,
       backgroundColor: 'rgba(255, 255, 255, 0.5)',
       '&:hover': {
