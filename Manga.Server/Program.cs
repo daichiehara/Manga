@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-// CORSƒIƒŠƒWƒ“İ’è
+// CORSï¿½Iï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½İ’ï¿½
 builder.Services.AddCors(options =>
 {
     /*
@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
         "AllowAll",
         builder =>
         {
-            builder.AllowAnyOrigin()   // ‚·‚×‚Ä‚ÌƒIƒŠƒWƒ“‚©‚ç‚ÌƒAƒNƒZƒX‚ğ‹–‰Â
+            builder.AllowAnyOrigin()   // ï¿½ï¿½ï¿½×‚Ä‚ÌƒIï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌƒAï¿½Nï¿½Zï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
@@ -35,7 +35,7 @@ builder.Services.AddCors(options =>
         "AllowSpecificOrigins",
         builder =>
         {
-            builder.WithOrigins("http://localhost:5227", "https://localhost:7103", "https://localhost:5173")
+            builder.WithOrigins("https://localhost:5173", "https://localhost:7103")
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
@@ -46,24 +46,24 @@ builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 //builder.Services.AddSwaggerGen(option => { option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { In = ParameterLocation.Header, Description = "Please enter a valid token", Name = "Authorization", Type = SecuritySchemeType.Http, BearerFormat = "JWT", Scheme = "Bearer" }); option.AddSecurityRequirement(new OpenApiSecurityRequirement { { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new string[] { } } }); });
 builder.Services.AddSwaggerGen(option => {
-    // Bearer”FØƒXƒL[ƒ€‚ğ’è‹`
+    // Bearerï¿½Fï¿½ØƒXï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½`
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        In = ParameterLocation.Header, // ƒg[ƒNƒ“‚Íƒwƒbƒ_[‚Å‘—M
-        Description = "Please enter a valid token", // Swagger UI‚É•\¦‚³‚ê‚éà–¾
-        Name = "Authorization", // ƒwƒbƒ_[‚Ì–¼‘O
-        Type = SecuritySchemeType.Http, // ”FØƒXƒL[ƒ€‚Ìƒ^ƒCƒv
-        BearerFormat = "JWT", // ƒg[ƒNƒ“‚ÌƒtƒH[ƒ}ƒbƒg
-        Scheme = "Bearer" // ƒXƒL[ƒ€–¼
+        In = ParameterLocation.Header, // ï¿½gï¿½[ï¿½Nï¿½ï¿½ï¿½Íƒwï¿½bï¿½_ï¿½[ï¿½Å‘ï¿½ï¿½M
+        Description = "Please enter a valid token", // Swagger UIï¿½É•\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        Name = "Authorization", // ï¿½wï¿½bï¿½_ï¿½[ï¿½Ì–ï¿½ï¿½O
+        Type = SecuritySchemeType.Http, // ï¿½Fï¿½ØƒXï¿½Lï¿½[ï¿½ï¿½ï¿½Ìƒ^ï¿½Cï¿½v
+        BearerFormat = "JWT", // ï¿½gï¿½[ï¿½Nï¿½ï¿½ï¿½Ìƒtï¿½Hï¿½[ï¿½}ï¿½bï¿½g
+        Scheme = "Bearer" // ï¿½Xï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½
     });
 
-    // ’è‹`‚µ‚½Bearer”FØƒXƒL[ƒ€‚ğ—vŒ‚Æ‚µ‚Ä’Ç‰Á
+    // ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½Bearerï¿½Fï¿½ØƒXï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Æ‚ï¿½ï¿½Ä’Ç‰ï¿½
     option.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
             new OpenApiSecurityScheme {
                 Reference = new OpenApiReference {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer" // SecurityDefinition‚Å’è‹`‚µ‚½ƒXƒL[ƒ€ID
+                    Id = "Bearer" // SecurityDefinitionï¿½Å’ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½Lï¿½[ï¿½ï¿½ID
                 }
             }, new string[] { }
         }
@@ -81,11 +81,11 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 /*
 builder.Services.AddDefaultIdentity<UserAccount>(options =>
 {
-    // ƒpƒXƒ[ƒh‚Ì•¡G‚³—vŒ
-    options.Password.RequireDigit = true; // ”š‚ª­‚È‚­‚Æ‚à1‚ÂŠÜ‚Ü‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚é
-    options.Password.RequiredLength = 6; // ƒpƒXƒ[ƒh‚ÌÅ¬’·
+    // ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½hï¿½Ì•ï¿½ï¿½Gï¿½ï¿½ï¿½vï¿½ï¿½
+    options.Password.RequireDigit = true; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚ï¿½1ï¿½ÂŠÜ‚Ü‚ï¿½Ä‚ï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    options.Password.RequiredLength = 6; // ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½hï¿½ÌÅï¿½ï¿½ï¿½
     options.Password.RequireNonAlphanumeric = false;
-    options.User.RequireUniqueEmail = true; // ƒ†[ƒU[‚Ìƒ[ƒ‹ƒAƒhƒŒƒX‚ªˆêˆÓ‚Å‚ ‚é‚±‚Æ
+    options.User.RequireUniqueEmail = true; // ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½Ìƒï¿½ï¿½[ï¿½ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½Ó‚Å‚ï¿½ï¿½é‚±ï¿½ï¿½
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -94,11 +94,11 @@ builder.Services.AddDefaultIdentity<UserAccount>(options =>
 
 builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 {
-    // ƒpƒXƒ[ƒh‚Ì•¡G‚³—vŒ
-    options.Password.RequireDigit = true; // ”š‚ª­‚È‚­‚Æ‚à1‚ÂŠÜ‚Ü‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚é
-    options.Password.RequiredLength = 6; // ƒpƒXƒ[ƒh‚ÌÅ¬’·
+    // ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½hï¿½Ì•ï¿½ï¿½Gï¿½ï¿½ï¿½vï¿½ï¿½
+    options.Password.RequireDigit = true; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚ï¿½1ï¿½ÂŠÜ‚Ü‚ï¿½Ä‚ï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    options.Password.RequiredLength = 6; // ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½hï¿½ÌÅï¿½ï¿½ï¿½
     options.Password.RequireNonAlphanumeric = false;
-    options.User.RequireUniqueEmail = true; // ƒ†[ƒU[‚Ìƒ[ƒ‹ƒAƒhƒŒƒX‚ªˆêˆÓ‚Å‚ ‚é‚±‚Æ
+    options.User.RequireUniqueEmail = true; // ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½Ìƒï¿½ï¿½[ï¿½ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½Ó‚Å‚ï¿½ï¿½é‚±ï¿½ï¿½
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -107,7 +107,7 @@ builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 builder.Services.AddLogging(loggingBuilder =>
 {
     loggingBuilder.AddConsole();
-    // ‘¼‚ÌƒƒMƒ“ƒOƒvƒƒoƒCƒ_[‚ğ’Ç‰Á‚·‚é‚±‚Æ‚à‚Å‚«‚Ü‚·
+    // ï¿½ï¿½ï¿½Ìƒï¿½ï¿½Mï¿½ï¿½ï¿½Oï¿½vï¿½ï¿½ï¿½oï¿½Cï¿½_ï¿½[ï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½é‚±ï¿½Æ‚ï¿½ï¿½Å‚ï¿½ï¿½Ü‚ï¿½
 });
 
 
@@ -132,6 +132,19 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
     };
     options.EventsType = typeof(CustomJwtBearerEvents);
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            // ãƒªã‚¯ã‚¨ã‚¹ãƒˆã®Cookieã‹ã‚‰ãƒˆãƒ¼ã‚¯ãƒ³ã‚’å–å¾—
+            if (context.Request.Cookies.ContainsKey("AccessToken"))
+            {
+                context.Token = context.Request.Cookies["AccessToken"];
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddTransient<CustomJwtBearerEvents>();
@@ -163,7 +176,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//‹t‚É‚µ‚Ä‚Í‚È‚ç‚È‚¢B
+//ï¿½tï¿½É‚ï¿½ï¿½Ä‚Í‚È‚ï¿½È‚ï¿½ï¿½B
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -173,7 +186,7 @@ app.MapFallbackToFile("/index.html");
 
 app.MapIdentityApi<UserAccount>();
 
-// CORS ƒ~ƒhƒ‹ƒEƒFƒA‚ğ—LŒø‚É‚·‚é
+// CORS ï¿½~ï¿½hï¿½ï¿½ï¿½Eï¿½Fï¿½Aï¿½ï¿½Lï¿½ï¿½ï¿½É‚ï¿½ï¿½ï¿½
 app.UseCors("AllowSpecificOrigins");
 
 app.Run();
