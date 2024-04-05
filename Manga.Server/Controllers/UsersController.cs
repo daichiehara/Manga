@@ -250,5 +250,11 @@ namespace Manga.Server.Controllers
         {
             return Ok("Success!");
         }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok(Request.Cookies["accessToken"]);
+        }
     }
 }
