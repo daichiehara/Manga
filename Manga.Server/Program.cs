@@ -20,17 +20,6 @@ builder.Services.AddControllers();
 // CORS�I���W���ݒ�
 builder.Services.AddCors(options =>
 {
-    /*
-    options.AddPolicy(
-        "AllowAll",
-        builder =>
-        {
-            builder.AllowAnyOrigin()   // ���ׂẴI���W������̃A�N�Z�X������
-                   .AllowAnyMethod()
-                   .AllowAnyHeader()
-                   .AllowCredentials();
-        });
-    */
     options.AddPolicy(
         "AllowSpecificOrigins",
         builder =>

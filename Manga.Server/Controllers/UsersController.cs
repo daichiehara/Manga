@@ -234,13 +234,13 @@ namespace Manga.Server.Controllers
             {
                 HttpOnly = true, // JavaScriptからのアクセスを禁止
                 Expires = DateTime.UtcNow.AddMinutes(expireMinutes), // 有効期限の設定
-                //Secure = true, // HTTPSを通じてのみCookieを送信
+                Secure = true, // HTTPSを通じてのみCookieを送信
                 SameSite = SameSiteMode.None // SameSite属性の設定
                 //SameSite = SameSiteMode.Strict, // または None + Secure, クロスオリジンの場合
             };
 
             // Cookieにトークンを保存
-            Response.Cookies.Append(key, "Bearer" + token, cookieOptions);
+            Response.Cookies.Append(key, "Bearer " + token, cookieOptions);
         }
 
 
