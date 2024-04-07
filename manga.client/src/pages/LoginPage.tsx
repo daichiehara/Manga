@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
+import BackButton from '../components/common/BackButton';
 import { useAuth } from '../components/common/AuthContext'; 
 
 
@@ -25,7 +26,10 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
 
-  /*
+  const handleBack = () => {
+    navigate(-1); // 前のページに戻る
+  };
+
   useEffect(() => {
     axios.get('http://localhost:5227/api/Users/protected', { withCredentials: true })
       .then(response => {
@@ -36,7 +40,7 @@ const Login: React.FC = () => {
         console.error("An error occurred:", error);
       });
   }, []);
-  */
+  
 
   const onSubmit = (data: LoginFormInputs) => {
     setApiErrors({}); // Clear previous errors
@@ -89,8 +93,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <Box sx={{p:3, boxShadow:"none", border:'none'}}>
-      <Typography variant="h5"sx={{}}>ログイン</Typography>
+    <Box sx={{pt:`4rem`, p:`1.2rem`, boxShadow:"none", border:'none'}}>
+        <BackButton handleBack={handleBack} />
+      <Typography variant="h5"sx={{ textAlign: 'center', fontWeight:'550' }}>ログイン</Typography>
       {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
       {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
       <form onSubmit={handleSubmit(onSubmit)}>

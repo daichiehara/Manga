@@ -1,15 +1,40 @@
 import React from 'react';
-import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BottomNavigation, BottomNavigationAction, Paper} from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import SearchOutlined from '@mui/icons-material/SearchOutlined';
+import NotificationsOutlined from '@mui/icons-material/NotificationsOutlined';
+import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
+import SellOutlined from '@mui/icons-material/SellOutlined';
+import PersonOutline from '@mui/icons-material/PersonOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import BookIcon from '@mui/icons-material/Book';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import SellIcon from '@mui/icons-material/Sell';
 import PersonIcon from '@mui/icons-material/Person';
 
 const MenuBar: React.FC = () => {
-  const [value, setValue] = React.useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const determineActiveIndex = () => {
+    switch (location.pathname) {
+      case '/': return 0;
+      case '/main-notification': return 1;
+      case '/main-mybook': return 2;
+      case '/main-sell': return 3;
+      case '/main-page': return 4;
+      default: return -1;
+    }
+  };
+  
+
+  const [value, setValue] = React.useState(determineActiveIndex());
+
+  // Effect to update the value when the location changes
+  useEffect(() => {
+    setValue(determineActiveIndex());
+  }, [location]);
 
   const handleNavigationChange = (newValue: 0 | 1 | 2 | 3 | 4) => {
     setValue(newValue);
@@ -24,40 +49,129 @@ const MenuBar: React.FC = () => {
         navigate('/main-mybook');
         break;
       case 3:
-        navigate('/main-sell'); 
+        navigate('/main-sell');
         break;
       case 4:
-        navigate('/main-page'); 
+        navigate('/main-page');
         break;
       default:
         break;
     }
   };
   
+
+  const getIcon = (index: number, outlined: React.ReactNode, filled: React.ReactNode) => {
+    return value === index ? filled : outlined;
+  };
+  
   const actionStyle = {
     p: 0,
-    display: 'flex', // フレックスボックスレイアウトを使用
-    flexDirection: 'column', // 要素を縦に配置
-    justifyContent: 'center', // 中央揃え
-    alignItems: 'center', // アイテムを中央に配置
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    color:`#7F7F7F`,
+    '&.Mui-selected': {
+      color: '#E97132', 
+    },
     '&:hover': {
-      backgroundColor: 'rgba(0, 0, 0, 0.1)', // ホバー時の背景色
-    }
+      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    },
+  };
+
+  const noticeStyle = {
+    py: 0,
+    pl: 0,
+    pr: 6,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    color:`#7F7F7F`,
+    '&.Mui-selected': {
+      color: '#E97132', 
+    },
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    },
+  };
+
+  const sellStyle = {
+    py: 0,
+    pl: 6,
+    pr: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    color:`#7F7F7F`,
+    '&.Mui-selected': {
+      color: '#E97132', 
+    },
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    },
+  };
+
+  const searchStyle = {
+    p: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    color:`#7F7F7F`,
+    '&.Mui-selected': {
+      color: '#E97132', 
+    },
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    },
+  };
+
+  const myBookshelfStyle = {
+    p:0,
+    background: 'linear-gradient(to right, #FCCF31, #F55555)',
+    boxShadow: '2px 4px 4px -1px rgba(0,0,0,0.25)', 
+    color: 'white',
+    zIndex: 1000,
+    borderRadius: '50%', 
+    width: `5rem`, 
+    height: `5rem`, 
+    position: 'absolute',
+    top: `-0.1rem`,
+    bottom: `10rem`, 
+    right: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    '&.Mui-selected': {
+      bgcolor: '#F2F2F2',
+      color: 'white',
+    },
+    '& .MuiBottomNavigationAction-label': {
+      fontSize: '0.75rem', 
+      zIndex: 5000,
+      color: 'white',
+    },
+    '& .MuiSvgIcon-root': { 
+      fontSize: '2rem',
+    },
   };
 
   return (
-    <BottomNavigation
-      value={value}
-      onChange={(_, newValue) => handleNavigationChange(newValue)}
-      showLabels
-      sx={{width: '100%', position: 'fixed', bottom: 0, zIndex: 1000 }}
-    >
-      <BottomNavigationAction label="探す" icon={<SearchIcon />} sx={actionStyle}/>
-      <BottomNavigationAction label="通知" icon={<NotificationsIcon />} sx={actionStyle}/>
-      <BottomNavigationAction label="マイ本棚" icon={<BookIcon />} sx={actionStyle}/> 
-      <BottomNavigationAction label="出品" icon={<SellIcon />} sx={actionStyle}/> 
-      <BottomNavigationAction label="マイページ" icon={<PersonIcon />} sx={actionStyle}/>
+    <Paper sx={{boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, width: '100%', zIndex: 1000 }}>
+      <BottomNavigation
+        value={value}
+        onChange={(_, newValue) => handleNavigationChange(newValue)}
+        showLabels
+        sx={{ width: '100%' }}
+      >
+      <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined />, <SearchIcon />)} sx={actionStyle} />
+      <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined />, <NotificationsIcon />)} sx={noticeStyle} />
+      <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon />, <AutoStoriesIcon />)} sx={myBookshelfStyle} />
+      <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined />, <SellIcon />)} sx={sellStyle} />
+      <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline />, <PersonIcon />)} sx={searchStyle} />
     </BottomNavigation>
+    </Paper>
   );
 };
 
