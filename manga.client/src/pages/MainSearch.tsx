@@ -24,8 +24,8 @@ const MainSearch: React.FC = () => {
     const fetchMangaData = async () => {
       try {
         console.log('APIリクエストを送信中...');
-        //const response = await fetch(`http://localhost:7103/api/Sells`);
-        const response = await fetch(`http://localhost:5227/api/Sells`);
+        const response = await fetch(`https://localhost:7103/api/Sells`);
+        //const response = await fetch(`http://localhost:5227/api/Sells`);
         console.log('レスポンス受信:', response.status, response.statusText);
         const data = await response.json();
         console.log('取得したデータ:', data);

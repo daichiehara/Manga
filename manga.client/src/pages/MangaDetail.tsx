@@ -72,7 +72,7 @@ const MangaDetail = () => {
   useEffect(() => {
     const fetchMangaDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5227/api/Sells/${sellId}`);
+        const response = await fetch(`https://localhost:7103/api/Sells/${sellId}`);
         const data = await response.json();
         setMangaDetail(data);
       } catch (error) {
