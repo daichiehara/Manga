@@ -203,7 +203,7 @@ namespace Manga.Server.Controllers
                 SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(15) // アクセストークンの有効期限
             };
-            Response.Cookies.Append("accessToken", newAccessToken, accessTokenCookieOptions);
+            HttpContext.Response.Cookies.Append("accessToken", newAccessToken, accessTokenCookieOptions);
 
             // リフレッシュトークンを別のHTTP Only Cookieに設定
             var refreshTokenCookieOptions = new CookieOptions
@@ -214,7 +214,7 @@ namespace Manga.Server.Controllers
                 SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(30) // リフレッシュトークンの有効期限
             };
-            Response.Cookies.Append("RefreshToken", newRefreshToken, refreshTokenCookieOptions);
+            HttpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, refreshTokenCookieOptions);
 
             // トークンが正常に更新されたことをクライアントに通知
             return Ok(new { message = "トークンが正常に更新されました。" });
