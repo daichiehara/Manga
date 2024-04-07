@@ -93,40 +93,39 @@ builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddErrorDescriber<IdentityErrorDescriberJP>();
 
+/*
 builder.Services.AddLogging(loggingBuilder =>
 {
     loggingBuilder.AddConsole();
     // ���̃��M���O�v���o�C�_�[��ǉ����邱�Ƃ��ł��܂�
 });
+*/
 
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    //options.DefaultForbidScheme =
-    //options.DefaultScheme =
-    //options.DefaultSignInScheme =
+    options.DefaultForbidScheme =
+    options.DefaultScheme =
+    options.DefaultSignInScheme =
     options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddCookie(x => 
-{
-    x.Cookie.Name = "accessToken";
 }).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
-        //ValidIssuer = builder.Configuration["JWT:Issuer"],
-        ValidateAudience = false,
-        //ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
     };
-    options.EventsType = typeof(CustomJwtBearerEvents);
-
+    
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -136,9 +135,9 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
+    
 });
 
-builder.Services.AddTransient<CustomJwtBearerEvents>();
 
 builder.Services.AddHttpClient();
 

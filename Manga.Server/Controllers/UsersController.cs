@@ -105,14 +105,31 @@ namespace Manga.Server.Controllers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                //issuer: _configuration["JWT:Issuer"],
-                //audience: _configuration["JWT:Audience"],
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public void SetTokenCookie(string key, string token, int expireMinutes)
+        {
+            // Cookieオプションの設定
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, // JavaScriptからのアクセスを禁止
+                Expires = DateTime.UtcNow.AddMinutes(expireMinutes), // 有効期限の設定
+                Secure = true, // HTTPSを通じてのみCookieを送信
+                SameSite = SameSiteMode.None // SameSite属性の設定
+                //SameSite = SameSiteMode.Strict, // または None + Secure, クロスオリジンの場合
+            };
+
+            // Cookieにトークンを保存
+            HttpContext.Response.Cookies.Append(key, token, cookieOptions);
         }
 
         private string GenerateRefreshToken()
@@ -224,23 +241,6 @@ namespace Manga.Server.Controllers
                 throw new SecurityTokenException("Invalid token");
 
             return principal;
-        }
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public void SetTokenCookie(string key, string token, int expireMinutes)
-        {
-            // Cookieオプションの設定
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true, // JavaScriptからのアクセスを禁止
-                Expires = DateTime.UtcNow.AddMinutes(expireMinutes), // 有効期限の設定
-                Secure = true, // HTTPSを通じてのみCookieを送信
-                SameSite = SameSiteMode.None // SameSite属性の設定
-                //SameSite = SameSiteMode.Strict, // または None + Secure, クロスオリジンの場合
-            };
-
-            // Cookieにトークンを保存
-            Response.Cookies.Append(key, "Bearer " + token, cookieOptions);
         }
 
 

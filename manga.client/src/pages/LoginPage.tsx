@@ -45,15 +45,15 @@ const Login: React.FC = () => {
     axios.post('https://localhost:7103/api/Users/Login', {
       Email: data.email,
       Password: data.password
-
-    }, {
+    },{
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      withCredentials: true
     })
     .then(response => {
     setIsLoginSuccessful(true);
-    navigate('/test'); 
+    navigate('/test');
     })
     .catch(error => {
         setIsLoginSuccessful(false);
