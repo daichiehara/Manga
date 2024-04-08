@@ -154,6 +154,23 @@ builder.Services.AddIdentity<UserAccount, IdentityRole>(options => options.SignI
 
 var app = builder.Build();
 
+// Add the seed data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var userManager = services.GetRequiredService<UserManager<UserAccount>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        await DataSeeder.SeedDataAsync(userManager, roleManager);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
 

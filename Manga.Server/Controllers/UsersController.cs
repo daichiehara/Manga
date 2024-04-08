@@ -84,10 +84,10 @@ namespace Manga.Server.Controllers
             await _userManager.UpdateAsync(user);
 
             // アクセストークンをHTTP Only Cookieにセット
-            SetTokenCookie("accessToken", token, 30); // 15分間有効
+            SetTokenCookie("accessToken", token, 30); // 30分間有効
 
             // リフレッシュトークンを別のHTTP Only Cookieにセット
-            SetTokenCookie("RefreshToken", refreshToken, 1440); // 1日間有効
+            SetTokenCookie("RefreshToken", refreshToken, 259200); // 180日間有効
 
             return Ok(new { AccessToken = token, RefreshToken = refreshToken });
         }
@@ -143,33 +143,6 @@ namespace Manga.Server.Controllers
             }
         }
 
-        /*
-        [HttpPost("RefreshToken")]
-        public async Task<IActionResult> RefreshToken([FromBody] JwtDto request)
-        {
-            // リフレッシュトークンの検証
-            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
-            var username = principal.Identity.Name; // アクセストークンからユーザー名を取得
-            var user = await _userManager.FindByNameAsync(username);
-
-            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-            {
-                return BadRequest("Invalid client request");
-            }
-
-            var newAccessToken = GenerateJwtToken(user);
-            var newRefreshToken = GenerateRefreshToken();
-
-            user.RefreshToken = newRefreshToken;
-            await _userManager.UpdateAsync(user);
-
-            return new ObjectResult(new
-            {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken
-            });
-        }
-        */
         [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken()
         {
@@ -178,14 +151,16 @@ namespace Manga.Server.Controllers
             var refreshToken = Request.Cookies["RefreshToken"];
             // リフレッシュトークンの検証
             var principal = GetPrincipalFromExpiredToken(accessToken);
-            var username = principal.Identity.Name; // アクセストークンからユーザー名を取得
-            var user = await _userManager.FindByNameAsync(username);
+            
+            var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (userId == null)
             {
-                return BadRequest("Invalid client request");
+                return BadRequest("Invalid token");
             }
 
+            // ユーザーIDを使用してユーザー情報を取得
+            var user = await _userManager.FindByIdAsync(userId);
             // 新しいアクセストークンとリフレッシュトークンを生成
             var newAccessToken = GenerateJwtToken(user);
             var newRefreshToken = GenerateRefreshToken();
@@ -201,7 +176,7 @@ namespace Manga.Server.Controllers
                 Secure = true,
                 //SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
                 SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddMinutes(15) // アクセストークンの有効期限
+                Expires = DateTime.UtcNow.AddMinutes(30) // アクセストークンの有効期限
             };
             HttpContext.Response.Cookies.Append("accessToken", newAccessToken, accessTokenCookieOptions);
 
@@ -212,7 +187,7 @@ namespace Manga.Server.Controllers
                 Secure = true,
                 //SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
                 SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(30) // リフレッシュトークンの有効期限
+                Expires = DateTime.UtcNow.AddDays(180) // リフレッシュトークンの有効期限
             };
             HttpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, refreshTokenCookieOptions);
 
