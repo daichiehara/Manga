@@ -13,13 +13,11 @@ import MainMyBook from './pages/MainMyBook';
 import MSell from './pages/MSell.tsx';
 import MainMyPage from './pages/MainMyPage';
 import LoginPage from './pages/LoginPage';
-import { AuthProvider } from './components/common/AuthContext.tsx';
 import TestRefreshToken from './pages/TestRefreshToken.tsx';
 
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <AuthProvider>
         <Router>
           <Routes>
             <Route path="/" element={<MainSearch />} />
@@ -34,7 +32,6 @@ const App: React.FC = () => {
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>
-      </AuthProvider>
     </ThemeProvider>
   );
 };
