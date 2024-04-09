@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -147,20 +148,18 @@ namespace Manga.Server.Controllers
         public async Task<IActionResult> RefreshToken()
         {
             // HTTPリクエストのCookieからリフレッシュトークンを取得
-            var accessToken = Request.Cookies["accessToken"];
             var refreshToken = Request.Cookies["RefreshToken"];
-            // リフレッシュトークンの検証
-            var principal = GetPrincipalFromExpiredToken(accessToken);
-            
-            var userId = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                return BadRequest("Invalid token");
+                return BadRequest("Refresh token is required.");
             }
 
-            // ユーザーIDを使用してユーザー情報を取得
-            var user = await _userManager.FindByIdAsync(userId);
+            // データベースからリフレッシュトークンを持つユーザーを検索
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return BadRequest("Invalid refresh token.");
+            }
             // 新しいアクセストークンとリフレッシュトークンを生成
             var newAccessToken = GenerateJwtToken(user);
             var newRefreshToken = GenerateRefreshToken();
@@ -193,29 +192,6 @@ namespace Manga.Server.Controllers
 
             // トークンが正常に更新されたことをクライアントに通知
             return Ok(new { message = "トークンが正常に更新されました。" });
-        }
-
-
-
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false, // アクセストークン失効時はオーディエンスの検証をスキップ
-                ValidateIssuer = false, // アクセストークン失効時は発行者の検証をスキップ
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SigningKey"])),
-                ValidateLifetime = false // アクセストークンが失効していてもOK
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
-
-            return principal;
         }
 
         [HttpPost("Logout")]
