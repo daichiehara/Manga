@@ -84,7 +84,7 @@ namespace Manga.Server.Controllers
             await _userManager.UpdateAsync(user);
 
             // アクセストークンをHTTP Only Cookieにセット
-            SetTokenCookie("accessToken", token, 30); // 30分間有効
+            SetTokenCookie("accessToken", token, 2); // 30分間有効
 
             // リフレッシュトークンを別のHTTP Only Cookieにセット
             SetTokenCookie("RefreshToken", refreshToken, 259200); // 180日間有効
@@ -217,6 +217,33 @@ namespace Manga.Server.Controllers
 
             return principal;
         }
+
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            // ユーザーのリフレッシュトークンを無効化する処理
+            // これにより、盗まれたトークンが使用されるのを防ぎます。
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                user.RefreshToken = null; // リフレッシュトークンをクリア
+                await _userManager.UpdateAsync(user);
+            }
+
+            // クライアント側のCookieからトークンを削除
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            };
+            Response.Cookies.Append("accessToken", "", cookieOptions); // トークンをクリア
+            Response.Cookies.Append("RefreshToken", "", cookieOptions); // トークンをクリア
+
+            return Ok(new { message = "ログアウトしました。" });
+        }
+
 
 
         [HttpGet("protected")]

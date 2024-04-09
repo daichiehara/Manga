@@ -69,22 +69,6 @@ namespace Manga.Server.Controllers
                 })
                 .ToListAsync();
 
-            /*
-            // リプライ通知のグループ化
-            var replyGroups = await _context.Reply
-                .Where(r => (r.Sell.UserAccountId == user.Id || r.Sell.Replys.Any(reply => reply.UserAccountId == user.Id)) && r.UserAccountId != user.Id && !r.IsDeleted)
-                .Include(r => r.Sell)
-                .ThenInclude(sell => sell.SellImages)
-                .GroupBy(r => r.SellId)
-                .Select(g => new NotificationsDto
-                {
-                    SellId = g.Key,
-                    Message = $"{g.Select(r => r.UserAccountId).Distinct().Count()}人が「{g.FirstOrDefault().Sell.Title}」にコメントしました。",
-                    SellImage = g.FirstOrDefault().Sell.SellImages.OrderBy(si => si.Order).FirstOrDefault().ImageUrl ?? string.Empty,
-                    UpdatedDateTime = g.Max(r => r.Created)
-                })
-                .ToListAsync();
-            */
             // リプライ通知のグループ化と取得
             var replyData = await _context.Reply
                 .Where(r => (r.Sell.UserAccountId == user.Id || r.Sell.Replys.Any(reply => reply.UserAccountId == user.Id)) && r.UserAccountId != user.Id && !r.IsDeleted)

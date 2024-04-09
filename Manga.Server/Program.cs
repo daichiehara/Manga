@@ -4,6 +4,7 @@ using Manga.Server.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -67,19 +68,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-/*
-builder.Services.AddDefaultIdentity<UserAccount>(options =>
-{
-    // �p�X���[�h�̕��G���v��
-    options.Password.RequireDigit = true; // ���������Ȃ��Ƃ�1�܂܂�Ă���K�v������
-    options.Password.RequiredLength = 6; // �p�X���[�h�̍ŏ���
-    options.Password.RequireNonAlphanumeric = false;
-    options.User.RequireUniqueEmail = true; // ���[�U�[�̃��[���A�h���X����ӂł��邱��
-})
-.AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddErrorDescriber<IdentityErrorDescriberJP>();
-*/
 
 builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 {
@@ -136,21 +124,14 @@ builder.Services.AddAuthentication(options =>
         }
     };
     
-});
+})/*.AddGoogle(async googleOptions =>
+{
+    googleOptions.ClientId = await GetAwsSecret.GetApiKeyFromAWSSecretsManager("Google_ClientId");
+    googleOptions.ClientSecret = await GetAwsSecret.GetApiKeyFromAWSSecretsManager("Google_ClientSecret");
+})*/;
 
 
 builder.Services.AddHttpClient();
-
-
-/*
-builder.Services.AddIdentityApiEndpoints<UserAccount>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-builder.Services.AddIdentity<UserAccount, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddIdentityApiEndpoints<UserAccount>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-*/
-
 
 var app = builder.Build();
 

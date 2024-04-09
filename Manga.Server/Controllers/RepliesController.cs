@@ -129,30 +129,30 @@ namespace Manga.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<Reply>> PostReply(ReplyPostDto replyDto)
         {
-            var userId = _userManager.GetUserId(User);
-            
-            //test out
-            
-            if (string.IsNullOrEmpty(userId))
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
             {
-                return Unauthorized("ユーザーIDが取得できませんでした。");
+                return NotFound("User not found.");
             }
-            
 
             var reply = new Reply
             {
                 SellId = replyDto.SellId,
                 Message = replyDto.Message,
                 Created = DateTime.UtcNow,
-                UserAccountId = userId,
+                UserAccountId = user.Id,
                 IsDeleted = false,
             };
 
             _context.Reply.Add(reply);
             await _context.SaveChangesAsync();
 
+            await NotificationsController.CreateNotificationsAsync(_context, replyDto.SellId, user.Id, user.NickName);
+
             return CreatedAtAction(nameof(PostReply), new { id = reply.ReplyId }, "Ok");
         }
+
+
 
         [HttpPost("DeleteReply/{replyId}")]
         public async Task<IActionResult> DeleteReply(int replyId)

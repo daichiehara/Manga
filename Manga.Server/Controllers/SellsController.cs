@@ -16,6 +16,7 @@ using System.Security.Policy;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Manga.Server.Controllers
 {
@@ -45,6 +46,7 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync()
         {
             var userId = _userManager.GetUserId(User);
