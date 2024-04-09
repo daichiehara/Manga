@@ -4,6 +4,7 @@ import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 import MenuBar from '../components/menu/MenuBar';
+import axios from 'axios';
 
 interface MainSearch {
   sellId: number;
@@ -24,15 +25,12 @@ const MainSearch: React.FC = () => {
     const fetchMangaData = async () => {
       try {
         console.log('APIリクエストを送信中...');
-        const response = await fetch('https://localhost:7103/api/Sells', {
-          mode: 'cors',           // CORSリクエストを許可
-          credentials: 'include'  // クロスオリジンリクエストにクッキーを含める
+        const response = await axios.get('https://localhost:7103/api/Sells', {
+          withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
-        //const response = await fetch(`http://localhost:5227/api/Sells`);
         console.log('レスポンス受信:', response.status, response.statusText);
-        const data = await response.json();
-        console.log('取得したデータ:', data);
-        setMangaData(data);
+        console.log('取得したデータ:', response.data);
+        setMangaData(response.data);
       } catch (error) {
         console.error('データ取得に失敗しました:', error);
       }
