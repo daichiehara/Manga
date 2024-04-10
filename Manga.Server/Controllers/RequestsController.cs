@@ -132,6 +132,7 @@ namespace Manga.Server.Controllers
 
         // POST: api/Requests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /*
         [HttpPost]
         public async Task<ActionResult<Request>> PostRequest(Request request)
         {
@@ -140,6 +141,51 @@ namespace Manga.Server.Controllers
 
             return CreatedAtAction("GetRequest", new { id = request.RequestId }, request);
         }
+        */
+
+        [HttpPost]
+        public async Task<IActionResult> CreateExchangeRequest([FromBody] RequestPostDto exchangeRequestDto)
+        {
+            var userId = _userManager.GetUserId(User); // 交換申請者のユーザーIDを取得
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            // 交換対象のSellが存在するか確認
+            var responderSell = await _context.Sell.FindAsync(exchangeRequestDto.ResponderSellId);
+            if (responderSell == null)
+            {
+                return NotFound("交換対象の出品が見つかりません。");
+            }
+
+            // 交換申請を作成し、データベースに保存
+            foreach (var requesterSellId in exchangeRequestDto.RequesterSellIds)
+            {
+                var requesterSell = await _context.Sell.FindAsync(requesterSellId);
+                if (requesterSell == null || requesterSell.UserAccountId != userId)
+                {
+                    continue; // 出品が見つからない、または出品者が申請者自身でない場合はスキップ
+                }
+
+                var request = new Request
+                {
+                    RequesterId = userId,
+                    RequesterSellId = requesterSellId,
+                    ResponderId = responderSell.UserAccountId,
+                    ResponderSellId = exchangeRequestDto.ResponderSellId,
+                    Status = RequestStatus.Pending,
+                    Create = DateTime.UtcNow
+                };
+
+                _context.Request.Add(request);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok("交換申請が正常に作成されました。");
+        }
+
 
         // DELETE: api/Requests/5
         [HttpDelete("{id}")]

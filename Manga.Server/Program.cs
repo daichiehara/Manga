@@ -164,6 +164,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// CORS
+app.UseCors("AllowSpecificOrigins");
+
 //�t�ɂ��Ă͂Ȃ�Ȃ��B
 app.UseAuthentication();
 app.UseAuthorization();
@@ -174,7 +177,5 @@ app.MapFallbackToFile("/index.html");
 
 app.MapIdentityApi<UserAccount>();
 
-// CORS �~�h���E�F�A��L���ɂ���
-app.UseCors("AllowSpecificOrigins");
 
 app.Run();
