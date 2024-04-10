@@ -377,6 +377,7 @@ namespace Manga.Server.Controllers
             return NoContent();
         }
 
+        /*
         [HttpGet("Request")]
         public async Task<ActionResult<ExchangeRequestDto>> GetMatchingTitles(int sellId)
         {
@@ -418,6 +419,48 @@ namespace Manga.Server.Controllers
             {
                 SellId = sellId,
                 MatchingTitles = matchingTitles
+            };
+
+            return dto;
+        }
+        */
+        [HttpGet("Request")]
+        public async Task<ActionResult<ExchangeRequestDto>> GetMatchingTitles(int sellId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var sell = await _context.Sell.Include(s => s.UserAccount).FirstOrDefaultAsync(s => s.SellId == sellId);
+            if (sell == null)
+            {
+                return NotFound();
+            }
+
+            var wishListTitles = await _context.WishList
+                .Where(w => w.UserAccountId == sell.UserAccountId)
+                .Select(w => w.Title)
+                .ToListAsync();
+
+            // Sellからのタイトル
+            var sellTitles = await _context.Sell
+                .Where(s => s.UserAccountId == userId && wishListTitles.Contains(s.Title))
+                .Select(s => new TitleInfo { Title = s.Title })
+                .ToListAsync();
+
+            // OwnedListからのタイトル
+            var ownedListTitles = await _context.OwnedList
+                .Where(o => o.UserAccountId == userId && wishListTitles.Contains(o.Title))
+                .Select(o => new TitleInfo { Title = o.Title })
+                .ToListAsync();
+
+            var dto = new ExchangeRequestDto
+            {
+                SellId = sellId,
+                SellTitles = sellTitles,
+                OwnedListTitles = ownedListTitles
             };
 
             return dto;
