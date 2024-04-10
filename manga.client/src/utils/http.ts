@@ -5,22 +5,27 @@ console.log('http.tsxが読み込まれた。');
 
 axios.interceptors.response.use(
     response => {
-      console.log('Response received:', response);
+      console.log('H1_Responseを受け取った。:', response);
       return response;
     },
     async error => {
-      console.error('Error response:', error.response);
+      console.error('H2_何かしらErrorを受け取った。:', error.response);
+      // 400 Bad Requestの場合、ログインページにリダイレクト
+      if (error.response.status === 400) {
+        console.log('H_3 本来はログインページ');
+      }
       if (error.response.status === 401) {
-        // 期限切れだったら401が返される
         try {
           await authService.refreshToken();
-          console.log('Token refreshed successfully');
+          console.log('H_4Token refreshed successfully');
           history.go(0);
+          //本来はlogin関数とかで認証状態に？
         } catch (refreshError) {
-          console.error('Refresh token failed:', refreshError);
-          // ログアウトの処理をここに実装する
+          console.error('H_5リフレッシュトークンに弾かれた。本来はログインページへ。:', refreshError);
+          // ログインページへ？
           return Promise.reject(refreshError);
         }
+      
       }
       return Promise.reject(error);
     }
