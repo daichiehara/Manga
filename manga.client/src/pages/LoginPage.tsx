@@ -29,19 +29,7 @@ const Login: React.FC = () => {
   const handleBack = () => {
     navigate(-1); // 前のページに戻る
   };
-
-  useEffect(() => {
-    axios.get('http://localhost:5227/api/Users/protected', { withCredentials: true })
-      .then(response => {
-        console.log("Success!");
-        console.log(response.data); // これはAPIからのレスポンスのデータを表示します
-      })
-      .catch(error => {
-        console.error("An error occurred:", error);
-      });
-  }, []);
-  
-
+ 
   const onSubmit = (data: LoginFormInputs) => {
     setApiErrors({}); // Clear previous errors
     setIsLoading(true); 

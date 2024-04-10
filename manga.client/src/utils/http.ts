@@ -15,7 +15,7 @@ axios.interceptors.response.use(
         try {
           await authService.refreshToken();
           console.log('Token refreshed successfully');
-          // ここでアプリケーションが適切に反応するように処理を実装する
+          history.go(0);
         } catch (refreshError) {
           console.error('Refresh token failed:', refreshError);
           // ログアウトの処理をここに実装する
