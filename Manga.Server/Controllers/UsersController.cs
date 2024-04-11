@@ -1,5 +1,7 @@
 ﻿using Azure.Core;
 using Manga.Server.Models;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Manga.Server.Data;
 
 namespace Manga.Server.Controllers
 {
@@ -18,12 +21,14 @@ namespace Manga.Server.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<UserAccount> _userManager;
         private readonly SignInManager<UserAccount> _signInManager;
         private readonly IConfiguration _configuration;
 
-        public UsersController(UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration)
+        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration)
         {
+            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
@@ -73,7 +78,7 @@ namespace Manga.Server.Controllers
                         { "Message", new[] { "メールアドレスもしくはパスワードが間違っています。" } }
                     }
                 };
-                return Unauthorized(errorResponse);
+                return BadRequest(errorResponse);
             }
 
             var token = GenerateJwtToken(user);
@@ -85,12 +90,56 @@ namespace Manga.Server.Controllers
             await _userManager.UpdateAsync(user);
 
             // アクセストークンをHTTP Only Cookieにセット
-            SetTokenCookie("accessToken", token, 2); // 30分間有効
+            SetTokenCookie("accessToken", token, 30); // 30分間有効
 
             // リフレッシュトークンを別のHTTP Only Cookieにセット
             SetTokenCookie("RefreshToken", refreshToken, 259200); // 180日間有効
 
             return Ok(new { AccessToken = token, RefreshToken = refreshToken });
+        }
+
+        [HttpGet("signin-google")]
+        public async Task<IActionResult> SignInWithGoogle()
+        {
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            if (result.Succeeded)
+            {
+                var claims = result.Principal.Identities.FirstOrDefault()?.Claims.Select(claim => new
+                {
+                    claim.Issuer,
+                    claim.OriginalIssuer,
+                    claim.Type,
+                    claim.Value
+                });
+
+                var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+                // ユーザーがデータベースに存在するかどうかを確認し、必要に応じてユーザーを作成または更新します。
+                var user = await _userManager.FindByEmailAsync(email);
+
+                if (user == null)
+                {
+                    // 新しいユーザーを作成します。
+                    user = new UserAccount
+                    {
+                        Email = email,
+                        UserName = email,
+                        //NickName = 
+                        // 他のユーザー情報を設定します。
+                    };
+
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
+
+                // JWTトークンを生成します。
+                var token = GenerateJwtToken(user);
+
+                return Ok(new { Token = token });
+            }
+
+            return Unauthorized();
         }
 
 

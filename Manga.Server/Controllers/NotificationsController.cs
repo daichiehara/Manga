@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Manga.Server.Data;
 using Manga.Server.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace Manga.Server.Controllers
 {
@@ -15,17 +17,50 @@ namespace Manga.Server.Controllers
     public class NotificationsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<UserAccount> _userManager;
 
-        public NotificationsController(ApplicationDbContext context)
+        public NotificationsController(ApplicationDbContext context, UserManager<UserAccount> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/Notifications
+        /*
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Notification>>> GetNotification()
         {
             return await _context.Notification.ToListAsync();
+        }
+        */
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<NotificationsDto>>> GetNotifications()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Ok(new
+                {
+                    ErrorMessage = "会員登録またはログインしてください。",
+                    ShowLoginButton = true
+                });
+            }
+
+            var notifications = await _context.Notification
+                .Where(n => n.UserAccountId == userId)
+                .Select(n => new NotificationsDto
+                {
+                    SellId = n.SellId ?? 0,
+                    Message = n.Message,
+                    SellImage = n.Sell != null && n.Sell.SellImages.Any()
+                        ? n.Sell.SellImages.OrderBy(si => si.Order).First().ImageUrl
+                        : string.Empty,
+                    UpdatedDateTime = n.UpdatedDateTime
+                })
+                .ToListAsync();
+
+            return notifications;
         }
 
         // GET: api/Notifications/5
@@ -119,8 +154,8 @@ namespace Manga.Server.Controllers
 
                 var otherCommentersCount = uniqueUserIds.Count;
                 var message = otherCommentersCount > 0
-                    ? $"{currentUserNickName}さん、他{otherCommentersCount}名が{sell.Title}にコメントしました。"
-                    : $"{currentUserNickName}さんが{sell.Title}にコメントしました。";
+                    ? $"{currentUserNickName}さん、他{otherCommentersCount}名が「{sell.Title}」にコメントしました。"
+                    : $"{currentUserNickName}さんが「{sell.Title}」にコメントしました。";
 
                 // 出品者に通知を送信
                 if (sell.UserAccountId != currentUserId)
@@ -149,6 +184,43 @@ namespace Manga.Server.Controllers
                     }
                 }
             }
+        }
+
+        public static async Task SendExchangeRequestNotification(ApplicationDbContext context, Request request, Sell responderSell)
+        {
+            // 交換を申請したユーザーの出品を取得
+            var requesterSell = await context.Sell.FindAsync(request.RequesterSellId);
+
+            if (requesterSell == null)
+            {
+                // 出品が見つからない場合は通知を送信せずにリターン
+                return;
+            }
+
+            // 交換を申請したユーザーの情報を取得
+            var requesterUser = await context.Users.FindAsync(request.RequesterId);
+
+            if (requesterUser == null)
+            {
+                // ユーザーが見つからない場合は通知を送信せずにリターン
+                return;
+            }
+
+            // 交換申請の件数を取得
+            var exchangeRequestCount = await context.Request
+                .CountAsync(r => r.ResponderSellId == responderSell.SellId && r.Status == RequestStatus.Pending);
+
+            // 通知のメッセージを作成
+            var message = $"あなたの作品「{responderSell.Title}」に {exchangeRequestCount} 件の交換申請があります。";
+
+            // 通知を作成し、データベースに保存
+            await CreateNotificationAsync(
+                context,
+                message,
+                Models.Type.Request,
+                request.ResponderId,
+                request.ResponderSellId
+            );
         }
 
         public static async Task CreateNotificationAsync(ApplicationDbContext context, string message, Models.Type type, string userAccountId, int? sellId)

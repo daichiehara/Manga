@@ -1,3 +1,5 @@
+using Amazon.SecretsManager.Model;
+using Amazon.SecretsManager;
 using Manga.Server;
 using Manga.Server.Data;
 using Manga.Server.Models;
@@ -10,8 +12,29 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+static async Task<string> GetApiKeyFromAWSSecretsManager(string keyName)
+{
+    string secretName = "Changey";
+    string region = "ap-northeast-1";
+
+    IAmazonSecretsManager client = new AmazonSecretsManagerClient(Amazon.RegionEndpoint.GetBySystemName(region));
+    GetSecretValueRequest request = new GetSecretValueRequest
+    {
+        SecretId = secretName,
+        VersionStage = "AWSCURRENT"
+    };
+    GetSecretValueResponse response = await client.GetSecretValueAsync(request);
+
+    // JSONからディクショナリに変換
+    var secrets = JsonSerializer.Deserialize<Dictionary<string, string>>(response.SecretString);
+
+    // APIKeyの値を返す
+    return secrets[keyName];
+}
 
 // Add services to the container.
 
@@ -89,6 +112,10 @@ builder.Services.AddLogging(loggingBuilder =>
 });
 */
 
+// クライアントIDとクライアントシークレットを事前に取得
+var clientId = await GetApiKeyFromAWSSecretsManager("Google_ClientId");
+var clientSecret = await GetApiKeyFromAWSSecretsManager("Google_ClientSecret");
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(options =>
@@ -113,7 +140,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
     };
-    
+
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -123,12 +150,12 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
-    
-})/*.AddGoogle(async googleOptions =>
+
+}).AddGoogle(googleOptions =>
 {
-    googleOptions.ClientId = await GetAwsSecret.GetApiKeyFromAWSSecretsManager("Google_ClientId");
-    googleOptions.ClientSecret = await GetAwsSecret.GetApiKeyFromAWSSecretsManager("Google_ClientSecret");
-})*/;
+    googleOptions.ClientId = clientId;
+    googleOptions.ClientSecret = clientSecret;
+});
 
 
 builder.Services.AddHttpClient();

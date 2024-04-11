@@ -45,6 +45,7 @@ namespace Manga.Server.Controllers
             return request;
         }
 
+        /*
         [HttpGet("Notification")]
         public async Task<ActionResult<List<NotificationsDto>>> GetAllNotifications()
         {
@@ -98,6 +99,7 @@ namespace Manga.Server.Controllers
 
             return allNotifications;
         }
+        */
 
         // PUT: api/Requests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -159,6 +161,8 @@ namespace Manga.Server.Controllers
                 return NotFound("交換対象の出品が見つかりません。");
             }
 
+            var createdRequests = new List<Request>();
+
             // 交換申請を作成し、データベースに保存
             foreach (var requesterSellId in exchangeRequestDto.RequesterSellIds)
             {
@@ -179,9 +183,16 @@ namespace Manga.Server.Controllers
                 };
 
                 _context.Request.Add(request);
+                createdRequests.Add(request);
             }
 
             await _context.SaveChangesAsync();
+
+            // 作成された交換申請ごとに通知を送信
+            foreach (var request in createdRequests)
+            {
+                await NotificationsController.SendExchangeRequestNotification(_context, request, responderSell);
+            }
 
             return Ok("交換申請が正常に作成されました。");
         }
