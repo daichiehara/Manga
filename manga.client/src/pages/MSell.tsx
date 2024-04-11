@@ -35,11 +35,20 @@ const MSell: React.FC= () => {
       {/* メインコンテンツエリア */}
       {/* 見出し */}
       <Toolbar sx={{
-          justifyContent: 'center', // Toolbar内の要素を中央揃えに
-          boxShadow: '0px 8px 8px -1px rgba(0,0,0,0.2)',
-          background: '#F2F2F2', // グラデーションの背景色
-      }}>
-          <Typography variant="h5" color="#757575" sx={{ 
+        borderBottom: '1px solid #F2F2F2',
+        background: '#F2F2F2',
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.25)',
+        display: 'flex',
+        justifyContent: 'center',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        padding: 0,
+        width: '100%',
+        zIndex: 1000,
+        }}>
+          <Typography variant="h6" color="#757575" sx={{ 
             flexGrow: 1, 
             textAlign: 'center',
             fontWeight: '600',
@@ -50,7 +59,7 @@ const MSell: React.FC= () => {
 
 
         {/* 出品ボタン */}
-      <Box sx={{ mt:4, ml:4, mr:4, mb: 6,}}>
+      <Box sx={{ mt:11, ml:4, mr:4, mb: 6,}}>
       <Typography 
         variant="h6" sx={{ 
           color: '#707070',
