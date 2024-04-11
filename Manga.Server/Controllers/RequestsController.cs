@@ -45,62 +45,6 @@ namespace Manga.Server.Controllers
             return request;
         }
 
-        /*
-        [HttpGet("Notification")]
-        public async Task<ActionResult<List<NotificationsDto>>> GetAllNotifications()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
-
-            // 交換申請通知のグループ化
-            var exchangeRequestGroups = await _context.Request
-                .Where(r => r.ResponderId == user.Id && r.Status == RequestStatus.Pending)
-                .Include(r => r.ResponderSell)
-                .ThenInclude(sell => sell.SellImages)
-                .GroupBy(r => r.ResponderSellId)
-                .Select(g => new NotificationsDto
-                {
-                    SellId = g.Key,
-                    Message = $"あなたの({g.FirstOrDefault().ResponderSell.Title})に{g.Count()}件の交換希望があります。",
-                    SellImage = g.FirstOrDefault().ResponderSell.SellImages.OrderBy(si => si.Order).FirstOrDefault().ImageUrl ?? string.Empty,
-                    UpdatedDateTime = g.Max(r => r.Create)
-                })
-                .ToListAsync();
-
-            // リプライ通知のグループ化と取得
-            var replyData = await _context.Reply
-                .Where(r => (r.Sell.UserAccountId == user.Id || r.Sell.Replys.Any(reply => reply.UserAccountId == user.Id)) && r.UserAccountId != user.Id && !r.IsDeleted)
-                .Include(r => r.Sell).ThenInclude(sell => sell.SellImages)
-                .Select(r => new { r.SellId, r.UserAccountId, r.UserAccount.NickName, r.Sell.Title, ImageUrl = r.Sell.SellImages.OrderBy(si => si.Order).FirstOrDefault().ImageUrl, r.Created })
-                .ToListAsync();
-
-            // アプリケーション側でのロジック処理
-            var replyGroups = replyData.GroupBy(r => r.SellId).Select(g => {
-                var distinctUsers = g.Select(r => r.UserAccountId).Distinct().Count();
-                var latestReply = g.OrderByDescending(r => r.Created).First();
-                var message = distinctUsers == 1 ?
-                              $"{latestReply.NickName}さんが「{latestReply.Title}」にコメントしました。" :
-                              $"{latestReply.NickName}さん、他{distinctUsers - 1}人が「{latestReply.Title}」にコメントしました。";
-                return new NotificationsDto
-                {
-                    SellId = g.Key,
-                    Message = message,
-                    SellImage = latestReply.ImageUrl ?? string.Empty,
-                    UpdatedDateTime = g.Max(r => r.Created)
-                };
-            }).ToList();
-            // 統合とソート
-            var allNotifications = exchangeRequestGroups.Concat(replyGroups)
-                .OrderByDescending(n => n.UpdatedDateTime)
-                .ToList();
-
-            return allNotifications;
-        }
-        */
-
         // PUT: api/Requests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

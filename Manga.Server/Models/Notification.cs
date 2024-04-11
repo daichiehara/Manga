@@ -18,5 +18,6 @@
     {
         Reply = 1,
         Request = 2,
+        Match = 3,
     }
 }

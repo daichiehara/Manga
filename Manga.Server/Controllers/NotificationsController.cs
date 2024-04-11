@@ -56,7 +56,8 @@ namespace Manga.Server.Controllers
                     SellImage = n.Sell != null && n.Sell.SellImages.Any()
                         ? n.Sell.SellImages.OrderBy(si => si.Order).First().ImageUrl
                         : string.Empty,
-                    UpdatedDateTime = n.UpdatedDateTime
+                    UpdatedDateTime = n.UpdatedDateTime,
+                    Type = n.Type,
                 })
                 .ToListAsync();
 

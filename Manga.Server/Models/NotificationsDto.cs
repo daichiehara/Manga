@@ -6,5 +6,6 @@
         public string Message { get; set; }
         public string SellImage { get; set; }
         public DateTime UpdatedDateTime { get; set; }
+        public Type Type { get; set; }
     }
 }

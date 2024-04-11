@@ -114,6 +114,11 @@ namespace Manga.Server.Controllers
                 });
 
                 var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+                }
 
                 // ユーザーがデータベースに存在するかどうかを確認し、必要に応じてユーザーを作成または更新します。
                 var user = await _userManager.FindByEmailAsync(email);
@@ -125,8 +130,7 @@ namespace Manga.Server.Controllers
                     {
                         Email = email,
                         UserName = email,
-                        //NickName = 
-                        // 他のユーザー情報を設定します。
+                        NickName = name
                     };
 
                     _context.Users.Add(user);
@@ -135,11 +139,23 @@ namespace Manga.Server.Controllers
 
                 // JWTトークンを生成します。
                 var token = GenerateJwtToken(user);
+                var refreshToken = GenerateRefreshToken();
+                // ユーザーアカウントにリフレッシュトークンを保存
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30);
+                // データベースに変更を保存
+                await _userManager.UpdateAsync(user);
+
+                // アクセストークンをHTTP Only Cookieにセット
+                SetTokenCookie("accessToken", token, 30); // 30分間有効
+
+                // リフレッシュトークンを別のHTTP Only Cookieにセット
+                SetTokenCookie("RefreshToken", refreshToken, 259200); // 180日間有効
 
                 return Ok(new { Token = token });
             }
 
-            return Unauthorized();
+            return BadRequest("Google認証に失敗しました。");
         }
 
 

@@ -23,5 +23,6 @@ namespace Manga.Server.Data
         public DbSet<Request>? Request { get; set; }
         public DbSet<MyList>? MyList { get; set; }
         public DbSet<Notification>? Notification { get; set; }
+        public DbSet<Match>? Match { get; set; }
     }
 }
