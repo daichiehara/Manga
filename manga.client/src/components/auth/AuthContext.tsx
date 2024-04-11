@@ -1,40 +1,53 @@
-// src/contexts/AuthContext.tsx
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { authService } from '../../api/authService';
+import React, { createContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
 
-interface AuthContextType {
+// 認証情報の型定義
+interface AuthState {
   isAuthenticated: boolean;
-  user: any;  // ユーザー情報の型を適宜定義
-  login: (user: any) => void;
-  logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthContextType {
+  authState: AuthState;
+  updateAuthState: (newState: AuthState) => void; 
+}
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<any>(null); // ユーザー情報の初期値を設定
-  
-    const login = (newUser: any) => {
-      setUser(newUser);
-    };
-  
-    const logout = () => {
-      setUser(null);
-    };
-  
-    // refreshTokenメソッドの削除
-  
-    return (
-      <AuthContext.Provider value={{ isAuthenticated: !!user, user, login, logout }}>
-        {children}
-      </AuthContext.Provider>
-    );
+const AuthContext = createContext<AuthContextType>({
+    authState: { isAuthenticated: false },
+    updateAuthState: () => {} // 空の関数で初期化
+  });
+// グローバルな状態更新関数
+let globalUpdateAuthState: (newState: AuthState) => void;
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [authState, setAuthState] = useState<AuthState>({ isAuthenticated: false});
+
+  const updateAuthState = (newState: AuthState) => {
+    setAuthState(newState);
   };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  globalUpdateAuthState = updateAuthState; // グローバル変数に関数を割り当てる
+
+  // 現在の状態と更新関数をログに出力
+  console.log('現在の認証状態:', authState);
+  console.log('状態更新関数:', updateAuthState);
+
+  return (
+    <AuthContext.Provider value={{ authState, updateAuthState }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
+
+// コンポーネント外から呼び出せるようにエクスポート
+
+export const updateGlobalAuthState = (newState: AuthState) => {
+    if (!globalUpdateAuthState) {
+      console.warn("updateGlobalAuthState was called before AuthProvider was mounted.");
+      return;
+    }
+    globalUpdateAuthState(newState);
+  };
+export { AuthContext };

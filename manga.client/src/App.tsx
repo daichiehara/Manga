@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -14,10 +14,17 @@ import MSell from './pages/MSell.tsx';
 import MainMyPage from './pages/MainMyPage';
 import LoginPage from './pages/LoginPage';
 import TestRefreshToken from './pages/TestRefreshToken.tsx';
+import { AuthProvider } from './components/auth/AuthContext';
+import { authService } from './api/authService.ts';
 
-const App: React.FC = () => {
+const App = () => {
+  useEffect(() => {
+    // アプリケーションの起動時に一度だけリフレッシュトークンのロジックを実行する
+    authService.refreshToken();
+  }, []);
   return (
     <ThemeProvider theme={theme}>
+      <AuthProvider>
         <Router>
           <Routes>
             <Route path="/" element={<MainSearch />} />
@@ -32,6 +39,7 @@ const App: React.FC = () => {
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>
+        </AuthProvider>
     </ThemeProvider>
   );
 };

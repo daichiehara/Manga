@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import TabsComponent from '../components/common/TabsComponent';
 import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 import MenuBar from '../components/menu/MenuBar';
 import axios from 'axios';
+import { AuthContext } from '../components/auth/AuthContext';
 
 interface MainSearch {
   sellId: number;
@@ -21,7 +22,14 @@ const MainSearch: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [mangaData, setMangaData] = useState<MainSearch[]>([]); 
 
+  // AuthContextから認証状態を安全に取得
+  const authContext = useContext(AuthContext);
+  const isAuthenticated = authContext ? authContext.authState.isAuthenticated : false;
+
   useEffect(() => {
+    
+    console.log('ログイン状態:', isAuthenticated); // ログイン状態をコンソールに表示
+
     const fetchMangaData = async () => {
       try {
         console.log('APIリクエストを送信中...');
@@ -30,6 +38,7 @@ const MainSearch: React.FC = () => {
         });
         console.log('レスポンス受信:', response.status, response.statusText);
         console.log('取得したデータ:', response.data);
+        console.log('ログイン状態:', isAuthenticated); // ログイン状態をコンソールに表示
         setMangaData(response.data);
       } catch (error) {
         console.error('データ取得に失敗しました:', error);
@@ -37,7 +46,7 @@ const MainSearch: React.FC = () => {
     };
 
     fetchMangaData();
-  }, []); // 空の依存配列を指定して、コンポーネントのマウント時にのみ実行
+  }, [isAuthenticated]); // 空の依存配列を指定して、コンポーネントのマウント時にのみ実行
 
   const handleSearch = (query: string) => {
     console.log(query); // ここで検索処理を実装します。今はコンソールに表示するだけです。

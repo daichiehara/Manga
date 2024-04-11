@@ -6,6 +6,7 @@ import axios from 'axios';
 import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
 import BackButton from '../components/common/BackButton';
 import { useAuth } from '../components/common/AuthContext'; 
+import { updateGlobalAuthState } from '../components/auth/AuthContext';
 
 
 type LoginFormInputs = {
@@ -45,6 +46,7 @@ const Login: React.FC = () => {
     })
     .then(response => {
     setIsLoginSuccessful(true);
+    updateGlobalAuthState({ isAuthenticated: true }); 
     navigate('/test');
     })
     .catch(error => {
