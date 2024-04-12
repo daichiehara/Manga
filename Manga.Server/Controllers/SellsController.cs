@@ -218,6 +218,74 @@ namespace Manga.Server.Controllers
             return homeDtos;
         }
 
+        [HttpGet("MyFavorite")]
+        [Authorize]
+        public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("ユーザー認証に失敗しました。");
+            }
+
+            // 現在のユーザーのOwnedListのタイトルリストを取得
+            var ownedTitles = await _context.OwnedList
+                                             .Where(o => o.UserAccountId == userId)
+                                             .Select(o => o.Title)
+                                             .ToListAsync();
+
+            // 現在のユーザーのSellのタイトルリストも取得
+            var sellTitles = await _context.Sell
+                                            .Where(s => s.UserAccountId == userId)
+                                            .Select(s => s.Title)
+                                            .ToListAsync();
+
+            // 両方のリストを結合
+            var userTitles = ownedTitles.Union(sellTitles).ToList();
+
+            // 現在のユーザーがMyListに登録したSellのIDを取得
+            var myListSellIds = await _context.MyList
+                .Where(m => m.UserAccountId == userId)
+                .Select(m => m.SellId)
+                .ToListAsync();
+
+            // 上記IDを使用して、Sellの詳細を取得
+            var sells = await _context.Sell
+                .Include(s => s.SellImages)
+                .Where(s => myListSellIds.Contains(s.SellId))
+                .OrderByDescending(s => s.SellTime)
+                .ToListAsync();
+
+            var homeDtos = new List<HomeDto>();
+
+            foreach (var sell in sells)
+            {
+                var wishTitles = await _context.WishList
+                                               .Where(w => w.UserAccountId == sell.UserAccountId)
+                                               .Select(w => new WishTitleInfo
+                                               {
+                                                   Title = w.Title,
+                                                   IsOwned = userTitles.Contains(w.Title)
+                                               })
+                                               .ToListAsync();
+
+                var dto = new HomeDto
+                {
+                    SellId = sell.SellId,
+                    SellTitle = sell.Title,
+                    NumberOfBooks = sell.NumberOfBooks,
+                    WishTitles = wishTitles,
+                    SellImage = sell.SellImages
+                                    .OrderBy(si => si.Order)
+                                    .FirstOrDefault()?.ImageUrl
+                };
+
+                homeDtos.Add(dto);
+            }
+
+            return homeDtos;
+        }
+
         /*
         // GET: api/Sells/5
         [HttpGet("{id}")]

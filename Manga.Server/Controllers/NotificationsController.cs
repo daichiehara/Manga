@@ -38,13 +38,9 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<IEnumerable<NotificationsDto>>> GetNotifications()
         {
             var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
+            if (userId == null)
             {
-                return Ok(new
-                {
-                    ErrorMessage = "会員登録またはログインしてください。",
-                    ShowLoginButton = true
-                });
+                return NotFound();
             }
 
             var notifications = await _context.Notification

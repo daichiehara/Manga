@@ -135,8 +135,89 @@ namespace Manga.Server.Controllers
             // 作成された交換申請ごとに通知を送信
             foreach (var request in createdRequests)
             {
-                await NotificationsController.SendExchangeRequestNotification(_context, request, responderSell);
+                // 相手からの交換申請を検索
+                var reciprocalRequest = await _context.Request
+                    .FirstOrDefaultAsync(r => r.RequesterId == request.ResponderId
+                        && r.ResponderId == request.RequesterId
+                        && r.RequesterSellId == request.ResponderSellId
+                        && r.ResponderSellId == request.RequesterSellId
+                        && r.Status == RequestStatus.Pending);
+
+                if (reciprocalRequest != null)
+                {
+                    // 両者の交換申請が存在する場合、Matchを作成
+                    var match = new Match
+                    {
+                        FirstRequestId = request.RequestId,
+                        SecondRequestId = reciprocalRequest.RequestId,
+                        Created = DateTime.UtcNow
+                    };
+
+                    _context.Match.Add(match);
+
+                    // 両方の交換申請のステータスを更新
+                    request.Status = RequestStatus.Approved;
+                    reciprocalRequest.Status = RequestStatus.Approved;
+
+                    // Sellの状態を更新
+                    request.RequesterSell.SellStatus = SellStatus.Established;
+                    responderSell.SellStatus = SellStatus.Established;
+
+                    await _context.SaveChangesAsync();
+
+                    // 交換する出品と交換対象の出品のタイトルを取得
+                    var requesterSellTitle = request.RequesterSell.Title;
+                    var responderSellTitle = responderSell.Title;
+
+                    // 通知のメッセージを作成
+                    string message = $"「{requesterSellTitle}」と「{responderSellTitle}」の交換が成立しました。内容を確認の上発送をお願いします。";
+
+                    // 通知を作成し、データベースに保存
+                    await NotificationsController.CreateNotificationAsync(
+                        _context,
+                        message,
+                        Models.Type.Match,
+                        request.RequesterId,
+                        request.RequesterSellId
+                    );
+
+                    await NotificationsController.CreateNotificationAsync(
+                        _context,
+                        message,
+                        Models.Type.Match,
+                        request.ResponderId,
+                        request.ResponderSellId
+                    );
+                }
+                else
+                {
+                    await NotificationsController.SendExchangeRequestNotification(_context, request, responderSell);
+                }
             }
+
+            var establishedRequesterSellIds = createdRequests
+                .Where(r => r.Status == RequestStatus.Approved)
+                .Select(r => r.RequesterSellId)
+                .ToList();
+
+            var establishedResponderSellIds = createdRequests
+                .Where(r => r.Status == RequestStatus.Approved)
+                .Select(r => r.ResponderSellId)
+                .ToList();
+
+            var unestablishedRequests = await _context.Request
+                .Where(r =>
+                    (establishedRequesterSellIds.Contains(r.RequesterSellId) || establishedResponderSellIds.Contains(r.ResponderSellId)) &&
+                    r.Status == RequestStatus.Pending)
+                .ToListAsync();
+
+            foreach (var request in unestablishedRequests)
+            {
+                request.Status = RequestStatus.Rejected;
+            }
+
+            await _context.SaveChangesAsync();
+
 
             return Ok("交換申請が正常に作成されました。");
         }

@@ -285,6 +285,23 @@ namespace Manga.Server.Controllers
             return Ok(new { message = "ログアウトしました。" });
         }
 
+        [HttpGet("MyPage")]
+        public async Task<IActionResult> GetMyPageInfo()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var myPageInfo = new
+            {
+                NickName = user.NickName,
+                ProfileIcon = user.ProfileIcon
+            };
+
+            return Ok(myPageInfo);
+        }
 
 
         [HttpGet("protected")]

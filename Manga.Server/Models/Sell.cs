@@ -32,6 +32,9 @@ namespace Manga.Server.Models
         [Display(Name = "メッセージ")]
         public string SellMessage { get; set;}
 
+        [Display(Name = "出品状態")]
+        public SellStatus SellStatus { get; set; }
+
         public string UserAccountId { get; set; }
         public virtual UserAccount UserAccount { get; set; }
 
@@ -62,6 +65,16 @@ namespace Manga.Server.Models
         Dirt3 = 4,
         [Display(Name = "全体的に状態が悪い")]
         Bad = 5,
+    }
+
+    public enum SellStatus
+    {
+        [Display(Name = "募集中")]
+        Recruiting = 1,
+        [Display(Name = "停止中")]
+        Suspended = 2,
+        [Display(Name = "成立")]
+        Established = 3,
     }
 
     public enum SendPrefecture

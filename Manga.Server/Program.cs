@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json;
+using Amazon.Extensions.NETCore.Setup;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,8 @@ static async Task<string> GetApiKeyFromAWSSecretsManager(string keyName)
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddSingleton<IEmailSender, AmazonSESEmailSender>(provider =>
+    new AmazonSESEmailSender("yourAccessKeyId", "yourSecretAccessKey", "yourFromEmail@example.com"));
 
 // CORS�I���W���ݒ�
 builder.Services.AddCors(options =>
