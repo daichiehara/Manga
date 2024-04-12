@@ -43,7 +43,7 @@ static async Task<string> GetApiKeyFromAWSSecretsManager(string keyName)
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSingleton<IEmailSender, AmazonSESEmailSender>(provider =>
-    new AmazonSESEmailSender("yourAccessKeyId", "yourSecretAccessKey", "yourFromEmail@example.com"));
+    new AmazonSESEmailSender("support@changey.net"));
 
 // CORS�I���W���ݒ�
 builder.Services.AddCors(options =>
