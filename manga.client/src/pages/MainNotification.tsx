@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Typography, Toolbar, Grid, Card, CardActionArea, CardContent, CardMedia} from '@mui/material';
+import { Box, Typography, Grid, Card, CardActionArea, CardContent, CardMedia} from '@mui/material';
 import MenuBar from '../components/menu/MenuBar';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios';
 import { AuthContext } from '../components/auth/AuthContext';
+import CustomToolbar from '../components/common/CustumToolbar';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 
 interface Notification {
@@ -12,6 +14,7 @@ interface Notification {
   sellImage: string;
   updatedDateTime: string
   type:number
+  title: string; 
 }
 
 
@@ -70,37 +73,33 @@ const MainNotification: React.FC = () => {
     return (
       <>
         {/* 見出しのToolbar */}
-        <Toolbar sx={{
-          borderBottom: '1px solid #F2F2F2',
-          background: '#F2F2F2',
-          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.25)',
-          display: 'flex',
-          justifyContent: 'center',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          padding: 0,
-          width: '100%',
-          zIndex: 1000,
-        }}>
-          <Typography variant="h6" color="#757575" sx={{ 
-            flexGrow: 1, 
-            textAlign: 'center',
-            fontWeight: '600',
-          }}>
-            お知らせ
-          </Typography>
-        </Toolbar>
-  
+        <CustomToolbar title='お知らせ'/>
         {/* ログイン促進メッセージ */}
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', paddingTop: '64px' /* Toolbarの高さを考慮 */ }}>
           <Typography variant="h5">
             ログインしてください
           </Typography>
         </Box>
-  
         {/* ナビゲーションバー */}
+        <MenuBar />
+      </>
+    );
+  }
+  //通知がない場合の表示
+  if (notifications.length === 0) {
+    return (
+      <>
+        {/* 見出しのToolbar */}
+        <CustomToolbar title='お知らせ'/>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 9 }}>
+          <NotificationsNoneIcon sx={{ fontSize: 60, color: 'action.active', padding:9}} />  {/* アイコンのサイズと色、下のマージンを調整 */}
+          <Typography variant="subtitle1">
+            現在、お知らせはありません
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1}}>
+            ここではコメントや交換申し込みの通知が表示されます
+          </Typography>
+        </Box>
         <MenuBar />
       </>
     );
@@ -110,30 +109,8 @@ const MainNotification: React.FC = () => {
   return (
     <>
       {/* メインコンテンツエリア */}
-      {/* 見出し */}
-      <Toolbar sx={{
-        borderBottom: '1px solid #F2F2F2',
-        background: '#F2F2F2',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.25)',
-        display: 'flex',
-        justifyContent: 'center',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        padding: 0,
-        width: '100%',
-        zIndex: 1000,
-        }}
->
-          <Typography variant="h6" color="#757575" sx={{ 
-            flexGrow: 1, 
-            textAlign: 'center',
-            fontWeight: '600',
-            }}>
-            お知らせ
-          </Typography>
-      </Toolbar>
+      {/* 見出しのToolbar */}
+      <CustomToolbar title='お知らせ'/>
       
       {/* 通知カードのリスト */}
       <Box sx={{mt: 8, mb: 8}}>
