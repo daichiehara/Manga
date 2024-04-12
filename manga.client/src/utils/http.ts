@@ -13,23 +13,24 @@ axios.interceptors.response.use(
       // 400 Bad Requestの場合、ログインページにリダイレクト
       if (error.response) {
         // 特定のエラー応答に基づく処理
-        if (error.response.status === 400) {
-          console.log('H_3 400 Bad Requestのエラー');
+        if (error.response.status === 400 || error.response.status === 500) {
+          console.log('H_3 400もしくは500 例外だがログアウトを促す。');
+          //updateGlobalAuthState({ isAuthenticated: false });
         } else if (error.response.status === 401) {
           try {
             await authService.refreshToken();
             console.log('H_4 Token refreshed successfully');
             history.go(0);
           } catch (refreshError) {
-            console.error('H_5 リフレッシュトークンにハジかれた。:', refreshError);
+            console.error('H_5 リフレッシュトークンAPIを叩くことに失敗。:', refreshError);
             updateGlobalAuthState({ isAuthenticated: false });
             return Promise.reject(refreshError);
           }
         } else {
-          console.error('H_その他のエラー。ステータスコード:', error.response.status);
+          console.error('H6_その他のエラー。ステータスコード:', error.response.status);
         }
       } else {
-        console.error('H_レスポンス無しのエラー:', error);
+        console.error('H7_レスポンス無し:', error);
       }
       return Promise.reject(error);
     }

@@ -60,9 +60,9 @@ const MainSearch: React.FC = () => {
   return (
     <>
       <Header onSearch={handleSearch} />
-      <div style={{ marginTop: 120,/* Tabsの高さに合わせて調整 */ paddingBottom:'6rem'}}>
-      <TabsComponent selectedTab={selectedTab} onTabChange={handleTabChange} />
       
+      <TabsComponent selectedTab={selectedTab} onTabChange={handleTabChange} />
+      <div style={{ marginTop: 145,/* Tabsの内容の高さに合わせて調整 */ paddingBottom:'6rem'}}>
       {/* メインコンテンツ */}
       {selectedTab === 0 && (
         mangaData.map((item, index) => (

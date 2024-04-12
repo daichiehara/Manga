@@ -4,6 +4,11 @@ import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import PublishIcon from '@mui/icons-material/Publish';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import MenuBar from '../components/menu/MenuBar';
+import CustomToolbar from '../components/common/CustumToolbar';
+
+interface MSell {
+  title: string; 
+}
 
 const MSell: React.FC= () => {
   const onClick = () => {
@@ -34,30 +39,7 @@ const MSell: React.FC= () => {
 
       {/* メインコンテンツエリア */}
       {/* 見出し */}
-      <Toolbar sx={{
-        borderBottom: '1px solid #F2F2F2',
-        background: '#F2F2F2',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.25)',
-        display: 'flex',
-        justifyContent: 'center',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        padding: 0,
-        width: '100%',
-        zIndex: 1000,
-        }}>
-          <Typography variant="h6" color="#757575" sx={{ 
-            flexGrow: 1, 
-            textAlign: 'center',
-            fontWeight: '600',
-            }}>
-            出品
-          </Typography>
-        </Toolbar>
-
-
+      <CustomToolbar title='出品'/>
         {/* 出品ボタン */}
       <Box sx={{ mt:11, ml:4, mr:4, mb: 6,}}>
       <Typography 
