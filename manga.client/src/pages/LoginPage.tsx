@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
 import BackButton from '../components/common/BackButton';
-import { useAuth } from '../components/common/AuthContext'; 
 import { updateGlobalAuthState } from '../components/auth/AuthContext';
 
 
@@ -47,7 +45,7 @@ const Login: React.FC = () => {
     .then(response => {
     setIsLoginSuccessful(true);
     updateGlobalAuthState({ isAuthenticated: true }); 
-    navigate('/test');
+    navigate('/');
     })
     .catch(error => {
         setIsLoginSuccessful(false);

@@ -16,11 +16,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   return (
     <AppBar position="fixed" sx={{
+       
         mb: 2, // 下のマージン
         background: 'linear-gradient(to right, #E97132, #F2CFEE)', // グラデーションの背景色
         boxShadow: 'none',
       }}>
-      <Toolbar sx={{mt: 0.5, mb: 0.5, 
+      <Toolbar sx={{mt: 3, mb: 0.5, 
       }}>
         <Paper
           component="form"

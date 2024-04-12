@@ -13,6 +13,7 @@ import MainMyBook from './pages/MainMyBook';
 import MSell from './pages/MSell.tsx';
 import MainMyPage from './pages/MainMyPage';
 import LoginPage from './pages/LoginPage';
+import MpFavoList from './pages/MpFavoList.tsx';
 import TestRefreshToken from './pages/TestRefreshToken.tsx';
 import { AuthProvider } from './components/auth/AuthContext';
 import { authService } from './api/authService.ts';
@@ -35,7 +36,7 @@ const App = () => {
             <Route path="/main-page" element={<MainMyPage />} /> {/* マイページのルート */}
             <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
             <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
-            
+            <Route path="/mpfavolist" element={<MpFavoList />} /> {/* test */}
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>

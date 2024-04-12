@@ -17,7 +17,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ selectedTab, onTabChange 
         display: 'flex',
         justifyContent: 'center',
         position: 'fixed',
-        top: 0,
+        top: 20,
         left: 0,
         right: 0,
         padding: 0,
