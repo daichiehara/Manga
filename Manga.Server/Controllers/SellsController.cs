@@ -219,13 +219,12 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("MyFavorite")]
-        [Authorize]
         public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync()
         {
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized("ユーザー認証に失敗しました。");
+                return NotFound();
             }
 
             // 現在のユーザーのOwnedListのタイトルリストを取得

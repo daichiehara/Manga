@@ -297,7 +297,8 @@ namespace Manga.Server.Controllers
             var myPageInfo = new
             {
                 NickName = user.NickName,
-                ProfileIcon = user.ProfileIcon
+                ProfileIcon = user.ProfileIcon,
+                HasIdVerificationImage = !string.IsNullOrEmpty(user.IdVerificationImage)
             };
 
             return Ok(myPageInfo);
