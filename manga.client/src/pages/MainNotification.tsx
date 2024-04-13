@@ -151,4 +151,4 @@ const MainNotification: React.FC = () => {
 };
 
 
-export default MainNotification;　
+export default MainNotification;
