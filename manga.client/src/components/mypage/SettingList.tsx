@@ -11,7 +11,7 @@ import { ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 const SettingList: React.FC = () => {
   const menuItems = [
     { name: 'プロフィール設定', path: '/mpfavolist' },
-    { name: 'メール・パスワード', path: '/mangahistory' },
+    { name: 'メール・パスワード', path: '/mpchangeemailpassword' },
     { name: '住所', path: '/mangaexchanged' },
     { name: '本人確認', path: '/mangaexchanged' },
   ];
