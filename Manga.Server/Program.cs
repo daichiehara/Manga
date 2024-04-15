@@ -43,7 +43,7 @@ static async Task<string> GetApiKeyFromAWSSecretsManager(string keyName)
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSingleton<IEmailSender, AmazonSESEmailSender>(provider =>
-    new AmazonSESEmailSender("support@changey.net"));
+    new AmazonSESEmailSender("support@changey.net", "Changey"));
 
 // CORS�I���W���ݒ�
 builder.Services.AddCors(options =>
@@ -100,9 +100,10 @@ builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 {
     // �p�X���[�h�̕��G���v��
     options.Password.RequireDigit = true; // ���������Ȃ��Ƃ�1�܂܂�Ă���K�v������
-    options.Password.RequiredLength = 6; // �p�X���[�h�̍ŏ���
+    options.Password.RequiredLength = 8; // �p�X���[�h�̍ŏ���
     options.Password.RequireNonAlphanumeric = false;
     options.User.RequireUniqueEmail = true; // ���[�U�[�̃��[���A�h���X����ӂł��邱��
+    options.SignIn.RequireConfirmedEmail = true;
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -194,6 +195,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
 // CORS
 app.UseCors("AllowSpecificOrigins");
@@ -208,5 +210,13 @@ app.MapFallbackToFile("/index.html");
 
 app.MapIdentityApi<UserAccount>();
 
+/*
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "confirmEmail",
+        pattern: "api/Users/ConfirmNewEmail/{userId}/{code}/{changedEmail}");
+});
+*/
 
 app.Run();

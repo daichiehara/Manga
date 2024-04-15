@@ -14,6 +14,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Manga.Server.Data;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Manga.Server.Controllers
 {
@@ -25,13 +26,15 @@ namespace Manga.Server.Controllers
         private readonly UserManager<UserAccount> _userManager;
         private readonly SignInManager<UserAccount> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly IEmailSender _emailSender;
 
-        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration)
+        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _emailSender = emailSender;
         }
 
         [HttpPost("Register")]
@@ -94,6 +97,9 @@ namespace Manga.Server.Controllers
 
             // リフレッシュトークンを別のHTTP Only Cookieにセット
             SetTokenCookie("RefreshToken", refreshToken, 259200); // 180日間有効
+
+            // メール送信の呼び出し
+            //await _emailSender.SendEmailAsync(user.Email, "Login Notification", "You have successfully logged in to your account.");
 
             return Ok(new { AccessToken = token, RefreshToken = refreshToken });
         }
@@ -303,6 +309,103 @@ namespace Manga.Server.Controllers
 
             return Ok(myPageInfo);
         }
+
+        [HttpPost("UpdateAccount")]
+        [Authorize]
+        public async Task<IActionResult> UpdateAccount([FromBody] ChangeEmailPasswordDto model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized("User not found.");
+            }
+
+            bool isEmailChanged = !string.IsNullOrEmpty(model.NewEmail) && model.NewEmail != user.Email;
+            bool isPasswordChangeRequested = !string.IsNullOrEmpty(model.NewPassword) && !string.IsNullOrEmpty(model.OldPassword);
+
+            IdentityResult emailResult = null;
+            IdentityResult passwordResult = null;
+            bool emailChangeInitiated = false;
+
+            // メールアドレスの変更を試みる
+            if (isEmailChanged)
+            {
+                var token = await _userManager.GenerateChangeEmailTokenAsync(user, model.NewEmail);
+                var callbackUrl = Url.Action("ConfirmNewEmail", "Users",
+                new
+                {
+                    userId = user.Id,
+                    code = token,
+                    changedEmail = model.NewEmail
+                },
+                Request.Scheme);
+
+                await _emailSender.SendEmailAsync(model.NewEmail, "メールアドレスの変更を完了してください。",
+                    $"Changeyをご利用いただきありがとうございます。<br /><br />以下のURLをクリックして、メールアドレスの変更手続きを完了してください。<br /><a href='{callbackUrl}'>{callbackUrl}</a><br /><br />Changeyサポートチーム");
+                emailChangeInitiated = true;
+            }
+
+            // パスワードの変更を試みる
+            if (isPasswordChangeRequested)
+            {
+                passwordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (!passwordResult.Succeeded)
+                {
+                    return BadRequest("Password change failed: " + string.Join("; ", passwordResult.Errors.Select(e => e.Description)));
+                }
+            }
+
+            // 変更の結果を評価
+            if (emailChangeInitiated && isPasswordChangeRequested)
+            {
+                if (passwordResult.Succeeded)
+                    return Ok("An email has been sent to confirm your new email address and your password has been changed successfully. Please check your email to complete the email change.");
+            }
+            else if (emailChangeInitiated)
+            {
+                return Ok("An email has been sent to confirm your new email address. Please check your email to complete the change.");
+            }
+            else if (isPasswordChangeRequested)
+            {
+                return Ok("Your password has been changed successfully.");
+            }
+            else
+            {
+                return Ok("No changes have been made to your account.");
+            }
+
+            // 上記のいずれの条件にも該当しない場合に備えたデフォルトのreturn文
+            return BadRequest("変更しませんでした。");
+        }
+
+
+
+        [HttpGet("ConfirmNewEmail")]
+        public async Task<IActionResult> ConfirmNewEmail(string userId, string code, string changedEmail)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(code) || string.IsNullOrEmpty(changedEmail))
+            {
+                return Redirect("/confirm-email.html?status=invalid");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Redirect("/confirm-email.html?status=notfound");
+            }
+
+            var result = await _userManager.ChangeEmailAsync(user, changedEmail, code);
+            if (result.Succeeded)
+            {
+                await _userManager.ConfirmEmailAsync(user, code);
+                return Redirect("https://localhost:5173/");
+            }
+            else
+            {
+                return Redirect("/confirm-email.html?status=error&message=" + Uri.EscapeDataString(string.Join("; ", result.Errors.Select(e => e.Description))));
+            }
+        }
+
 
 
         [HttpGet("protected")]
