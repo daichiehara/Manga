@@ -17,6 +17,8 @@ import MpFavoList from './pages/MpFavoList.tsx';
 import TestRefreshToken from './pages/TestRefreshToken.tsx';
 import { AuthProvider } from './components/auth/AuthContext';
 import { authService } from './api/authService.ts';
+import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
+import path from 'path';
 
 const App = () => {
   useEffect(() => {
@@ -37,6 +39,7 @@ const App = () => {
             <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
             <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
             <Route path="/mpfavolist" element={<MpFavoList />} /> {/* test */}
+            <Route path="/mpchangeemailpassword" element={<MpChangeEmailPassword />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>

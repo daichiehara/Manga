@@ -29,6 +29,7 @@ export const authService = {
 
       // クライアントの認証情報をクリア
       updateGlobalAuthState({ isAuthenticated: false });
+      console.log(`ログアウト処理が実行されました`)
     } catch (error) {
       console.error('ログアウトに失敗しました:', error);
       throw error;

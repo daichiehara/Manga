@@ -14,6 +14,7 @@ import SellerInfo from '../components/common/SellerInfo';
 import ImageModal from '../components/common/ImageModal';
 import RecentCommentsDisplay from '../components/item/RecentCommentsDisplay'; 
 import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply インターフェイスのインポート
+import axios from 'axios';
 
 /**
  * MangaDetail コンポーネント
@@ -52,7 +53,6 @@ const MangaDetail = () => {
   const handleBack = () => {
     navigate(-1); // 前のページに戻る
   };
-  console.log(sellId);
 
   const handleImageClick = (index: number) => {
     setCurrentImageIndex(index);
@@ -72,9 +72,10 @@ const MangaDetail = () => {
   useEffect(() => {
     const fetchMangaDetails = async () => {
       try {
-        const response = await fetch(`https://localhost:7103/api/Sells/${sellId}`);
-        const data = await response.json();
-        setMangaDetail(data);
+        const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
+        withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+      });
+        setMangaDetail(response.data);
       } catch (error) {
         setError('漫画の詳細の読み込みに失敗しました。');
         console.error('漫画の詳細情報の取得に失敗:', error);
