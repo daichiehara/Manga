@@ -18,6 +18,7 @@ import TestRefreshToken from './pages/TestRefreshToken.tsx';
 import { AuthProvider } from './components/auth/AuthContext';
 import { authService } from './api/authService.ts';
 import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
+import MpAdressUpadate from './pages/MpAdressUpdate.tsx';
 import path from 'path';
 
 const App = () => {
@@ -40,6 +41,7 @@ const App = () => {
             <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
             <Route path="/mpfavolist" element={<MpFavoList />} /> {/* test */}
             <Route path="/mpchangeemailpassword" element={<MpChangeEmailPassword />} />
+            <Route path="/mpadressupdate" element={<MpAdressUpadate />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>
