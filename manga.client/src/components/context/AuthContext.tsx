@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
+import { createContext, useState, ReactNode} from 'react';
 
 // 認証情報の型定義
 interface AuthState {
@@ -45,7 +45,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 export const updateGlobalAuthState = (newState: AuthState) => {
     if (!globalUpdateAuthState) {
-      console.warn("updateGlobalAuthState was called before AuthProvider was mounted.");
       return;
     }
     globalUpdateAuthState(newState);

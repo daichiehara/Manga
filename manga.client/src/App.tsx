@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,11 +15,10 @@ import MainMyPage from './pages/MainMyPage';
 import LoginPage from './pages/LoginPage';
 import MpFavoList from './pages/MpFavoList.tsx';
 import TestRefreshToken from './pages/TestRefreshToken.tsx';
-import { AuthProvider } from './components/auth/AuthContext';
 import { authService } from './api/authService.ts';
 import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
 import MpAdressUpadate from './pages/MpAdressUpdate.tsx';
-import path from 'path';
+import MpMySell from './pages/MpMySell.tsx';
 
 const App = () => {
   useEffect(() => {
@@ -28,7 +27,6 @@ const App = () => {
   }, []);
   return (
     <ThemeProvider theme={theme}>
-      <AuthProvider>
         <Router>
           <Routes>
             <Route path="/" element={<MainSearch />} />
@@ -42,10 +40,10 @@ const App = () => {
             <Route path="/mpfavolist" element={<MpFavoList />} /> {/* test */}
             <Route path="/mpchangeemailpassword" element={<MpChangeEmailPassword />} />
             <Route path="/mpadressupdate" element={<MpAdressUpadate />} />
+            <Route path="/mpmysell" element={<MpMySell />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>
-        </AuthProvider>
     </ThemeProvider>
   );
 };

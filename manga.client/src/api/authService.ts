@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { updateGlobalAuthState } from '../components/auth/AuthContext';
+import { updateGlobalAuthState } from '../components/context/AuthContext';
 
 export const authService = {
   refreshToken: async () => {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { authService } from '../api/authService';
-import { updateGlobalAuthState } from '../components/auth/AuthContext';
+import { updateGlobalAuthState } from '../components/context/AuthContext';
 
 console.log('http.tsxが読み込まれた。');
 axios.interceptors.response.use(
