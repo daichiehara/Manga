@@ -418,6 +418,8 @@ namespace Manga.Server.Controllers
 
             var addressDto = new ChangeAddressDto
             {
+                Sei = user?.Sei,
+                Mei = user?.Mei,
                 PostalCode = user.PostalCode,
                 Prefecture = user?.Prefecture,
                 Address1 = user?.Address1,
@@ -437,6 +439,8 @@ namespace Manga.Server.Controllers
                 return NotFound();
             }
 
+            user.Sei = model?.Sei;
+            user.Mei = model?.Mei;
             user.PostalCode = model?.PostalCode;
             user.Prefecture = model?.Prefecture;
             user.Address1 = model?.Address1;
