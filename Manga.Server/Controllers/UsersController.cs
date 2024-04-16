@@ -427,7 +427,7 @@ namespace Manga.Server.Controllers
             return Ok(addressDto);
         }
 
-        [HttpPut("updateAddress")]
+        [HttpPut("UpdateAddress")]
         [Authorize]
         public async Task<IActionResult> UpdateAddress(ChangeAddressDto model)
         {
