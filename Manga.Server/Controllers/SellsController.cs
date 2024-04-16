@@ -657,6 +657,7 @@ namespace Manga.Server.Controllers
                     SellImage = s.SellImages
                                     .OrderBy(si => si.Order)
                                     .FirstOrDefault().ImageUrl, // Ensure null-safety with ?
+                    SellStatus = s.SellStatus,
                     SellTime = s.SellTime
                 })
                 .ToListAsync(); // Use ToListAsync for async query

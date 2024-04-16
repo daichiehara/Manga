@@ -5,6 +5,7 @@
         public int SellId { get; set; }
         public string Message { get; set; }
         public string SellImage { get; set; }
+        public SellStatus SellStatus { get; set; }
         public DateTime SellTime { get; set; }
     }
 }
