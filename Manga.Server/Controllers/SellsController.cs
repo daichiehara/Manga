@@ -17,6 +17,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.XPath;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Manga.Server.Controllers
 {
@@ -635,6 +636,36 @@ namespace Manga.Server.Controllers
                 _logger.LogError(ex, "An error occurred while processing the request.");
                 return StatusCode(500, "An internal server error occurred.");
             }
+        }
+
+        [HttpGet("MySell")]
+        [Authorize]
+        public async Task<ActionResult<List<MySellDto>>> GetMySells()
+        {
+            var userId = _userManager.GetUserId(User);  // Get user ID from the claims
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var sells = await _context.Sell
+                .Where(s => s.UserAccountId == userId)
+                .Select(s => new MySellDto
+                {
+                    SellId = s.SellId,
+                    Message = s.SellMessage,
+                    SellImage = s.SellImages
+                                    .OrderBy(si => si.Order)
+                                    .FirstOrDefault().ImageUrl, // Ensure null-safety with ?
+                    SellTime = s.SellTime
+                })
+                .ToListAsync(); // Use ToListAsync for async query
+
+            if (sells == null || !sells.Any())
+            {
+                return NotFound("No sells found for this user.");
+            }
+            return sells;
         }
 
         private string NormalizeTitle(string title)
