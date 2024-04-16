@@ -15,10 +15,10 @@ namespace Manga.Server.Models
         [Display(Name = "都道府県")]
         public string? Prefecture { get; set; }
 
-        [Display(Name = "市区町村・地名・丁目")]
+        [Display(Name = "市区町村・地名・丁目・番地")]
         public string? Address1 {  get; set; }
 
-        [Display(Name = "それ以降の住所")]
+        [Display(Name = "建物名・部屋番号など")]
         public string? Address2 { get; set; }
         
         [Display(Name = "本人確認画像")]

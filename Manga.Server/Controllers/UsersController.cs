@@ -406,7 +406,50 @@ namespace Manga.Server.Controllers
             }
         }
 
+        [HttpGet("GetAddress")]
+        [Authorize]
+        public async Task<IActionResult> GetAddress()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
+            var addressDto = new ChangeAddressDto
+            {
+                PostalCode = user.PostalCode,
+                Prefecture = user?.Prefecture,
+                Address1 = user?.Address1,
+                Address2 = user?.Address2
+            };
+
+            return Ok(addressDto);
+        }
+
+        [HttpPut("updateAddress")]
+        [Authorize]
+        public async Task<IActionResult> UpdateAddress(ChangeAddressDto model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.PostalCode = model?.PostalCode;
+            user.Prefecture = model?.Prefecture;
+            user.Address1 = model?.Address1;
+            user.Address2 = model?.Address2;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok();
+        }
 
         [HttpGet("protected")]
         [Authorize]
