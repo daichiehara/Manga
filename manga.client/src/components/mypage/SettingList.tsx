@@ -12,7 +12,7 @@ const SettingList: React.FC = () => {
   const menuItems = [
     { name: 'プロフィール設定', path: '/mpfavolist' },
     { name: 'メール・パスワード', path: '/mpchangeemailpassword' },
-    { name: '住所', path: '/mangaexchanged' },
+    { name: '住所', path: '/mpadressupdate' },
     { name: '本人確認', path: '/mangaexchanged' },
   ];
 
