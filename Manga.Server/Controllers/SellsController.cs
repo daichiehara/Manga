@@ -653,7 +653,7 @@ namespace Manga.Server.Controllers
                 .Select(s => new MySellDto
                 {
                     SellId = s.SellId,
-                    Message = s.SellMessage,
+                    Message = s.Title,
                     SellImage = s.SellImages
                                     .OrderBy(si => si.Order)
                                     .FirstOrDefault().ImageUrl, // Ensure null-safety with ?

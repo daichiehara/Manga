@@ -9,6 +9,12 @@ namespace Manga.Server.Models
         [Display(Name = "ユーザー名")]
         public string NickName {  get; set; }
 
+        [Display(Name = "姓")]
+        public string? Sei { get; set; }
+
+        [Display(Name = "名")]
+        public string? Mei { get; set; }
+
         [Display(Name = "郵便番号")]
         public string? PostalCode {  get; set; }
 
