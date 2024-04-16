@@ -14,7 +14,7 @@ import SettingList from '../components/mypage/SettingList';
 import SellSettingList from '../components/mypage/SellSettingList';
 import PolicyList from '../components/mypage/PolicyList';
 import { useContext } from 'react';
-import { AuthContext } from '../components/auth/AuthContext';
+import { AuthContext } from '../components/context/AuthContext';
 import { Link } from 'react-router-dom';
 import LogoutList from '../components/mypage/LogoutList';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';

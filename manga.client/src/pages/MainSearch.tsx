@@ -5,7 +5,7 @@ import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 import MenuBar from '../components/menu/MenuBar';
 import axios from 'axios';
-import { AuthContext } from '../components/auth/AuthContext';
+import { AuthContext } from '../components/context/AuthContext';
 
 interface MainSearch {
   sellId: number;

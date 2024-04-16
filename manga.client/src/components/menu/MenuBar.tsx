@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BottomNavigation, BottomNavigationAction, Paper} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
@@ -12,10 +11,17 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import SellIcon from '@mui/icons-material/Sell';
 import PersonIcon from '@mui/icons-material/Person';
+import { useDrawer } from '../../hooks/useDrawer';
+import MyBookModal from '../common/MyBookModal';
 
 const MenuBar: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleModalToggle = () => {
+    setIsModalOpen(!isModalOpen);
+  };
 
   const determineActiveIndex = () => {
     switch (location.pathname) {
@@ -46,7 +52,7 @@ const MenuBar: React.FC = () => {
         navigate('/main-notification');
         break;
       case 2:
-        navigate('/main-mybook');
+        handleModalToggle(); // モーダルをトグルする
         break;
       case 3:
         navigate('/main-sell');
@@ -171,7 +177,9 @@ const MenuBar: React.FC = () => {
       <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined />, <SellIcon />)} sx={sellStyle} />
       <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline />, <PersonIcon />)} sx={searchStyle} />
     </BottomNavigation>
+    <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
     </Paper>
+    
   );
 };
 

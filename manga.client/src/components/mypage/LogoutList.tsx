@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
-import { Box, Typography } from '@mui/material';
+import { Box} from '@mui/material';
 import Divider from '@mui/material/Divider';
 import { ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { authService } from '../../api/authService';

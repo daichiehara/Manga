@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
 import BackButton from '../components/common/BackButton';
-import { updateGlobalAuthState } from '../components/auth/AuthContext';
+import { updateGlobalAuthState } from '../components/context/AuthContext';
 
 
 type LoginFormInputs = {

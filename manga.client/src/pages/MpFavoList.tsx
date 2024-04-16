@@ -4,7 +4,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import React, { useState, useEffect, useContext } from 'react';
 import MenuBar from '../components/menu/MenuBar';
 import axios from 'axios';
-import { AuthContext } from '../components/auth/AuthContext';
+import { AuthContext } from '../components/context/AuthContext';
 import MangaListItem from '../components/item/MangaListItem';
 import { Box, Typography } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';

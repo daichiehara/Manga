@@ -3,7 +3,7 @@ import { Box, Typography, Grid, Card, CardActionArea, CardContent, CardMedia} fr
 import MenuBar from '../components/menu/MenuBar';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios';
-import { AuthContext } from '../components/auth/AuthContext';
+import { AuthContext } from '../components/context/AuthContext';
 import CustomToolbar from '../components/common/CustumToolbar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
