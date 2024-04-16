@@ -6,7 +6,7 @@ namespace Manga.Server
     {
         public override IdentityError DefaultError() => new IdentityError { Code = nameof(DefaultError), Description = "未知のエラーが発生しました。" };
         public override IdentityError ConcurrencyFailure() => new IdentityError { Code = nameof(ConcurrencyFailure), Description = "楽観的同時実行制御の失敗、オブジェクトが変更されています。" };
-        public override IdentityError PasswordMismatch() => new IdentityError { Code = nameof(PasswordMismatch), Description = "パスワードが正しくありません。" };
+        public override IdentityError PasswordMismatch() => new IdentityError { Code = nameof(PasswordMismatch), Description = "現在のパスワードが正しくありません。" };
         public override IdentityError InvalidToken() => new IdentityError { Code = nameof(InvalidToken), Description = "無効なトークンです。" };
         public override IdentityError LoginAlreadyAssociated() => new IdentityError { Code = nameof(LoginAlreadyAssociated), Description = "このログインは既に使用されています。" };
         public override IdentityError InvalidUserName(string userName) => new IdentityError { Code = nameof(InvalidUserName), Description = $"ユーザー名 '{userName}' は無効です。文字または数字のみ使用できます。" };
