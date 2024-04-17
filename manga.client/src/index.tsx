@@ -7,6 +7,7 @@ import theme from './theme/theme';
 import { AuthProvider } from './components/context/AuthContext';
 import './utils/http'
 
+
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>

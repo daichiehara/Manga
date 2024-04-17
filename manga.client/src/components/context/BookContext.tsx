@@ -49,21 +49,21 @@ export const BooksProvider: React.FC<{children: ReactNode}> = ({ children }) => 
 };
 
 // コンポーネント外から呼び出せるグローバル関数
-export const updateGlobalBooks = {
-  addBook: (book: Book) => {
+// 各関数を個別にエクスポートする
+export const addGlobalBook = (book: Book) => {
     if (!globalAddBook) {
       console.warn("addBook was called before BooksProvider was mounted.");
       return;
     }
     globalAddBook(book);
-  },
-  removeBook: (id: string) => {
+  };
+  
+  export const removeGlobalBook = (id: string) => {
     if (!globalRemoveBook) {
       console.warn("removeBook was called before BooksProvider was mounted.");
       return;
     }
     globalRemoveBook(id);
-  }
-};
+  };
 
 export default BooksContext;

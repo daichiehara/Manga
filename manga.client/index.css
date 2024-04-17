@@ -4,12 +4,12 @@ body, html {
     padding: 0;
     box-sizing: border-box;
     --gray-color: #F2F2F2;
+    width: 100%; /* 全体の幅を画面に合わせる */
+    max-width: 1024px; /* 最大幅を640pxに制限 */
+    margin: 0 auto; /* 中央揃え */
 }
 
 #root {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-
+    width: 100%; /* rootも全幅を使用し、上記の最大幅に従う */
 }
-  
+

@@ -22,7 +22,7 @@ axios.interceptors.response.use(
             console.log('H_4 Token refreshed successfully');
             history.go(0);
           } catch (refreshError) {
-            console.error('H_5 リフレッシュトークンAPIを叩くことに失敗。:', refreshError);
+            console.error('H_5 リフレッシュトークンAPIを叩くことに失敗。ログインfalse状態に。:', refreshError);
             updateGlobalAuthState({ isAuthenticated: false });
             return Promise.reject(refreshError);
           }

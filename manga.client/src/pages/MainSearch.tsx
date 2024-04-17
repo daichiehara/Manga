@@ -6,6 +6,7 @@ import Header from '../components/common/Header';
 import MenuBar from '../components/menu/MenuBar';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface MainSearch {
   sellId: number;
@@ -21,6 +22,10 @@ interface MainSearch {
 const MainSearch: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [mangaData, setMangaData] = useState<MainSearch[]>([]); 
+
+  // 新しいステートの追加
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // AuthContextから認証状態を安全に取得
   const authContext = useContext(AuthContext);
@@ -42,6 +47,8 @@ const MainSearch: React.FC = () => {
         setMangaData(response.data);
       } catch (error) {
         console.error('データ取得に失敗しました:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -63,6 +70,20 @@ const MainSearch: React.FC = () => {
       
       <TabsComponent selectedTab={selectedTab} onTabChange={handleTabChange} />
       <div style={{ marginTop: 140,/* Tabsの内容の高さに合わせて調整 */ paddingBottom:'6rem'}}>
+      
+      {/* データ取得中のインジケーター */}
+      {loading && <div>ローディング中...</div>}
+      {/* エラーメッセージ */}
+      {error && <div>{error}</div>}
+      {/* framer-motionを用いたアニメーションの適用 */}
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, x: -100 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 100 }}
+          transition={{ duration: 0.5 }}
+          style={{ marginTop: 140, paddingBottom: '6rem' }}
+        >
       {/* メインコンテンツ */}
       {selectedTab === 0 && (
         mangaData.map((item, index) => (
@@ -80,7 +101,11 @@ const MainSearch: React.FC = () => {
         // "MyList" タブのコンテンツ
         <div>MyList content goes here...</div>
       )}
+
+      </motion.div>
+      </AnimatePresence>
       </div>
+      
       <MenuBar />
     </>
   );

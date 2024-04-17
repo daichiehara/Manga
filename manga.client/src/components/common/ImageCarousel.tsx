@@ -15,25 +15,42 @@ interface ImageCarouselProps {
 }
 
 const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title, onImageClick }) => {
-    const swiperRef = useRef<SwiperClass>(null);
-    const [currentSlide, setCurrentSlide] = useState(0);
+  const swiperRef = useRef<SwiperClass | null>(null); // null 初期化を追加
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-    const handleSlideChange = (swiper: SwiperClass) => {
-        setCurrentSlide(swiper.realIndex);
-    };
+  const handleSlideChange = (swiper: SwiperClass) => {
+      setCurrentSlide(swiper.realIndex);
+  };
+
+  // Swiper インスタンスを ref に割り当てる正しい方法
+  const handleSwiper = (swiper: SwiperClass) => {
+      swiperRef.current = swiper;
+  };
 
     return (
-      <div style={{ display: 'flex', justifyContent: 'center',  padding: 0, margin:0, marginBottom: 0, overflow: 'hidden', backgroundColor:`#F2F2F2`}}>
+      <div style={{ display: 'flex', justifyContent: 'center',  padding: 0, margin:0, marginBottom: 0, overflow: 'hidden', backgroundColor:`#F2F2F2`,position:`relative`}}>
         {/* カスタムナビゲーションボタン */}
         <IconButton
-          sx={{ position: 'absolute', top: '28%', left: 0, zIndex: 1000, transform: 'translateY(-50%)', backgroundColor: 'rgba(0, 0, 0, 0.2)', // 透明度を調整
+          sx={{
+            position: 'absolute',
+            top: '50%',  // 画像の縦の中央
+            left: 0,  // 左端
+            zIndex: 1000,
+            transform: 'translateY(-50%)',  // Y軸に沿って完全に中央へ移動
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
           }}
           onClick={() => swiperRef.current?.slidePrev()}
         >
           <ChevronLeftIcon sx={{ color: 'white', fontSize: '2rem' }} />
         </IconButton>
         <IconButton
-          sx={{ position: 'absolute', top: '28%', right: 0, zIndex: 1000, transform: 'translateY(-50%)', backgroundColor: 'rgba(0, 0, 0, 0.2)', // 透明度を調整
+          sx={{
+            position: 'absolute',
+            top: '50%',  // 画像の縦の中央
+            right: 0,  // 左端
+            zIndex: 1000,
+            transform: 'translateY(-50%)',  // Y軸に沿って完全に中央へ移動
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
           }}
           onClick={() => swiperRef.current?.slideNext()}
         >
@@ -62,16 +79,16 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls, title, onImage
             zIndex: 1000, 
             justifyContent: 'center', 
             alignItems: 'center', 
-            top: '51%', 
+            top: '98%',  // 親コンテナの下端に配置
             left: '50%',
-            transform: 'translate(-50%, -50%)', // 中心に配置
+            transform: 'translate(-50%, -100%)', // X軸では中央、Y軸では完全に下端に合わせる
             color: 'white',
             background: 'rgba(0, 0, 0, 0.4)', 
             borderRadius: '4px', // 角を丸くする
             py: 0.3, // 縦方向の余白
             px: 1, // 横方向の余白
           }}
-          >
+        >
           {`${currentSlide + 1} / ${imageUrls.length}`}
         </Typography>
     </div>
