@@ -45,7 +45,7 @@ const MyBookModal: React.FC<MyBookModalProps> = ({ isOpen, onClose }) => {
           }}
           role="presentation"
         >
-          <Typography>ここにコンテンツを入っｋれます。</Typography>
+          <Typography>ここにコンテンツ。</Typography>
           {/* 他のコンテンツ要素 */}
         </Box>
       </SwipeableDrawer>

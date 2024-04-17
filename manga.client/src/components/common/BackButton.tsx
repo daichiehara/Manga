@@ -1,4 +1,5 @@
 import React from 'react';
+import { Grid } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -7,13 +8,14 @@ interface BackButtonProps extends IconButtonProps {
 }
 
 const BackButton: React.FC<BackButtonProps> = ({ handleBack, ...rest }) => (
+  <Grid container  sx={{position:`fixed`}}>
+    <Grid item xs={1}>
   <IconButton
     onClick={handleBack}
     {...rest}
     sx={{
-      position: 'fixed',
-      top: `1.2rem`,
-      left: `1.2rem`,
+     
+      
       zIndex: 1000,
       backgroundColor: 'rgba(255, 255, 255, 0.5)',
       '&:hover': {
@@ -23,6 +25,9 @@ const BackButton: React.FC<BackButtonProps> = ({ handleBack, ...rest }) => (
   >
     <ArrowBackIcon />
   </IconButton>
+  </Grid>
+  <Grid item xs={11}></Grid>
+  </Grid>
 );
 
 export default BackButton;

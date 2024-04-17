@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Typography, Button, Avatar, Tab, Tabs, Box, Stack, Grid } from '@mui/material';
+import { Typography, Button, Avatar, Box, Stack, Grid } from '@mui/material';
 import MenuBar from '../components/menu/MenuBar';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../api/authService';
@@ -135,7 +135,7 @@ const MainMyPage: React.FC = () => {
             {`いいね一覧`}
           </Typography>
         </Grid>
-        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mangahistory' }sx={{textDecoration: 'none'}}>
+        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mpmysell' }sx={{textDecoration: 'none'}}>
           <Box
             bgcolor="#F2F2F2" // グレーの背景色
             borderRadius="50%" // 円形にする

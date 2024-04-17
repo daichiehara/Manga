@@ -1,3 +1,4 @@
+//MenuBar.tsx
 import React, { useState, useEffect } from 'react';
 import { BottomNavigation, BottomNavigationAction, Paper} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -164,7 +165,7 @@ const MenuBar: React.FC = () => {
   };
 
   return (
-    <Paper sx={{boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, width: '100%', zIndex: 1000 }}>
+    <Paper sx={{boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '1024px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
       <BottomNavigation
         value={value}
         onChange={(_, newValue) => handleNavigationChange(newValue)}

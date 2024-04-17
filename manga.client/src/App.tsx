@@ -4,6 +4,7 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
+import { Box } from '@mui/material';
 import MainSearch from './pages/MainSearch';
 import MangaDetail from './pages/MangaDetail';
 import { ThemeProvider } from '@mui/material/styles';
@@ -20,6 +21,7 @@ import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
 import MpAdressUpadate from './pages/MpAdressUpdate.tsx';
 import MpMySell from './pages/MpMySell.tsx';
 
+
 const App = () => {
   useEffect(() => {
     // アプリケーションの起動時に一度だけリフレッシュトークンのロジックを実行する
@@ -27,6 +29,11 @@ const App = () => {
   }, []);
   return (
     <ThemeProvider theme={theme}>
+      {/* 全体を囲むBoxコンポーネント */}
+      <Box sx={{
+        minHeight: '100vh', // 画面の最小高さ
+        backgroundColor: '#f8f8ff' // 背景色をグレーに設定
+      }}>
         <Router>
           <Routes>
             <Route path="/" element={<MainSearch />} />
@@ -44,6 +51,8 @@ const App = () => {
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>
+        
+      </Box>
     </ThemeProvider>
   );
 };

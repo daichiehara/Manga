@@ -6,7 +6,7 @@ type CustomToolbarProps = {
 };
 
 const CustomToolbar: React.FC<CustomToolbarProps> = ({ title }) => (
-  <Toolbar sx={{
+  <Toolbar disableGutters sx={{
     borderBottom: '1px solid #F2F2F2',
     background: '#F2F2F2',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.25)',
@@ -14,11 +14,11 @@ const CustomToolbar: React.FC<CustomToolbarProps> = ({ title }) => (
     justifyContent: 'center',
     position: 'fixed',
     top: 0,
-    left: 0,
+    
     right: 0,
-    padding: 0,
+    pl: 0,
     width: '100%',
-    zIndex: 1000,
+    zIndex: 1000,maxWidth: '1024px',left: '50%',transform: 'translateX(-50%)',
   }}>
     <Typography variant="h6" sx={{ 
       flexGrow: 1, 
