@@ -106,6 +106,7 @@ namespace Manga.Server.Controllers
 
         // POST: api/OwnedLists
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /*
         [HttpPost]
         public async Task<ActionResult<OwnedList>> PostOwnedList(OwnedList ownedList)
         {
@@ -113,6 +114,43 @@ namespace Manga.Server.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetOwnedList", new { id = ownedList.OwnedListId }, ownedList);
+        }
+        */
+
+        [HttpPost]
+        public async Task<IActionResult> AddToOwnedList([FromQuery] string title)
+        {
+            if (string.IsNullOrEmpty(title))
+            {
+                return BadRequest("タイトルは必須です。");
+            }
+
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("ユーザー認証に失敗しました。");
+            }
+
+            // すでに同じタイトルがWishListに存在するか確認
+            var existingEntry = await _context.OwnedList
+                                              .FirstOrDefaultAsync(w => w.UserAccountId == userId && w.Title == title);
+            if (existingEntry != null)
+            {
+                return BadRequest("このタイトルはすでにWishListに登録されています。");
+            }
+
+            // ユーザーIDとタイトルを使用して新しいOwnedListエントリーを作成
+            var ownedListEntry = new OwnedList
+            {
+                Title = title,
+                UserAccountId = userId
+            };
+
+            // データベースにエントリーを追加
+            _context.OwnedList.Add(ownedListEntry);
+            await _context.SaveChangesAsync();
+
+            return Ok($"タイトル '{title}' が所有リストに追加されました。");
         }
 
         // DELETE: api/OwnedLists/5

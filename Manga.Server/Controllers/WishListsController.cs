@@ -100,6 +100,7 @@ namespace Manga.Server.Controllers
 
         // POST: api/WishLists
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /*
         [HttpPost]
         public async Task<ActionResult<WishList>> PostWishList(WishList wishList)
         {
@@ -107,6 +108,43 @@ namespace Manga.Server.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetWishList", new { id = wishList.WishListId }, wishList);
+        }
+        */
+
+        [HttpPost("AddToWishList")]
+        public async Task<IActionResult> AddToWishList([FromQuery] string title)
+        {
+            if (string.IsNullOrEmpty(title))
+            {
+                return BadRequest("タイトルは必須です。");
+            }
+
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("ユーザー認証に失敗しました。");
+            }
+
+            // すでに同じタイトルがWishListに存在するか確認
+            var existingEntry = await _context.WishList
+                                              .FirstOrDefaultAsync(w => w.UserAccountId == userId && w.Title == title);
+            if (existingEntry != null)
+            {
+                return BadRequest("このタイトルはすでにWishListに登録されています。");
+            }
+
+            // ユーザーIDとタイトルを使用して新しいWishListエントリーを作成
+            var wishListEntry = new WishList
+            {
+                Title = title,
+                UserAccountId = userId
+            };
+
+            // データベースにエントリーを追加
+            _context.WishList.Add(wishListEntry);
+            await _context.SaveChangesAsync();
+
+            return Ok($"タイトル '{title}' がWishListに追加されました。");
         }
 
         // DELETE: api/WishLists/5

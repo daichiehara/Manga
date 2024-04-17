@@ -88,7 +88,7 @@ namespace Manga.Server.Controllers
             var refreshToken = GenerateRefreshToken();
             // ユーザーアカウントにリフレッシュトークンを保存
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(180);
             // データベースに変更を保存
             await _userManager.UpdateAsync(user);
 
@@ -237,6 +237,7 @@ namespace Manga.Server.Controllers
 
             // トークン更新処理
             user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(180);
             await _userManager.UpdateAsync(user);
 
             // アクセストークンをHTTP Only Cookieに設定
