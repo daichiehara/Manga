@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, TextField, Button, Grid, CircularProgress, Box, IconButton, InputAdornment } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Typography, TextField, Button, Grid, CircularProgress, Box } from '@mui/material';
 import axios from 'axios';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -29,9 +28,6 @@ const MpChangeEmailPassword: React.FC = () => {
   const [passwordMismatchError, setPasswordMismatchError] = useState('');
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [serverError, setServerError] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,26 +55,26 @@ const MpChangeEmailPassword: React.FC = () => {
     const isPasswordChange =
     data.currentPassword !== '' || data.newPassword !== '' || data.confirmPassword !== '';
 
-  if (isPasswordChange) {
-    const errors: string[] = [];
+    if (isPasswordChange) {
+      const errors: string[] = [];
 
-    if (data.newPassword !== data.confirmPassword) {
-      errors.push('新しいパスワードと新しいパスワード(確認)が一致していません。');
-    }
+      if (data.newPassword !== data.confirmPassword) {
+        errors.push('新しいパスワードと新しいパスワード(確認)が一致していません。');
+      }
 
-    if (data.newPassword.length < 8) {
-      errors.push('パスワードは最低でも 8 文字必要です。');
-    }
+      if (data.newPassword.length < 8) {
+        errors.push('パスワードは最低でも 8 文字必要です。');
+      }
 
-    if (!/\d/.test(data.newPassword)) {
-      errors.push('パスワードには少なくとも1つの数字 (0~9) が必要です。');
-    }
+      if (!/\d/.test(data.newPassword)) {
+        errors.push('パスワードには少なくとも1つの数字 (0~9) が必要です。');
+      }
 
-    if (errors.length > 0) {
-      setPasswordErrors(errors);
-      return;
+      if (errors.length > 0) {
+        setPasswordErrors(errors);
+        return;
+      }
     }
-  }
 
     setIsLoading(true);
 
@@ -139,7 +135,7 @@ const MpChangeEmailPassword: React.FC = () => {
     <>
       {/* CustomToolbarはそのままにする */}
       <CustomToolbar title='メール・パスワード' />
-      <Box mt={8} px={2}>
+      <Box mt={9} px={2}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={12}>
@@ -174,17 +170,8 @@ const MpChangeEmailPassword: React.FC = () => {
                   <TextField
                     {...field}
                     label="現在のパスワード"
-                    type={showCurrentPassword ? 'text' : 'password'}
+                    type="password"
                     fullWidth
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
-                            {showCurrentPassword ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
                   />
                 )}
               />
@@ -198,17 +185,8 @@ const MpChangeEmailPassword: React.FC = () => {
                   <TextField
                     {...field}
                     label="新しいパスワード"
-                    type={showNewPassword ? 'text' : 'password'}
+                    type="password"
                     fullWidth
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowNewPassword(!showNewPassword)}>
-                            {showNewPassword ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
                   />
                 )}
               />
@@ -222,17 +200,8 @@ const MpChangeEmailPassword: React.FC = () => {
                   <TextField
                     {...field}
                     label="新しいパスワード(確認)"
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type="password"
                     fullWidth
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                            {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
                   />
                 )}
               />
