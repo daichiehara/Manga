@@ -41,9 +41,10 @@ const MSell: React.FC= () => {
       {/* 見出し */}
       <CustomToolbar title='出品'/>
         {/* 出品ボタン */}
-      <Box sx={{ mt:11, ml:4, mr:4, mb: 6,}}>
+      <Box sx={{ml:4, mr:4, mb: 6,}}>
       <Typography 
         variant="h6" sx={{ 
+          pt:10,
           color: '#707070',
           fontWeight: '700',
           mb:2
