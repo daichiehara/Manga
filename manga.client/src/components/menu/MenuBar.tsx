@@ -1,5 +1,5 @@
 //MenuBar.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BottomNavigation, BottomNavigationAction, Paper} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
@@ -15,7 +15,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { useDrawer } from '../../hooks/useDrawer';
 import MyBookModal from '../common/MyBookModal';
 
-const MenuBar: React.FC = () => {
+const MenuBar = React.memo(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,10 +40,11 @@ const MenuBar: React.FC = () => {
 
   // Effect to update the value when the location changes
   useEffect(() => {
-    setValue(determineActiveIndex());
-  }, [location]);
+    const newIndex = determineActiveIndex();
+    setValue(newIndex);
+  }, [location.pathname]); // location.pathname が変わったときだけ更新
 
-  const handleNavigationChange = (newValue: 0 | 1 | 2 | 3 | 4) => {
+  const handleNavigationChange = useCallback((newValue: 0 | 1 | 2 | 3 | 4) => {
     setValue(newValue);
     switch (newValue) {
       case 0:
@@ -63,8 +64,8 @@ const MenuBar: React.FC = () => {
         break;
       default:
         break;
-    }
-  };
+      }
+    }, [navigate]);
   
 
   const getIcon = (index: number, outlined: React.ReactNode, filled: React.ReactNode) => {
@@ -165,7 +166,7 @@ const MenuBar: React.FC = () => {
   };
 
   return (
-    <Paper sx={{boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '1024px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
+    <Paper sx={{boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
       <BottomNavigation
         value={value}
         onChange={(_, newValue) => handleNavigationChange(newValue)}
@@ -182,6 +183,6 @@ const MenuBar: React.FC = () => {
     </Paper>
     
   );
-};
+});
 
 export default MenuBar;

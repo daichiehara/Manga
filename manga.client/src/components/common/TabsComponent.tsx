@@ -22,7 +22,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ selectedTab, onTabChange 
         p: 0,
         width: '100%',
         zIndex: 'tooltip', // Material-UI では z-index を theme から参照することができます。
-        maxWidth: '1024px',
+        maxWidth: '640px',
         left: '50%',
         transform: 'translateX(-50%)',
       }}

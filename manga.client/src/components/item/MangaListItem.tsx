@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 import WishListDisplay from './WishListDisplay';
+import { memo } from 'react';
 
 interface MangaListItemProps {
   sellId: number;
@@ -11,7 +12,7 @@ interface MangaListItemProps {
   wishTitles: { title: string; isOwned: boolean }[];
 }
 
-const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles }) => {
+const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles }) => {
   return (
     <Link to={`/item/${sellId}`} style={{ textDecoration: 'none' }}>
       <Card 
@@ -80,7 +81,7 @@ const MangaListItem: React.FC<MangaListItemProps> = ({ sellId, sellImage, sellTi
           
         </CardContent>
       </Card>
-    </Link>
+      </Link>
   );
-};
+});
 export default MangaListItem;

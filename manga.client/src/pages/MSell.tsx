@@ -57,7 +57,7 @@ const MSell: React.FC= () => {
             width: '100%', 
             height: 70, 
             fontWeight: '700',
-            fontSize: 16,
+            fontSize: '1rem',
           }}
         >
           漫画全巻を出品する

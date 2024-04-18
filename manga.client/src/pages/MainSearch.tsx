@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import TabsComponent from '../components/common/TabsComponent';
 import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 import MenuBar from '../components/menu/MenuBar';
 import axios from 'axios';
-import { AuthContext } from '../components/context/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface MainSearch {
   sellId: number;
@@ -27,42 +25,36 @@ const MainSearch: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // AuthContextから認証状態を安全に取得
-  const authContext = useContext(AuthContext);
-  const isAuthenticated = authContext ? authContext.authState.isAuthenticated : false;
-
   useEffect(() => {
-    
-    console.log('ログイン状態:', isAuthenticated); // ログイン状態をコンソールに表示
-
     const fetchMangaData = async () => {
+      setLoading(true);
       try {
-        console.log('APIリクエストを送信中...');
         const response = await axios.get('https://localhost:7103/api/Sells', {
-          withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+          withCredentials: true
         });
-        console.log('レスポンス受信:', response.status, response.statusText);
-        console.log('取得したデータ:', response.data);
-        console.log('ログイン状態:', isAuthenticated); // ログイン状態をコンソールに表示
         setMangaData(response.data);
       } catch (error) {
         console.error('データ取得に失敗しました:', error);
+        setError('データのロードに失敗しました');
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchMangaData();
-  }, [isAuthenticated]); // 空の依存配列を指定して、コンポーネントのマウント時にのみ実行
+  }, []);  // 空の依存配列を使用して、コンポーネントのマウント時にのみ実行
 
-  const handleSearch = (query: string) => {
-    console.log(query); // ここで検索処理を実装します。今はコンソールに表示するだけです。
-  };
+  const handleSearch = useCallback((query: string) => {
+    // 検索処理
+  }, []);  // 依存配列が空なので、コンポーネントのライフタイムで一度だけ生成される
 
   // タブが変更されたときに呼び出される関数
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
-  };
+  }, []);
+
+  const MemoizedMangaListItem = React.memo(MangaListItem);
+
 
   return (
     <>
@@ -75,15 +67,6 @@ const MainSearch: React.FC = () => {
       {loading && <div>ローディング中...</div>}
       {/* エラーメッセージ */}
       {error && <div>{error}</div>}
-      {/* framer-motionを用いたアニメーションの適用 */}
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 100 }}
-          transition={{ duration: 0.5 }}
-          style={{ marginTop: 140, paddingBottom: '6rem' }}
-        >
       {/* メインコンテンツ */}
       {selectedTab === 0 && (
         mangaData.map((item, index) => (
@@ -101,9 +84,6 @@ const MainSearch: React.FC = () => {
         // "MyList" タブのコンテンツ
         <div>MyList content goes here...</div>
       )}
-
-      </motion.div>
-      </AnimatePresence>
       </div>
       
       <MenuBar />
