@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Typography, Button, Avatar, Box, Stack, Grid } from '@mui/material';
+import { Typography, Button, Avatar, Box, Stack, Grid, Snackbar, Alert } from '@mui/material';
 import MenuBar from '../components/menu/MenuBar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../api/authService';
 import BeenhereRoundedIcon from '@mui/icons-material/BeenhereRounded';
 import BeenhereOutlinedIcon from '@mui/icons-material/BeenhereOutlined'; 
@@ -33,6 +33,16 @@ const MainMyPage: React.FC = () => {
   const { authState } = useContext(AuthContext);
 
   const navigate = useNavigate();
+
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.snackOpen) {
+      setSnackMessage(location.state.snackMessage);
+      setSnackOpen(true);
+    }
+  }, [location]);
 
   // useCallbackを使用して関数が再生成されるのを避ける
   const handleLogin = useCallback(() => {
@@ -222,6 +232,16 @@ const MainMyPage: React.FC = () => {
         
 
       )}
+
+      <Snackbar
+        open={snackOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        style={{ marginBottom: '5rem' }}
+      >
+      <Alert severity="success">{snackMessage}</Alert>
+      </Snackbar>
       
       {/* 以降の部分は変わらず共通のコンポーネントやUI要素を表示 */}
       <MenuBar />

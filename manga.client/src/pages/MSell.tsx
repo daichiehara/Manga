@@ -41,9 +41,10 @@ const MSell: React.FC= () => {
       {/* 見出し */}
       <CustomToolbar title='出品'/>
         {/* 出品ボタン */}
-      <Box sx={{ mt:11, ml:4, mr:4, mb: 6,}}>
+      <Box sx={{ml:4, mr:4, mb: 6,}}>
       <Typography 
         variant="h6" sx={{ 
+          pt:10,
           color: '#707070',
           fontWeight: '700',
           mb:2
@@ -56,7 +57,7 @@ const MSell: React.FC= () => {
             width: '100%', 
             height: 70, 
             fontWeight: '700',
-            fontSize: 16,
+            fontSize: '1rem',
           }}
         >
           漫画全巻を出品する

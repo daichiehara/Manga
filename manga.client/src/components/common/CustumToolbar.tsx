@@ -18,7 +18,7 @@ const CustomToolbar: React.FC<CustomToolbarProps> = ({ title }) => (
     right: 0,
     pl: 0,
     width: '100%',
-    zIndex: 1000,maxWidth: '1024px',left: '50%',transform: 'translateX(-50%)',
+    zIndex: 1000,maxWidth: '640px',left: '50%',transform: 'translateX(-50%)',
   }}>
     <Typography variant="h6" sx={{ 
       flexGrow: 1, 

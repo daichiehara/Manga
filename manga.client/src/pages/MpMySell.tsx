@@ -1,8 +1,7 @@
 import CustomToolbar from '../components/common/CustumToolbar';
-import BackButton from '../components/common/BackButton';
 import {  useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Typography, Grid, Card, CardActionArea, CardContent, CardMedia} from '@mui/material';
+import { Box, Typography, Grid, Card, CardActionArea, CardContent, CardMedia, Chip} from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
@@ -57,7 +56,7 @@ function getStatusStyle(sellStatus: number): StatusStyle {
     case 2:
       return { text: "公開停止中", color: "red" };
     case 3:
-      return { text: "match!!", color: "gray" };
+      return { text: "マッチング！", color: "gray" };
     default:
       return { text: "", color: "inherit" }; // 不明なステータスの場合はデフォルト色
   }
@@ -67,9 +66,6 @@ function getStatusStyle(sellStatus: number): StatusStyle {
 
 const MpMySell: React.FC = () => {
   const navigate = useNavigate();
-  const handleBack = () => {
-    navigate(-1); // 前のページに戻る
-  };
   const [mpmysell, setmpmysell] = useState<MpMySell[]>([]);
   const { authState } = useContext(AuthContext); // 認証状態にアクセス
 
@@ -98,8 +94,6 @@ const MpMySell: React.FC = () => {
       <>
         {/* 見出しのToolbar */}
         <CustomToolbar title='出品した漫画'/>
-        {/* 戻るボタン */}
-        <BackButton handleBack={handleBack} />
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 9 }}>
           <NotificationsNoneIcon sx={{ fontSize: 60, color: 'action.active', padding:9}} />  {/* アイコンのサイズと色、下のマージンを調整 */}
           <Typography variant="subtitle1">
@@ -115,11 +109,9 @@ const MpMySell: React.FC = () => {
     <>
       {/* CustomToolbarはそのままにする */}
       <CustomToolbar title='出品した漫画' />
-      {/* 戻るボタン */}
-      <BackButton handleBack={handleBack} />
       {/* 通知カードのリスト */}
-      <Box sx={{mt: 8, mb: 8}}>
-      <Grid container spacing={0.5}>
+      <Box sx={{mt: 8, mb: 10}}>
+      <Grid container >
         {mpmysell.map((item, index) => (
         <Grid item xs={12} key={item.sellId} style={{ 
           borderBottom: index !== mpmysell.length - 1 ? '1px solid #e0e0e0' : '' 
@@ -133,22 +125,31 @@ const MpMySell: React.FC = () => {
                     width: 70,    // 幅を70pxに設定
                     height: 70,   // 高さを70pxに設定
                     margin: 2,
-                    borderRadius: '10px',
+                    borderRadius: '5px',
                     objectFit: 'cover'  // 画像が枠内に収まるように調整
                   }}
                   image={item.sellImage}
                   />
-                  <CardContent sx={{ flexGrow: 1, '&:last-child': { paddingBottom: '8px' }, padding: '4px' }}>
+                  <CardContent sx={{ flexGrow: 1, '&:last-child': { paddingBottom: '8px' }, padding: '9px' }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: '580'}}>
                     {item.message}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: 12, mt: 0.5 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: 12, mb: 0.5 }}>
                     {timeSince(item.sellTime)}
                   </Typography>
-                 {/* ステータステキストと色の適用 */}
-                 <Typography variant="body2" style={{ color: getStatusStyle(item.sellStatus).color, fontWeight: '590'}}>
-                   {getStatusStyle(item.sellStatus).text}
-                 </Typography>
+                 {/*Chipで ステータステキストと色の適用 */}
+                 <Chip 
+                 label={getStatusStyle(item.sellStatus).text}
+                 size="small"
+                 variant="outlined"  // 枠線付きのバリアントを適用
+                 style={{
+                  color: getStatusStyle(item.sellStatus).color,
+                  borderColor:getStatusStyle(item.sellStatus).color,
+                  padding: '1px 2px',
+                  fontSize: '0.7rem',
+                  borderWidth: '1px'  // 枠線の太さを調整（オプション）
+                }}
+                />
                  </CardContent>
                 <ArrowForwardIosIcon sx={{ marginRight: 2, fontSize: '24px', color: '#707070'}} />
                 </Box>

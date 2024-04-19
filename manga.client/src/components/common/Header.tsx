@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { AppBar, Toolbar, InputBase, Paper, IconButton} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -19,7 +19,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
        
         mb: 2, // 下のマージン
         background: 'linear-gradient(to right, #E97132, #F2CFEE)', // グラデーションの背景色
-        boxShadow: 'none',maxWidth: '1024px',width: '100%', left: '50%',transform: 'translateX(-50%)',
+        boxShadow: 'none',maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',
       }}>
       <Toolbar sx={{mt: 3, mb: 0.5, }}>
         <Paper
@@ -50,4 +50,4 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   );
 };
 
-export default SearchBar;
+export default memo(SearchBar);  // React.memo でコンポーネントをメモ化
