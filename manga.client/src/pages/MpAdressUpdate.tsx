@@ -18,6 +18,7 @@ interface ChangeAddressDto {
 
 const MpAdressUpdate: React.FC = () => {
 
+  window.scrollTo({top:0, behavior: "instant"});
   const { control, handleSubmit, reset, getValues, setValue } = useForm<ChangeAddressDto>({
     defaultValues: {
       sei: '',
@@ -132,7 +133,7 @@ const MpAdressUpdate: React.FC = () => {
         withCredentials: true,
       });
       console.log('更新されました。');
-      navigate(-1);
+      navigate('/main-page', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
     } catch (error) {
       console.error('Error updating address:', error);
     }

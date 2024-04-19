@@ -15,6 +15,7 @@ type FormData = {
 
 const MpChangeEmailPassword: React.FC = () => {
   
+  window.scrollTo({top:0, behavior: "instant"});
   const [currentEmail, setCurrentEmail] = useState('');
   const { control, handleSubmit, reset } = useForm<FormData>({
     defaultValues: {
@@ -95,7 +96,8 @@ const MpChangeEmailPassword: React.FC = () => {
       if (response.status === 200) {
         // Handle success
         console.log('更新されました。');
-        navigate(-1);
+        //navigate(-1);
+        navigate('/main-page', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
       } else {
         // Handle error
         console.error('Failed to update account');
