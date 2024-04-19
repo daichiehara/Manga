@@ -45,5 +45,6 @@ namespace Manga.Server.Models
         public virtual ICollection<Reply> Replys { get; set; }
         public virtual ICollection<MyList> MyLists { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<Contact> Contacts { get; set; }
     }
 }

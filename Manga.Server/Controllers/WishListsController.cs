@@ -111,7 +111,7 @@ namespace Manga.Server.Controllers
         }
         */
 
-        [HttpPost("AddToWishList")]
+        [HttpPost]
         public async Task<IActionResult> AddToWishList([FromQuery] string title)
         {
             if (string.IsNullOrEmpty(title))

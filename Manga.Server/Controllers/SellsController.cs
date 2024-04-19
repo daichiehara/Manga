@@ -47,7 +47,6 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet]
-        [Authorize]
         public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync()
         {
             var userId = _userManager.GetUserId(User);
@@ -278,6 +277,93 @@ namespace Manga.Server.Controllers
                     SellImage = sell.SellImages
                                     .OrderBy(si => si.Order)
                                     .FirstOrDefault()?.ImageUrl
+                };
+
+                homeDtos.Add(dto);
+            }
+
+            return homeDtos;
+        }
+
+        [HttpGet("GetRecommendedSells")]
+        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // 現在のユーザーのOwnedListのタイトルリストを取得
+            var ownedTitles = await _context.OwnedList
+                .Where(o => o.UserAccountId == userId)
+                .Select(o => o.Title)
+                .ToListAsync();
+
+            // 現在のユーザーのSellのタイトルリストも取得
+            var sellTitles = await _context.Sell
+                .Where(s => s.UserAccountId == userId)
+                .Select(s => s.Title)
+                .ToListAsync();
+
+            // 両方のリストを結合
+            var userTitles = ownedTitles.Union(sellTitles).ToList();
+
+            // 現在のユーザーのWishListのタイトルリストを取得
+            var wishTitles = await _context.WishList
+                .Where(w => w.UserAccountId == userId)
+                .Select(w => w.Title)
+                .ToListAsync();
+
+            // 自分のOwnedListのタイトルまたはSellのタイトルと、WishListのタイトルが一致するユーザーのSellを取得
+            var matchingUserSells = await _context.Sell
+                .Include(s => s.SellImages)
+                .Where(s => _context.WishList.Any(w => w.UserAccountId == s.UserAccountId && userTitles.Contains(w.Title)))
+                .ToListAsync();
+
+            // 自分のWishListと同じタイトルのSellを取得
+            var wishMatchingSells = await _context.Sell
+                .Include(s => s.SellImages)
+                .Where(s => wishTitles.Contains(s.Title))
+                .ToListAsync();
+
+            // すべてのSellを新着順に取得
+            var allSells = await _context.Sell
+                .Include(s => s.SellImages)
+                .OrderByDescending(s => s.SellTime)
+                .ToListAsync();
+
+            // 自分のOwnedListまたはSellのタイトルと、WishListのタイトルが一致するユーザーのSellの中で、自分のWishListと同じタイトルのSellを抽出
+            var exactMatchingSells = matchingUserSells
+                .Where(s => wishTitles.Contains(s.Title))
+                .ToList();
+
+            // 結果のリストを作成
+            var recommendedSells = exactMatchingSells
+                .Concat(matchingUserSells)
+                .Concat(wishMatchingSells)
+                .Concat(allSells)
+                .Distinct()
+                .ToList();
+
+            var homeDtos = new List<HomeDto>();
+
+            foreach (var sell in recommendedSells)
+            {
+                var wishTitle = await _context.WishList
+                    .Where(w => w.UserAccountId == sell.UserAccountId)
+                    .Select(w => new WishTitleInfo
+                    {
+                        Title = w.Title,
+                        IsOwned = userTitles.Contains(w.Title)
+                    })
+                    .ToListAsync();
+
+                var dto = new HomeDto
+                {
+                    SellId = sell.SellId,
+                    SellTitle = sell.Title,
+                    NumberOfBooks = sell.NumberOfBooks,
+                    WishTitles = wishTitle,
+                    SellImage = sell.SellImages
+                        .OrderBy(si => si.Order)
+                        .FirstOrDefault()?.ImageUrl
                 };
 
                 homeDtos.Add(dto);

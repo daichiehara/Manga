@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Manga.Server.Data;
 using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using Amazon.SimpleEmail.Model;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Manga.Server.Controllers
 {
@@ -17,11 +19,13 @@ namespace Manga.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserAccount> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public RequestsController(ApplicationDbContext context, UserManager<UserAccount> userManager)
+        public RequestsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         // GET: api/Requests
@@ -192,6 +196,10 @@ namespace Manga.Server.Controllers
                 else
                 {
                     await NotificationsController.SendExchangeRequestNotification(_context, request, responderSell);
+
+
+                    var body = string.Format(Resources.EmailTemplates.RequestMessage, responderSell.UserAccount.NickName, responderSell.Title, request.RequesterSell.Title);
+                    await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "あなたの出品に交換申請がありました。", body);
                 }
             }
 

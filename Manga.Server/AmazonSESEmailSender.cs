@@ -1,4 +1,5 @@
-﻿using Amazon.SimpleEmail.Model;
+﻿using Amazon;
+using Amazon.SimpleEmail.Model;
 using Amazon.SimpleEmail;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
@@ -15,16 +16,20 @@ namespace Manga.Server
             _fromName = fromName;
         }
 
-        public async Task SendEmailAsync(string email, string subject, string message)
+        public async Task SendEmailAsync(string receiverAddress, string subject, string htmlBody)
         {
-            using (var client = new AmazonSimpleEmailServiceClient(Amazon.RegionEndpoint.USWest2))
+            // Change to your from email
+            string senderAddress = "support@changey.net";
+            // Change to your region
+            using (var client = new AmazonSimpleEmailServiceClient(RegionEndpoint.USWest2))
             {
                 var sendRequest = new SendEmailRequest
                 {
-                    Source = $"\"{_fromName}\" <{_fromEmail}>",
+                    Source = senderAddress,
                     Destination = new Destination
                     {
-                        ToAddresses = new List<string> { email }
+                        ToAddresses =
+                        new List<string> { receiverAddress }
                     },
                     Message = new Message
                     {
@@ -34,22 +39,17 @@ namespace Manga.Server
                             Html = new Content
                             {
                                 Charset = "UTF-8",
-                                Data = message
+                                Data = htmlBody
+                            },
+                            Text = new Content
+                            {
+                                Charset = "UTF-8",
+                                Data = htmlBody
                             }
                         }
                     }
                 };
-
-                try
-                {
-                    var response = await client.SendEmailAsync(sendRequest);
-                    // ログ記録またはエラーハンドリング
-                }
-                catch (Exception ex)
-                {
-                    // エラーハンドリング
-                    throw;
-                }
+                var response = await client.SendEmailAsync(sendRequest);
             }
         }
     }

@@ -208,7 +208,7 @@ namespace Manga.Server.Controllers
                 .CountAsync(r => r.ResponderSellId == responderSell.SellId && r.Status == RequestStatus.Pending);
 
             // 通知のメッセージを作成
-            var message = $"あなたの作品「{responderSell.Title}」に {exchangeRequestCount} 件の交換申請があります。";
+            var message = $"あなたの出品「{responderSell.Title}」に {exchangeRequestCount} 件の交換申請があります。";
 
             // 通知を作成し、データベースに保存
             await CreateNotificationAsync(
