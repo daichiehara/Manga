@@ -285,7 +285,7 @@ namespace Manga.Server.Controllers
             return homeDtos;
         }
 
-        [HttpGet("GetRecommendedSells")]
+        [HttpGet("Recommend")]
         public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync()
         {
             var userId = _userManager.GetUserId(User);
