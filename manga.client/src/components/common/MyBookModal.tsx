@@ -2,6 +2,7 @@ import React from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import BooksTabs from './BooksTabs';
 
 interface MyBookModalProps {
     isOpen: boolean;
@@ -45,8 +46,9 @@ const MyBookModal: React.FC<MyBookModalProps> = ({ isOpen, onClose }) => {
           }}
           role="presentation"
         >
-          <Typography>ここにコンテンツ。</Typography>
+          
           {/* 他のコンテンツ要素 */}
+          <BooksTabs />
         </Box>
       </SwipeableDrawer>
     </>

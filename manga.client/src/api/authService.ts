@@ -3,7 +3,8 @@ import { updateGlobalAuthState } from '../components/context/AuthContext';
 import { addGlobalBook, removeGlobalBook } from '../components/context/BookContext';
 
 interface Book {
-  id: string;
+  id: string;  // オプショナルなプロパティとして定義
+  itemId: string;
   title: string;
 }
 
@@ -13,39 +14,85 @@ interface BooksApiResponse {
 }
 
 type BookId = string; // `bookId`は文字列型ですが、意味の明確化のために型エイリアスを使用しています。
+type WishList = Book[]; // WishListはBookの配列です
 
 
 const API_BASE_URL = 'https://localhost:7103/api';
 
 export const bookService = {
-  getBooks: async () => {
+  getBooksData: async () => {
     try {
-      const response = await axios.get<BooksApiResponse>(`${API_BASE_URL}/Users/OwnedLists`, { withCredentials: true });
+      const response = await axios.get<BooksApiResponse>(`${API_BASE_URL}/OwnedLists`, { withCredentials: true });
       console.log('Book data fetched:', response.data);
-      response.data.ownedLists.forEach(book => addGlobalBook(book));  // ownedListsを状態に反映
-      response.data.sells.forEach(book => addGlobalBook(book));      // sellsも状態に反映
+      const allBooks = [...response.data.ownedLists, ...response.data.sells]; // 2つのリストを結合
+      allBooks.forEach(book => {
+        addGlobalBook({ id: book.itemId, title: book.title }); // グローバルな書籍リストに追加
+      });
+      return response.data; // 処理されたデータを返す
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  },
+
+  getWishLists: async () => {
+    try {
+      const response = await axios.get<WishList>(`${API_BASE_URL}/WishLists`, { withCredentials: true });
+      console.log('Wish list data fetched:', response.data);
+      response.data.forEach(book => addGlobalBook({ id: book.itemId, title: book.title }));
       return response.data;
     } catch (error) {
       handleError(error);
       throw error;
     }
   },
-  addBook: async (book: Book) => {
+
+  addOwnedLists: async (book: Book) => {
     try {
-      const response = await axios.post<Book>(`${API_BASE_URL}/Users/AddBook`, book, { withCredentials: true });
+      const response = await axios.post<Book>(`${API_BASE_URL}/OwnedLists`, { title: book.title }, { withCredentials: true });
       console.log('Book added:', response.data);
-      addGlobalBook(response.data); // 新しい本を状態に追加
+      if (!response.data) {
+        throw new Error('Invalid server response');
+      }
+      addGlobalBook(response.data);
       return response.data;
     } catch (error) {
       handleError(error);
       throw error;
     }
   },
-  removeBook: async (bookId: BookId) => {
+  
+  addWishLists: async (book: Book) => {
     try {
-      await axios.delete(`${API_BASE_URL}/Users/RemoveBook/${bookId}`, { withCredentials: true });
-      console.log('Book removed:', bookId);
-      removeGlobalBook(bookId); // 本を状態から削除
+      const response = await axios.post<Book>(`${API_BASE_URL}/WishLists`, { title: book.title }, { withCredentials: true });
+      console.log('Book added:', response.data);
+      if (!response.data) {
+        throw new Error('Invalid server response');
+      }
+      addGlobalBook(response.data);
+      return response.data;
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  },
+  
+  removeOwnedLists: async (sellId: BookId) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/OwnedLists/${sellId}`, { withCredentials: true });
+      console.log('Owned list book removed:', sellId);
+      removeGlobalBook(sellId);
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  },
+  
+  removeWishLists: async (sellId: BookId) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/WishLists/${sellId}`, { withCredentials: true });
+      console.log('Wish list book removed:', sellId);
+      removeGlobalBook(sellId);
     } catch (error) {
       handleError(error);
       throw error;
@@ -53,14 +100,14 @@ export const bookService = {
   }
 };
 
-// エラーハンドリング共通関数
-function handleError(error:unknown) {
+function handleError(error: unknown) {
   if (axios.isAxiosError(error)) {
     console.error('API request failed:', error.response ? error.response.data : error.message);
   } else {
     console.error('Unexpected error:', error);
   }
 }
+
 
 export const authService = {
   refreshToken: async () => {
