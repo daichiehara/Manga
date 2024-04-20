@@ -103,7 +103,10 @@ namespace Manga.Server.Controllers
             }
 
             // 交換対象のSellが存在するか確認
-            var responderSell = await _context.Sell.FindAsync(exchangeRequestDto.ResponderSellId);
+            var responderSell = await _context.Sell
+                .Include(s => s.UserAccount) // UserAccount を含めてデータをロード
+                .Include(s => s.UserAccount.WishLists)
+                .FirstOrDefaultAsync(s => s.SellId == exchangeRequestDto.ResponderSellId);
             if (responderSell == null)
             {
                 return NotFound("交換対象の出品が見つかりません。");
@@ -118,6 +121,12 @@ namespace Manga.Server.Controllers
                 if (requesterSell == null || requesterSell.UserAccountId != userId)
                 {
                     continue; // 出品が見つからない、または出品者が申請者自身でない場合はスキップ
+                }
+
+                // WishListにrequesterSellのTitleが含まれているか確認
+                if (!responderSell.UserAccount.WishLists.Any(wl => wl.Title == requesterSell.Title))
+                {
+                    continue; // WishListに含まれない場合はスキップ
                 }
 
                 var request = new Request
@@ -135,6 +144,11 @@ namespace Manga.Server.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            if (createdRequests.Count == 0)
+            {
+                return BadRequest("交換申請に失敗しました。。条件に一致する出品が存在しないか、既に申請済みの可能性があります。");
+            }
 
             // 作成された交換申請ごとに通知を送信
             foreach (var request in createdRequests)
