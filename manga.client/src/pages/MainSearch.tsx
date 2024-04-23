@@ -24,7 +24,7 @@ interface MainSearchProps {
   initialTab: number;
 }
 
-const MainSearch: React.FC<MainSearchProps> = ({initialTab = 0}) => {
+const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
   //const [selectedTab, setSelectedTab] = useState(0);
   const [mangaData, setMangaData] = useState<MainSearch[]>([]); 
   const [myListData, setMyListData] = useState<MainSearch[]>([]);
@@ -59,27 +59,27 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 0}) => {
 
   useEffect(() => {
     // パスに基づいて selectedTab を更新
-    const tabFromPath = location.pathname === '/' ? 0 : location.pathname === '/item/mylist' ? 1 : location.pathname === '/item/recommend' ? 2 : 0;
+    const tabFromPath = location.pathname === '/item/favorite' ? 0 : location.pathname === '/' ? 1 : location.pathname === '/item/new' ? 2 : 0;
     setSelectedTab(tabFromPath);
   }, [location]);
 
   useEffect(() => {
-    if (location.pathname === '/') {
+    if (location.pathname === '/item/favorite') {
       setSelectedTab(0);
-    } else if (location.pathname === '/item/mylist') {
+    } else if (location.pathname === '/') {
       setSelectedTab(1);
-    } else if (location.pathname === '/item/recomend') {
+    } else if (location.pathname === '/item/new') {
       setSelectedTab(2);
     }
   }, [location]);
 
   useEffect(() => {
     if (selectedTab === 0) {
-      fetchMangaData();
-    } else if (selectedTab === 1) {
       fetchMyListData();
-    } else if (selectedTab === 2) {
+    } else if (selectedTab === 1) {
       fetchRecommendData();
+    } else if (selectedTab === 2) {
+      fetchMangaData();
     }
   }, [selectedTab]);  // selectedTabの変更を検知
 
@@ -142,11 +142,11 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 0}) => {
   const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
     if (newValue === 0) {
-      navigate('/');
+      navigate('/item/favorite');
     } else if (newValue === 1) {
-      navigate('/item/mylist');
+      navigate('/');
     } else if (newValue === 2) {
-      navigate('/item/recommend');
+      navigate('/item/new');
     }
   }, [navigate]);
   const MemoizedMangaListItem = React.memo(MangaListItem);
@@ -163,20 +163,8 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 0}) => {
       {loading && <div>ローディング中...</div>}
       {/* エラーメッセージ */}
       {error && <div>{error}</div>}
-      {/* メインコンテンツ */}
+      {/* メインコンテンツ */}     
       {selectedTab === 0 && (
-        mangaData.map((item, index) => (
-          <MangaListItem 
-            key={index}
-            sellId={item.sellId}
-            sellImage={item.sellImage} 
-            sellTitle={item.sellTitle} 
-            numberOfBooks={item.numberOfBooks}
-            wishTitles={item.wishTitles} // 修正
-          />
-        ))
-      )}
-      {selectedTab === 1 && (
         myListData.length > 0 ? (
           myListData.map((item, index) => (
             <MangaListItem
@@ -221,8 +209,20 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 0}) => {
           </Box>
         )
       )}
-      {selectedTab === 2 && (
+      {selectedTab === 1 && (
         RecommendData.map((item, index) => (
+          <MangaListItem 
+            key={index}
+            sellId={item.sellId}
+            sellImage={item.sellImage} 
+            sellTitle={item.sellTitle} 
+            numberOfBooks={item.numberOfBooks}
+            wishTitles={item.wishTitles} // 修正
+          />
+        ))
+      )}
+      {selectedTab === 2 && (
+        mangaData.map((item, index) => (
           <MangaListItem 
             key={index}
             sellId={item.sellId}

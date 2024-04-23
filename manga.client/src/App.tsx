@@ -37,9 +37,9 @@ const App = () => {
         <Router>
           <Routes>
             //<Route path="/" element={<MainSearch />} />
-            <Route path="/" element={<MainSearch initialTab={0} />} />
-            <Route path="/item/mylist" element={<MainSearch initialTab={1} />} />
-            <Route path="/item/recommend" element={<MainSearch initialTab={2} />} />
+            <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
+            <Route path="/" element={<MainSearch initialTab={1} />} />
+            <Route path="/item/new" element={<MainSearch initialTab={2} />} />
             <Route path="/item/:sellId" element={<MangaDetail />} />
             <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
             <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}

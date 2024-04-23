@@ -27,6 +27,8 @@ const MenuBar = React.memo(() => {
   const determineActiveIndex = () => {
     switch (location.pathname) {
       case '/': return 0;
+      case '/item/new' : return 0;
+      case '/item/favorite' : return 0;
       case '/main-notification': return 1;
       case '/main-mybook': return 2;
       case '/main-sell': return 3;

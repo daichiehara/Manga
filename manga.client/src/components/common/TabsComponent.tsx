@@ -32,9 +32,9 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ selectedTab, onTabChange 
         onChange={onTabChange} 
         aria-label="basic tabs example"
       >
-        <Tab label="新着順" />
         <Tab label="マイリスト" />
         <Tab label="おすすめ" />
+        <Tab label="新着順" />
       </Tabs>
     </Box>
   );
