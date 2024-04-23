@@ -20,6 +20,7 @@ import { authService } from './api/authService.ts';
 import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
 import MpAdressUpadate from './pages/MpAdressUpdate.tsx';
 import MpMySell from './pages/MpMySell.tsx';
+import MpMatchedSell from './pages/MpMatchedSell.tsx';
 
 
 const App = () => {
@@ -36,7 +37,6 @@ const App = () => {
       }}>
         <Router>
           <Routes>
-            //<Route path="/" element={<MainSearch />} />
             <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
             <Route path="/" element={<MainSearch initialTab={1} />} />
             <Route path="/item/new" element={<MainSearch initialTab={2} />} />
@@ -51,6 +51,7 @@ const App = () => {
             <Route path="/mpchangeemailpassword" element={<MpChangeEmailPassword />} />
             <Route path="/mpadressupdate" element={<MpAdressUpadate />} />
             <Route path="/mpmysell" element={<MpMySell />} />
+            <Route path="/mpmatchedsell" element={<MpMatchedSell />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>
