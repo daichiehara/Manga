@@ -20,32 +20,7 @@ type WishList = Book[]; // WishListはBookの配列です
 const API_BASE_URL = 'https://localhost:7103/api';
 
 export const bookService = {
-  getBooksData: async () => {
-    try {
-      const response = await axios.get<BooksApiResponse>(`${API_BASE_URL}/OwnedLists`, { withCredentials: true });
-      console.log('Book data fetched:', response.data);
-      const allBooks = [...response.data.ownedLists, ...response.data.sells]; // 2つのリストを結合
-      allBooks.forEach(book => {
-        addGlobalBook({ id: book.itemId, title: book.title }); // グローバルな書籍リストに追加
-      });
-      return response.data; // 処理されたデータを返す
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  },
-
-  getWishLists: async () => {
-    try {
-      const response = await axios.get<WishList>(`${API_BASE_URL}/WishLists`, { withCredentials: true });
-      console.log('Wish list data fetched:', response.data);
-      response.data.forEach(book => addGlobalBook({ id: book.itemId, title: book.title }));
-      return response.data;
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  },
+  
 
   addOwnedLists: async (book: Book) => {
     try {

@@ -1,55 +1,52 @@
-// BooksTabs.tsx
 import React, { useState, useEffect } from 'react';
 import { Tab, Tabs, Box } from '@mui/material';
-import { bookService } from '../../api/authService';
+import axios from 'axios';
 import BooksList from '../item/BooksList';
+import { useBooks } from '../context/BookContext';
+
+const API_BASE_URL = 'https://localhost:7103/api';
 
 interface Book {
-  id: string;
+  id: string;  // Assume each book has a unique ID
   title: string;
 }
 
-interface BooksApiResponse {
-  ownedLists: Book[];
-  sells: Book[];
+interface BooksTabsProps {
+  triggerFetch: boolean;  // New prop to control data fetching
 }
 
-const BooksTabs = () => {
+const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
+  const { addBook } = useBooks(); // Use the context method to add books globally
   const [tabIndex, setTabIndex] = useState(0);
-  // ここでuseStateにジェネリック型引数を渡して、配列の要素の型を指定します。
   const [ownedLists, setOwnedLists] = useState<Book[]>([]);
   const [sells, setSells] = useState<Book[]>([]);
   const [wishLists, setWishLists] = useState<Book[]>([]);
 
   useEffect(() => {
-    let isMounted = true; // Flag to check the mounted state
-
-    async function fetchData() {
-      try {
-        const booksData = await bookService.getBooksData();
-        const wishData = await bookService.getWishLists();
-
-        if (isMounted) { // Only update state if the component is still mounted
-          setOwnedLists(booksData.ownedLists);
-          setSells(booksData.sells);
-          setWishLists(wishData);
-        }
-      } catch (error) {
-        console.error('Failed to fetch data', error);
-      }
+    if (triggerFetch) {  // Fetch data only when triggerFetch is true
+      fetchBooksData();
+      fetchWishLists();
     }
+  }, [triggerFetch]);  // Depend on triggerFetch
 
-    fetchData();
+  const fetchBooksData = async () => {
+    const { data } = await axios.get(`${API_BASE_URL}/OwnedLists`, { withCredentials: true });
+    console.log('owned_fetch叩かれた');
+    setOwnedLists(data.ownedLists);
+    setSells(data.sells);
+    data.ownedLists.concat(data.sells).forEach((book: Book) => addBook({ id: book.id, title: book.title }));
+  };
 
-    return () => {
-      isMounted = false; // Clean up the flag when the component is unmounted
-    };
-  }, []);
+  const fetchWishLists = async () => {
+    const { data } = await axios.get(`${API_BASE_URL}/WishLists`, { withCredentials: true });
+    console.log('wish_fetch叩かれた');
+    setWishLists(data);
+    data.forEach((book: Book) => addBook({ id: book.id, title: book.title }));
+  };
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
   };
-  
 
   return (
     <Box sx={{ width: '100%' }}>

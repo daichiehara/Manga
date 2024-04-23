@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import BooksTabs from './BooksTabs';
 
 interface MyBookModalProps {
@@ -9,18 +8,32 @@ interface MyBookModalProps {
     onClose: () => void;
 }
 
-const MyBookModal: React.FC<MyBookModalProps> = ({ isOpen, onClose }) => {
+const MyBookModal: React.FC<MyBookModalProps> = React.memo(({ isOpen, onClose }) => {
+  // State to manage when to trigger data fetching in BooksTabs
+  const [triggerFetch, setTriggerFetch] = useState(false);
+
+  // Effect to control the triggerFetch state based on isOpen prop
+  useEffect(() => {
+    if (isOpen) {
+      // Trigger fetching when modal opens
+      setTriggerFetch(true);
+    }
+  }, [isOpen]);
+
   return (
-    <>
-      <SwipeableDrawer
+    <SwipeableDrawer
         anchor='bottom'
         open={isOpen}
-        onClose={onClose}
-        onOpen={() => onClose()}  // このonOpenは本来の意図に合わせて適切に設定する必要があります。
-        swipeAreaWidth={0}  // より具体的な値に設定
-        disableSwipeToOpen={false}  // デフォルトの動作を維持
+        onClose={() => {
+          onClose();
+          // Reset triggerFetch when modal closes
+          setTriggerFetch(false);
+        }}
+        onOpen={() => {}}
+        swipeAreaWidth={0}
+        disableSwipeToOpen={false}
         ModalProps={{
-          keepMounted: true,
+          keepMounted: true,  // Keep the component mounted after it's been displayed once
           BackdropProps: {
             invisible: true
           }
@@ -37,22 +50,20 @@ const MyBookModal: React.FC<MyBookModalProps> = ({ isOpen, onClose }) => {
         <Box
           sx={{
             width: 'auto',
-            height: 500, // 「rem」単位からピクセル単位に変更
+            height: 500,
             overflow: 'hidden',
             mx: 'auto',
             mt: 2,
             mb: 2,
-            p: 2  // パディングを追加
+            p: 2
           }}
           role="presentation"
         >
-          
-          {/* 他のコンテンツ要素 */}
-          <BooksTabs />
+          {/* Pass the triggerFetch state to BooksTabs */}
+          <BooksTabs triggerFetch={triggerFetch} />
         </Box>
       </SwipeableDrawer>
-    </>
   );
-};
+});
 
 export default MyBookModal;

@@ -1,5 +1,5 @@
 //MenuBar.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { BottomNavigation, BottomNavigationAction, Paper} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
@@ -15,59 +15,67 @@ import PersonIcon from '@mui/icons-material/Person';
 import { useDrawer } from '../../hooks/useDrawer';
 import MyBookModal from '../common/MyBookModal';
 
-const MenuBar = React.memo(() => {
+// determineActiveIndexをコンポーネント外に移動
+function determineActiveIndex(pathname: string): number {
+  switch (pathname) {
+    case '/':
+    case '/item/new':
+    case '/item/favorite':
+      return 0;
+    case '/main-notification':
+      return 1;
+    case '/main-mybook':
+      return 2;
+    case '/main-sell':
+      return 3;
+    case '/main-page':
+      return 4;
+    default:
+      return -1;
+  }
+}
+
+const MenuBar = memo(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [value, setValue] = useState(-1);
 
-  const handleModalToggle = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
-  const determineActiveIndex = () => {
-    switch (location.pathname) {
-      case '/': return 0;
-      case '/item/new' : return 0;
-      case '/item/favorite' : return 0;
-      case '/main-notification': return 1;
-      case '/main-mybook': return 2;
-      case '/main-sell': return 3;
-      case '/main-page': return 4;
-      default: return -1;
-    }
-  };
-  
-
-  const [value, setValue] = React.useState(determineActiveIndex());
-
-  // Effect to update the value when the location changes
   useEffect(() => {
-    const newIndex = determineActiveIndex();
-    setValue(newIndex);
-  }, [location.pathname]); // location.pathname が変わったときだけ更新
+    const newIndex = determineActiveIndex(location.pathname);
+    if (newIndex !== value) {
+      setValue(newIndex);
+    }
+  }, [location.pathname, value]);
 
-  const handleNavigationChange = useCallback((newValue: 0 | 1 | 2 | 3 | 4) => {
-    setValue(newValue);
-    switch (newValue) {
-      case 0:
-        navigate('/');
-        break;
-      case 1:
-        navigate('/main-notification');
-        break;
-      case 2:
-        handleModalToggle(); // モーダルをトグルする
-        break;
-      case 3:
-        navigate('/main-sell');
-        break;
-      case 4:
-        navigate('/main-page');
-        break;
-      default:
-        break;
+  const handleModalToggle = useCallback(() => {
+    setIsModalOpen(prev => !prev);
+  }, []);
+
+  const handleNavigationChange = useCallback((newValue: number) => {
+    if (newValue !== value) {
+      setValue(newValue);
+      switch (newValue) {
+        case 0:
+          navigate('/');
+          break;
+        case 1:
+          navigate('/main-notification');
+          break;
+        case 2:
+          handleModalToggle();
+          break;
+        case 3:
+          navigate('/main-sell');
+          break;
+        case 4:
+          navigate('/main-page');
+          break;
+        default:
+          break;
       }
-    }, [navigate]);
+    }
+  }, [navigate, value, handleModalToggle]);
   
 
   const getIcon = (index: number, outlined: React.ReactNode, filled: React.ReactNode) => {
