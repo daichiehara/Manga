@@ -175,18 +175,18 @@ const MenuBar = memo(() => {
   };
 
   return (
-    <Paper sx={{pb:`1,1rem`, pt:`0.1rem`, boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
+    <Paper sx={{pb:`1rem`, pt:`0.1rem`, boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
       <BottomNavigation
         value={value}
         onChange={(_, newValue) => handleNavigationChange(newValue)}
         showLabels
         sx={{ width: '100%' }}
       >
-      <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined sx={{fontSize:`2rem`}}/>, <SearchIcon sx={{fontSize:`2rem`}} />)} sx={actionStyle} />
-      <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined sx={{fontSize:`2rem`}} />, <NotificationsIcon sx={{fontSize:`2rem`}} />)} sx={noticeStyle} />
-      <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon sx={{fontSize:`2rem`}} />, <AutoStoriesIcon sx={{fontSize:`2rem`}} />)} sx={myBookshelfStyle} />
-      <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined sx={{fontSize:`2rem`}} />, <SellIcon sx={{fontSize:`2rem`}} />)} sx={sellStyle} />
-      <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline sx={{fontSize:`2rem`}} />, <PersonIcon sx={{fontSize:`2rem`}} />)} sx={searchStyle} />
+      <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined sx={{fontSize:`1.4rem`}}/>, <SearchIcon sx={{fontSize:`1.4rem`}} />)} sx={actionStyle} />
+      <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined sx={{fontSize:`1.4rem`}} />, <NotificationsIcon sx={{fontSize:`1.4rem`}} />)} sx={noticeStyle} />
+      <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon sx={{fontSize:`1.4rem`}} />, <AutoStoriesIcon sx={{fontSize:`1.4rem`}} />)} sx={myBookshelfStyle} />
+      <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined sx={{fontSize:`1.4rem`}}/>, <SellIcon sx={{fontSize:`1.4rem`}}/>)} sx={sellStyle} />
+      <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline sx={{fontSize:`1.4rem`}} />, <PersonIcon sx={{fontSize:`1.4rem`}}/>)} sx={searchStyle} />
     </BottomNavigation>
     <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
     </Paper>

@@ -33,7 +33,8 @@ const App = () => {
       {/* 全体を囲むBoxコンポーネント */}
       <Box sx={{
         minHeight: '100vh', // 画面の最小高さ
-        backgroundColor: '#f8f8ff' // 背景色をグレーに設定
+        //backgroundColor: '#FCFCFC', // 背景色をグレーに設定
+        boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.2), -2px 0 4px -2px rgba(0, 0, 0, 0.2)' 
       }}>
         <Router>
           <Routes>
