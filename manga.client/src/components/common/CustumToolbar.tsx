@@ -9,7 +9,7 @@ const CustomToolbar: React.FC<CustomToolbarProps> = ({ title }) => (
   <Toolbar disableGutters sx={{
     borderBottom: '0.05px solid #BFBFBF',
     background:`#FFFFFF`,
-    
+    boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.2), -2px 0 4px -2px rgba(0, 0, 0, 0.2)' ,
     display: 'flex',
     justifyContent: 'center',
     position: 'fixed',
