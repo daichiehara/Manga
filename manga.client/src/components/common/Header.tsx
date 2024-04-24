@@ -21,29 +21,31 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
         background: 'linear-gradient(to right, #E97132, #F2CFEE)', // グラデーションの背景色
         boxShadow: 'none',maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',
       }}>
-      <Toolbar sx={{mt: 3, mb: 0.5, }}>
+      <Toolbar disableGutters sx={{mt: 3, mb: 0.5, px:2,}}>
         <Paper
           component="form"
           sx={{
-            p: '2px 4px',
+            
             display: 'flex',
             alignItems: 'center',
             width: '100%', // モバイルでの表示調整
             boxShadow: '0px 4px 4px -1px rgba(0,0,0,0.2)',
             margin: 'auto', // 中央揃え
-            borderRadius: '12px'
+            borderRadius: '5px'
           }}
           onSubmit={handleSearch}
         >
+          <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+            <SearchIcon />
+          </IconButton>
+
           <InputBase
             sx={{ ml: 1, flex: 1 }}
             placeholder="欲しい漫画を探す"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-            <SearchIcon />
-          </IconButton>
+          
         </Paper>
       </Toolbar>
     </AppBar>
