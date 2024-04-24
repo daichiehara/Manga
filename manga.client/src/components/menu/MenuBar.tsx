@@ -175,7 +175,7 @@ const MenuBar = memo(() => {
   };
 
   return (
-    <Paper sx={{pb:`1rem`, pt:`0.1rem`, boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
+    <Paper sx={{pb:`1rem`, pt:`0.1rem`, boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.1)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
       <BottomNavigation
         value={value}
         onChange={(_, newValue) => handleNavigationChange(newValue)}

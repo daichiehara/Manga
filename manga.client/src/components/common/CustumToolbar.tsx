@@ -8,7 +8,7 @@ type CustomToolbarProps = {
 const CustomToolbar: React.FC<CustomToolbarProps> = ({ title }) => (
   <Toolbar disableGutters sx={{
     borderBottom: '0.05px solid #BFBFBF',
-    
+    background:`#FFFFFF`,
     
     display: 'flex',
     justifyContent: 'center',
