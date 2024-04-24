@@ -42,17 +42,19 @@ const MyBookModal: React.FC<MyBookModalProps> = React.memo(({ isOpen, onClose })
           '& .MuiDrawer-paper': {
             borderTopLeftRadius: 15,
             borderTopRightRadius: 15,
-            width: 'auto',
+            width: 'auto',  // Allows the width to grow with content up to maxWidth
+            maxWidth: '640px',  // Maximum width set to 640px
             mx: 'auto',
           }
         }}
       >
         <Box
           sx={{
-            width: 'auto',
+            width: 'auto',  // Allows the width to grow with content up to maxWidth
+            maxWidth: '640px',  // Maximum width set to 640px
             height: 500,
             overflow: 'hidden',
-            mx: 'auto',
+            mx: 5,
             mt: 2,
             mb: 2,
             p: 2
