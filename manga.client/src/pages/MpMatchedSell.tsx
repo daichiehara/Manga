@@ -125,6 +125,7 @@ const MpMatchedSell: React.FC = () => {
             <Box
               sx={{
                 p: 0.5,
+                pb: '1rem',
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'relative',
@@ -144,14 +145,14 @@ const MpMatchedSell: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    mt: 4,
+                    mt: 2,
                     width: '70%', // 固定幅
-                    textAlign: 'center'
+                    textAlign: 'center',
                   }}
                 >
                   <CardMedia
                     component="img"
-                    sx={{ width: 80, height: 80,  borderRadius: '5px', objectFit: 'cover' }}
+                    sx={{ width: 70, height: 70,  borderRadius: '5px', objectFit: 'cover' }}
                     image={exchange.myManga.image}
                     alt={exchange.myManga.title}
                   />
@@ -166,14 +167,14 @@ const MpMatchedSell: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    mt: 4,
+                    mt: 2,
                     width: '70%', // 固定幅
-                    textAlign: 'center'
+                    textAlign: 'center',
                   }}
                 >
                   <CardMedia
                     component="img"
-                    sx={{ width: 80, height: 80,  borderRadius: '5px', objectFit: 'cover' }}
+                    sx={{ width: 70, height: 70,  borderRadius: '5px', objectFit: 'cover' }}
                     image={exchange.matchedManga.image}
                     alt={exchange.matchedManga.title}
                   />
