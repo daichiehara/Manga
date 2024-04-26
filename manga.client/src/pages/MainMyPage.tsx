@@ -194,31 +194,30 @@ const MainMyPage: React.FC = () => {
         )
       ) : (
         // ログインしていない場合の表示
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          mt: 9
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '80vh',  // 画面全体の高さを使用
+          }}
+        >
 
-          <Typography variant='h6' sx={{mt:`20rem`,fontWeight:`bold`,color:'#707070'}}>
-            ログインしないと
-          </Typography>
           <Typography variant='h6' sx={{mb:`2rem`,fontWeight:`bold`,color:'#707070'}}>
-            このコンテンツは利用できません。
+            ご利用にはログイン・会員登録が必要です
           </Typography>
           <Button
             variant="contained"
             onClick={handleLogin}
-            startIcon={<NotificationsNoneIcon sx={{}}/>}
             sx={{
               fontSize: '1.1rem',
               fontWeight: 600,
               background: 'linear-gradient(to right, #FCCF31, #F55555)',
               color: '#FFFFFF',
+              width:`95%`,
               
-              borderRadius: '20px',
+              borderRadius: '8px',
               boxShadow: 'none',
               '&:hover': {
                 background: 'linear-gradient(to right, #FDB813, #F55555)',
