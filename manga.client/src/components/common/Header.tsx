@@ -16,9 +16,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   return (
     <AppBar position="fixed" sx={{
-       
+        height:`8rem`,
         mb: 2, // 下のマージン
-        background: 'linear-gradient(to right, #E97132, #F2CFEE)', // グラデーションの背景色
+        pb: `3rem`,
+        background: 'linear-gradient(to right, #E97132, #F2CFEE, #B4F8C8)',  // グラデーションの背景色
         boxShadow: 'none',maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',
       }}>
       <Toolbar disableGutters sx={{mt: 3, mb: 0.5, px:2,}}>
@@ -41,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
           <InputBase
             sx={{ ml: 1, flex: 1 }}
-            placeholder="欲しい漫画を探す"
+            placeholder="衣替え中"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

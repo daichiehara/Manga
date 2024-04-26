@@ -10,14 +10,15 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ selectedTab, onTabChange 
   return (
     <Box
       sx={{
-        borderBottom: '1px solid #F2F2F2',
-        backgroundColor: '#F2F2F2',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.25)',
+        // borderBottom: '1px solid #F2F2F2',
+        //backgroundColor: '#F2F2F2',
+        //boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.25)',
         mt: 9, // Material-UI ではテーマのスペーシング単位を使用できます。デフォルトでは8倍数です。
         display: 'flex',
         justifyContent: 'center',
         position: 'fixed',
-        top: '20px', // 数値の直接使用よりも単位付きの文字列を使用するのが一般的です。
+        top: '0.8rem', 
+        
         right: 0,
         p: 0,
         width: '100%',
@@ -31,10 +32,11 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ selectedTab, onTabChange 
         value={selectedTab} 
         onChange={onTabChange} 
         aria-label="basic tabs example"
+        sx={{pt:`0px`}}
       >
-        <Tab label="マイリスト" />
-        <Tab label="おすすめ" />
-        <Tab label="新着順" />
+        <Tab  sx={{color:`#404040`,pt:`0px`, pb:`2px`,px:`5vw`}} label="マイリスト" />
+        <Tab sx={{color:`#404040`,pt:`0px`, pb:`2px`,px:`5vw`}} label="おすすめ" />
+        <Tab sx={{color:`#404040`,pt:`0px`, pb:`2px`,px:`5vw`}} label="新着順" />
       </Tabs>
     </Box>
   );
