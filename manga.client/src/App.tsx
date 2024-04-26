@@ -20,6 +20,7 @@ import { authService } from './api/authService.ts';
 import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
 import MpAdressUpadate from './pages/MpAdressUpdate.tsx';
 import MpMySell from './pages/MpMySell.tsx';
+import MpMatchedSell from './pages/MpMatchedSell.tsx';
 
 
 const App = () => {
@@ -32,11 +33,14 @@ const App = () => {
       {/* 全体を囲むBoxコンポーネント */}
       <Box sx={{
         minHeight: '100vh', // 画面の最小高さ
-        backgroundColor: '#f8f8ff' // 背景色をグレーに設定
+        //backgroundColor: '#FCFCFC', // 背景色をグレーに設定
+        boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.2), -2px 0 4px -2px rgba(0, 0, 0, 0.2)' 
       }}>
         <Router>
           <Routes>
-            <Route path="/" element={<MainSearch />} />
+            <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
+            <Route path="/" element={<MainSearch initialTab={1} />} />
+            <Route path="/item/new" element={<MainSearch initialTab={2} />} />
             <Route path="/item/:sellId" element={<MangaDetail />} />
             <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
             <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
@@ -48,6 +52,7 @@ const App = () => {
             <Route path="/mpchangeemailpassword" element={<MpChangeEmailPassword />} />
             <Route path="/mpadressupdate" element={<MpAdressUpadate />} />
             <Route path="/mpmysell" element={<MpMySell />} />
+            <Route path="/mpmatchedsell" element={<MpMatchedSell />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>

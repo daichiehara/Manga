@@ -66,4 +66,4 @@ export const addGlobalBook = (book: Book) => {
     globalRemoveBook(id);
   };
 
-export default BooksContext;
+export default {BooksContext};

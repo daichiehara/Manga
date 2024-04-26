@@ -1,5 +1,5 @@
 //MenuBar.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { BottomNavigation, BottomNavigationAction, Paper} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
@@ -12,60 +12,69 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import SellIcon from '@mui/icons-material/Sell';
 import PersonIcon from '@mui/icons-material/Person';
-import { useDrawer } from '../../hooks/useDrawer';
 import MyBookModal from '../common/MyBookModal';
 
-const MenuBar = React.memo(() => {
+// determineActiveIndexをコンポーネント外に移動
+function determineActiveIndex(pathname: string): number {
+  switch (pathname) {
+    case '/':
+    case '/item/new':
+    case '/item/favorite':
+      return 0;
+    case '/main-notification':
+      return 1;
+    case '/main-mybook':
+      return 2;
+    case '/main-sell':
+      return 3;
+    case '/main-page':
+      return 4;
+    default:
+      return -1;
+  }
+}
+
+const MenuBar = memo(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [value, setValue] = useState(-1);
 
-  const handleModalToggle = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
-  const determineActiveIndex = () => {
-    switch (location.pathname) {
-      case '/': return 0;
-      case '/main-notification': return 1;
-      case '/main-mybook': return 2;
-      case '/main-sell': return 3;
-      case '/main-page': return 4;
-      default: return -1;
-    }
-  };
-  
-
-  const [value, setValue] = React.useState(determineActiveIndex());
-
-  // Effect to update the value when the location changes
   useEffect(() => {
-    const newIndex = determineActiveIndex();
-    setValue(newIndex);
-  }, [location.pathname]); // location.pathname が変わったときだけ更新
+    const newIndex = determineActiveIndex(location.pathname);
+    if (newIndex !== value) {
+      setValue(newIndex);
+    }
+  }, [location.pathname, value]);
 
-  const handleNavigationChange = useCallback((newValue: 0 | 1 | 2 | 3 | 4) => {
-    setValue(newValue);
-    switch (newValue) {
-      case 0:
-        navigate('/');
-        break;
-      case 1:
-        navigate('/main-notification');
-        break;
-      case 2:
-        handleModalToggle(); // モーダルをトグルする
-        break;
-      case 3:
-        navigate('/main-sell');
-        break;
-      case 4:
-        navigate('/main-page');
-        break;
-      default:
-        break;
+  const handleModalToggle = useCallback(() => {
+    setIsModalOpen(prev => !prev);
+  }, []);
+
+  const handleNavigationChange = useCallback((newValue: number) => {
+    if (newValue !== value) {
+      setValue(newValue);
+      switch (newValue) {
+        case 0:
+          navigate('/');
+          break;
+        case 1:
+          navigate('/main-notification');
+          break;
+        case 2:
+          handleModalToggle();
+          break;
+        case 3:
+          navigate('/main-sell');
+          break;
+        case 4:
+          navigate('/main-page');
+          break;
+        default:
+          break;
       }
-    }, [navigate]);
+    }
+  }, [navigate, value, handleModalToggle]);
   
 
   const getIcon = (index: number, outlined: React.ReactNode, filled: React.ReactNode) => {
@@ -166,18 +175,18 @@ const MenuBar = React.memo(() => {
   };
 
   return (
-    <Paper sx={{boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.25)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
+    <Paper sx={{pb:`1rem`, pt:`0.1rem`, boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.1)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
       <BottomNavigation
         value={value}
         onChange={(_, newValue) => handleNavigationChange(newValue)}
         showLabels
         sx={{ width: '100%' }}
       >
-      <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined />, <SearchIcon />)} sx={actionStyle} />
-      <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined />, <NotificationsIcon />)} sx={noticeStyle} />
-      <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon />, <AutoStoriesIcon />)} sx={myBookshelfStyle} />
-      <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined />, <SellIcon />)} sx={sellStyle} />
-      <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline />, <PersonIcon />)} sx={searchStyle} />
+      <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined sx={{fontSize:`1.4rem`}}/>, <SearchIcon sx={{fontSize:`1.4rem`}} />)} sx={actionStyle} />
+      <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined sx={{fontSize:`1.4rem`}} />, <NotificationsIcon sx={{fontSize:`1.4rem`}} />)} sx={noticeStyle} />
+      <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon sx={{fontSize:`1.4rem`}} />, <AutoStoriesIcon sx={{fontSize:`1.4rem`}} />)} sx={myBookshelfStyle} />
+      <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined sx={{fontSize:`1.4rem`}}/>, <SellIcon sx={{fontSize:`1.4rem`}}/>)} sx={sellStyle} />
+      <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline sx={{fontSize:`1.4rem`}} />, <PersonIcon sx={{fontSize:`1.4rem`}}/>)} sx={searchStyle} />
     </BottomNavigation>
     <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
     </Paper>
