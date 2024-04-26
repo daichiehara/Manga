@@ -8,16 +8,10 @@ namespace Manga.Server.Models
         public int MatchId { get; set; }
 
         [Required]
-        public int FirstRequestId { get; set; }
+        public int RequestId { get; set; }
 
-        [ForeignKey("FirstRequestId")]
-        public virtual Request FirstRequest { get; set; }
-
-        [Required]
-        public int SecondRequestId { get; set; }
-
-        [ForeignKey("SecondRequestId")]
-        public virtual Request SecondRequest { get; set; }
+        [ForeignKey("RequestId")]
+        public virtual Request Request { get; set; }
 
         [Required]
         public DateTime Created { get; set; }

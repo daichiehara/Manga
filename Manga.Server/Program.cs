@@ -15,6 +15,7 @@ using System.Text;
 using System.Text.Json;
 using Amazon.Extensions.NETCore.Setup;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Google.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSingleton<IEmailSender, AmazonSESEmailSender>(provider =>
     new AmazonSESEmailSender("support@changey.net", "Changey"));
+
+builder.Services.AddSingleton<S3Service>();
+
 
 // CORS�I���W���ݒ�
 builder.Services.AddCors(options =>

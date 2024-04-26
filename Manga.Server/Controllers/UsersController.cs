@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Manga.Server.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Google.Cloud.RecaptchaEnterprise.V1;
 
 namespace Manga.Server.Controllers
 {
@@ -27,14 +28,16 @@ namespace Manga.Server.Controllers
         private readonly SignInManager<UserAccount> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailSender _emailSender;
+        private readonly S3Service _s3Service;
 
-        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender)
+        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender, S3Service s3Service)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _emailSender = emailSender;
+            _s3Service = s3Service;
         }
 
         [HttpPost("Register")]
@@ -455,6 +458,46 @@ namespace Manga.Server.Controllers
 
             return Ok();
         }
+
+        [HttpGet("hasIdVerificationImage")]
+        [Authorize]
+        public async Task<IActionResult> HasIdVerificationImage()
+        {
+            // Retrieve user information from the database
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound("User not found");
+
+            // Check if the user has an ID verification image uploaded
+            bool hasIdImage = !string.IsNullOrEmpty(user.IdVerificationImage);
+
+            return Ok(new { HasIdVerificationImage = hasIdImage });
+        }
+
+        [HttpPost("uploadIdVerificationImage")]
+        public async Task<IActionResult> UploadIdVerificationImage(IFormFile file)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var imageUrl = await _s3Service.ProcessImageAsync(file);
+
+            if (!string.IsNullOrEmpty(user?.IdVerificationImage))
+            {
+                // 既存の画像をS3から削除
+                var existingImageFileName = Path.GetFileName(user.IdVerificationImage);
+                await _s3Service.DeleteFileFromS3Async(existingImageFileName);
+            }
+
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                user.IdVerificationImage = imageUrl;
+                await _context.SaveChangesAsync();
+                return Ok(new { ImageUrl = imageUrl });
+            }
+
+            return BadRequest("Failed to process image.");
+        }
+
 
         [HttpGet("protected")]
         [Authorize]

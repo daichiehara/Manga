@@ -87,12 +87,30 @@ namespace Manga.Server.Resources {
         /// <summary>
         ///   トカエルをご利用いただきありがとうございます。
         ///
+        ///「{0}」と「{1}」の交換が成立しました。内容を確認の上発送をお願いします。
+        ///
+        ///交換成立後の流れや発送方法はこちら
+        ///&lt;a href=&quot;https://localhost:5173/notification&quot;&gt;https://localhost:5173/notification&lt;/a&gt;
+        ///
+        ///トカエルサポートチーム に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MatchMessage {
+            get {
+                return ResourceManager.GetString("MatchMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   トカエルをご利用いただきありがとうございます。
+        ///
         ///{0}さんの出品「{1}」に交換申請がありました。
         ///
         ///申請を受け入れると相手の出品「{2}」と交換することができます。
         ///
         ///詳細を確認してほしい作品を手に入れましょう！
-        ///&lt;a href=&quot;https://localhost:5173/notification&quot;&gt;https://localhost:5173/notification&lt;/a&gt; に類似しているローカライズされた文字列を検索します。
+        ///&lt;a href=&quot;https://localhost:5173/notification&quot;&gt;https://localhost:5173/notification&lt;/a&gt;
+        ///
+        ///トカエルサポートチーム に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string RequestMessage {
             get {
