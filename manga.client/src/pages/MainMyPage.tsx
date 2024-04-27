@@ -217,7 +217,7 @@ const MainMyPage: React.FC = () => {
               color: '#FFFFFF',
               width:`95%`,
               
-              borderRadius: '8px',
+              borderRadius: '50px',
               boxShadow: 'none',
               '&:hover': {
                 background: 'linear-gradient(to right, #FDB813, #F55555)',
