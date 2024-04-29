@@ -1,30 +1,46 @@
-// BooksList.tsx
 import React from 'react';
-import { List, ListItem, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemText, IconButton, Collapse } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { TransitionGroup } from 'react-transition-group';
 
 interface Book {
-  id: string;
+  itemId: number;  // 'id' was changed to 'itemId'
   title: string;
 }
 
 interface BooksListProps {
   title: string;
   books: Book[];
+  onRemove: (itemId: number) => void;  // 'sellId' was changed to 'itemId'
 }
 
-const BooksList: React.FC<BooksListProps> = React.memo(({ title, books }) => {
-  //console.log(`Rendering BooksList - ${title}`, books);
+const BooksList: React.FC<BooksListProps> = React.memo(({ title, books, onRemove }) => {
+  console.log("Books data:", books);  // Logging data for debugging
 
   return (
     <div>
       <h2>{title}</h2>
       <List>
-        {books.map((book, index) => (
-          // Adding index to the key for debugging, should not be used in production if ids are unique
-          <ListItem key={book.id || index}>
-            <ListItemText primary={book.title} />
-          </ListItem>
-        ))}
+        <TransitionGroup>
+          {books.map((book) => (
+            <Collapse key={book.itemId}> 
+              <ListItem 
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    title="Delete"
+                    onClick={() => onRemove(book.itemId)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                }
+              >
+                <ListItemText primary={book.title} />
+              </ListItem>
+            </Collapse>
+          ))}
+        </TransitionGroup>
       </List>
     </div>
   );

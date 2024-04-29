@@ -208,25 +208,26 @@ const MainMyPage: React.FC = () => {
             ご利用にはログイン・会員登録が必要です
           </Typography>
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={handleLogin}
             sx={{
               fontSize: '1.1rem',
               fontWeight: 600,
-              background: 'linear-gradient(to right, #FCCF31, #F55555)',
-              color: '#FFFFFF',
-              width:`95%`,
-              
-              borderRadius: '8px',
-              boxShadow: 'none',
+              color: (theme) => theme.palette.primary.main, // テキストカラーをテーマのプライマリー色に
+              borderColor: (theme) => theme.palette.primary.main, // 境界線をテーマのプライマリー色に
+              borderWidth:`1px`,
+              width: `95%`,
+              borderRadius: '5px',
               '&:hover': {
-                background: 'linear-gradient(to right, #FDB813, #F55555)',
+                background: 'rgba(0, 0, 0, 0.04)', // ホバー時の背景を軽く暗く
+                borderColor: (theme) => theme.palette.primary.main, // ホバー時の境界線をテーマのプライマリーの暗い色に
                 boxShadow: 'none',
               }
             }}
           >
             ログイン・会員登録
           </Button>
+
         </Box>
         
 

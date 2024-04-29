@@ -110,7 +110,7 @@ const MpMySell: React.FC = () => {
       {/* CustomToolbarはそのままにする */}
       <CustomToolbar title='出品した漫画' />
       {/* 通知カードのリスト */}
-      <Box sx={{mt: 8, mb: 10}}>
+      <Box sx={{mt: '3.5rem', mb: 10}}>
       <Grid container >
         {mpmysell.map((item, index) => (
         <Grid item xs={12} key={item.sellId} style={{ 

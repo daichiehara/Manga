@@ -147,15 +147,15 @@ const MenuBar = memo(() => {
 
   const myBookshelfStyle = {
     p:0,
-    background: 'linear-gradient(to right, #FCCF31, #F55555)',
-    boxShadow: '2px 4px 4px -1px rgba(0,0,0,0.25)', 
+    background: 'orange', 
+    boxShadow: '0px -5px 5px -1px rgba(0,0,0,0.2)', 
     color: 'white',
     zIndex: 1000,
     borderRadius: '50%', 
     width: `5rem`, 
     height: `5rem`, 
     position: 'absolute',
-    top: `-0.1rem`,
+    top: `1rem`,
     bottom: `10rem`, 
     right: '50%',
     left: '50%',
@@ -175,7 +175,7 @@ const MenuBar = memo(() => {
   };
 
   return (
-    <Paper sx={{pb:`1rem`, pt:`0.1rem`, boxShadow: '0px -4px 10px -1px rgba(0,0,0,0.1)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
+    <Paper sx={{pb:`1rem`, pt:`0.1rem`, boxShadow: '0px -4px 2.5px -1px rgba(0,0,0,0.1)',  position: 'fixed', bottom: 0, zIndex: 1000, maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)',   }}>
       <BottomNavigation
         value={value}
         onChange={(_, newValue) => handleNavigationChange(newValue)}

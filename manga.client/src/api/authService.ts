@@ -3,8 +3,8 @@ import { updateGlobalAuthState } from '../components/context/AuthContext';
 import { addGlobalBook, removeGlobalBook } from '../components/context/BookContext';
 
 interface Book {
-  id: string;  // オプショナルなプロパティとして定義
-  itemId: string;
+  id: number;  // オプショナルなプロパティとして定義
+  itemId: number;
   title: string;
 }
 
@@ -13,7 +13,7 @@ interface BooksApiResponse {
   sells: Book[];
 }
 
-type BookId = string; // `bookId`は文字列型ですが、意味の明確化のために型エイリアスを使用しています。
+type BookId = number;
 type WishList = Book[]; // WishListはBookの配列です
 
 

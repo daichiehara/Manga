@@ -154,11 +154,11 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
 
   return (
     <>
-      <Header onSearch={handleSearch} />
+      <Header onSearch={handleSearch} selectedTab={selectedTab} onTabChange={handleTabChange}/>
       
-      <TabsComponent selectedTab={selectedTab} onTabChange={handleTabChange} />
-      <div style={{ marginTop: 140,/* Tabsの内容の高さに合わせて調整 */ paddingBottom:'6rem'}}>
       
+      
+      <Box sx={{mt:'7rem',pt:`1rem`, pb:`6rem`}}>
       {/* データ取得中のインジケーター */}
       {loading && <div>ローディング中...</div>}
       {/* エラーメッセージ */}
@@ -233,8 +233,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
           />
         ))
       )}
-      </div>
-      
+      </Box>
       <MenuBar />
     </>
   );
