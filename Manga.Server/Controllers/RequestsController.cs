@@ -393,7 +393,7 @@ namespace Manga.Server.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<MatchDto>>> GetMatchesByUser()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
