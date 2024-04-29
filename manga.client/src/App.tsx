@@ -21,6 +21,8 @@ import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
 import MpAdressUpadate from './pages/MpAdressUpdate.tsx';
 import MpMySell from './pages/MpMySell.tsx';
 import MpMatchedSell from './pages/MpMatchedSell.tsx';
+import MpIdVerification from './pages/MpIdVerification.tsx';
+import IdCamera from './pages/IdCamera.tsx';
 
 
 const App = () => {
@@ -53,6 +55,8 @@ const App = () => {
             <Route path="/mpadressupdate" element={<MpAdressUpadate />} />
             <Route path="/mpmysell" element={<MpMySell />} />
             <Route path="/mpmatchedsell" element={<MpMatchedSell />} />
+            <Route path="/user/verification" element={<MpIdVerification />} />
+            <Route path="/user/verification/camera" element={<IdCamera />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>

@@ -13,7 +13,7 @@ const SettingList: React.FC = () => {
     { name: 'プロフィール設定', path: '/mpfavolist' },
     { name: 'メール・パスワード', path: '/mpchangeemailpassword' },
     { name: '住所', path: '/mpadressupdate' },
-    { name: '本人確認', path: '/mangaexchanged' },
+    { name: '本人確認', path: '/user/verification' },
   ];
 
   return (
