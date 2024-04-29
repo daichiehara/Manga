@@ -9,7 +9,8 @@ interface TabsComponentProps {
 
 // 共通のタブスタイル定義
 const commonTabStyle = {
-  color: '#404040', // タブのテキスト色
+  //color: '#404040', // タブのテキスト色
+  color:`white`,
   pt: '0px', // 上パディングなし
   pb: '0px', // 下パディングなし
   py: '0px', // 垂直方向のパディングなし

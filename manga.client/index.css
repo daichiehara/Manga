@@ -4,7 +4,7 @@ body, html {
     padding: 0;
     box-sizing: border-box;
     --gray-color: #F2F2F2;
-    width: 100%; /* 全体の幅を画面に合わせる */
+    width: calc(100vw -15px);
     max-width: 640px; /* 最大幅を640pxに制限 */
     margin: 0 auto; /* 中央揃え */
 }

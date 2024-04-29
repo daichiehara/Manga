@@ -74,9 +74,10 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
               相手の欲しい漫画リスト
             </Typography>
             
-              {wishTitles && (
-                <WishListDisplay wishTitles={wishTitles} />
-              )}
+            {/* WishListDisplayにwishTitlesを渡す */}
+            {wishTitles && <WishListDisplay wishTitles={wishTitles} />}
+                
+           
             
           
         </CardContent>

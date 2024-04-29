@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Typography, Button, Toolbar, Grid,  } from '@mui/material';
-import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import { Box, Typography, Button, Grid,  } from '@mui/material';
+import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import PublishIcon from '@mui/icons-material/Publish';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import MenuBar from '../components/menu/MenuBar';
@@ -18,12 +18,13 @@ const MSell: React.FC= () => {
 
   return (
     <>
-      {/* アクションボタン */}
+    
+      {/*  
       <Button
       variant="contained"
       color="primary"
       onClick={onClick}
-      startIcon={<AddAPhotoIcon sx={{ fontSize: '50px' }}/>}
+      startIcon={<CameraAltIcon sx={{ fontSize: '50px' }}/>}
       sx={{
         position: 'fixed',
         borderRadius: '50%', // 角を完全に丸くする
@@ -34,8 +35,10 @@ const MSell: React.FC= () => {
         bottom: 130, // 画面の下から20pxの位置
         right: 50, // 画面の右から20pxの位置
       }}
+
     >
     </Button>
+    */}
 
       {/* メインコンテンツエリア */}
       {/* 見出し */}
@@ -52,14 +55,16 @@ const MSell: React.FC= () => {
         出品する
       </Typography>
         <Button
-          startIcon={<AddAPhotoIcon />}
           variant="outlined" sx={{ 
+            borderWidth:`1px`,
+            borderColor: (theme) => theme.palette.primary.main, 
             width: '100%', 
             height: 70, 
             fontWeight: '700',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
           }}
         >
+          <CameraAltOutlinedIcon sx={{pr:`0.6rem`, fontSize: '1.5rem' }} />
           漫画全巻を出品する
         </Button>
       </Box>

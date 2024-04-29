@@ -24,8 +24,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, selectedTab, onTabChang
     // AppBar コンポーネントは検索バーを含むツールバーとタブを表示
     <AppBar position="fixed" sx={{
       pb: '0rem',
-      //background: 'linear-gradient(to right, #E97132, #F2CFEE, #B4F8C8)',  // グラデーションの背景色
-      background: 'linear-gradient(to right, #98D7DE, #B2E4D1)',// amazon#69FF97#00E4FF
+      //background: 'linear-gradient(to right, #0068B7, #30D5C8)',  // グラデーションの背景色
+      background: 'linear-gradient(to right, #fce2c4, orange)',
       boxShadow: 'none',  // 影を消去
       maxWidth: '640px',
       width: '100%',
