@@ -3,20 +3,25 @@ import { Tab, Tabs, Box, Typography } from '@mui/material';
 import axios from 'axios';
 import BooksList from '../item/BooksList';
 import { useBooks } from '../context/BookContext';
-import { Divider } from '@mui/material';
 import AutoStoriesOutlined from '@mui/icons-material/AutoStoriesOutlined';
+import IconButton from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { TransitionGroup } from 'react-transition-group';
 
 
 const API_BASE_URL = 'https://localhost:7103/api';
 
 interface Book {
-  id: string;  // Assume each book has a unique ID
+  itemId: number;  // `id` を `itemId` に変更
   title: string;
 }
 
 interface BooksTabsProps {
   triggerFetch: boolean;  // New prop to control data fetching
 }
+
+type BookId = number; // `bookId`は文字列型ですが、意味の明確化のために型エイリアスを使用しています。
+type WishList = Book[]; // WishListはBookの配列です
 
 const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
   const { addBook } = useBooks(); // Use the context method to add books globally
@@ -37,19 +42,61 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
     console.log('owned_fetch叩かれた');
     setOwnedLists(data.ownedLists);
     setSells(data.sells);
-    data.ownedLists.concat(data.sells).forEach((book: Book) => addBook({ id: book.id, title: book.title }));
+    data.ownedLists.concat(data.sells).forEach((book: Book) => addBook({ itemId: book.itemId, title: book.title }));
   };
-
+  
   const fetchWishLists = async () => {
     const { data } = await axios.get(`${API_BASE_URL}/WishLists`, { withCredentials: true });
     console.log('wish_fetch叩かれた');
     setWishLists(data);
-    data.forEach((book: Book) => addBook({ id: book.id, title: book.title }));
+    data.forEach((book: Book) => addBook({ itemId: book.itemId, title: book.title }));
   };
+  
+  const removeOwnedLists = async (itemId: BookId) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/OwnedLists/${itemId}`, { withCredentials: true });
+      console.log('Owned list book removed:', itemId);
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  };
+  
+  const removeWishLists = async (sellId: BookId) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/WishLists/${sellId}`, { withCredentials: true });
+      console.log('Wish list book removed:', sellId);
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  };
+
+  const handleRemoveOwnedLists = async (itemId: BookId) => {
+    try {
+      await removeOwnedLists(itemId);
+      setOwnedLists(prevOwnedLists => prevOwnedLists.filter(book => book.itemId !== itemId));
+      console.log('Owned list book removed successfully:', itemId);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+  
+  function handleError(error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error('API request failed:', error.response ? error.response.data : error.message);
+      alert('Error: ' + (error.response ? error.response.data.message : error.message));
+    } else {
+      console.error('Unexpected error:', error);
+    }
+  }
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
   };
+
+  
+  
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -109,14 +156,15 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
       
       {tabIndex === 0 && (
         <>
-          <BooksList key="owned-lists" title="簡単登録" books={ownedLists} />
-          <BooksList key="sells" title="出品中の漫画" books={sells} />
+          <BooksList key="owned-lists" title="簡単登録" books={ownedLists} onRemove={handleRemoveOwnedLists} />
+          {/*<BooksList key="sells" title="出品中の漫画" books={sells} />*/}
         </>
       )}
       {tabIndex === 1 && (
-        <BooksList key="wish-lists" title="欲しい漫画" books={wishLists} />
+        //<BooksList key="wish-lists" title="欲しい漫画" books={wishLists} />
+        <Typography variant='h1'>aaaa</Typography>
       )}
-      <Typography variant='h1'>aaaa</Typography>
+      
       <Typography variant='h1'>aaaa</Typography>
       <Typography variant='h1'>aaaa</Typography>
     </Box>
