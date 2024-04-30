@@ -340,6 +340,7 @@ namespace Manga.Server.Controllers
                 .Concat(wishMatchingSells)
                 .Concat(allSells)
                 .Distinct()
+                .Where(r => r.UserAccountId != userId)
                 .ToList();
 
             var homeDtos = new List<HomeDto>();
