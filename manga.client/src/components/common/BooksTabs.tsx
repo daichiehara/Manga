@@ -4,6 +4,7 @@ import axios from 'axios';
 import BooksList from '../item/BooksList';
 import { useBooks } from '../context/BookContext';
 import AutoStoriesOutlined from '@mui/icons-material/AutoStoriesOutlined';
+import BooksListSells from '../item/BookListSells';
 import IconButton from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { TransitionGroup } from 'react-transition-group';
@@ -77,6 +78,16 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
       await removeOwnedLists(itemId);
       setOwnedLists(prevOwnedLists => prevOwnedLists.filter(book => book.itemId !== itemId));
       console.log('Owned list book removed successfully:', itemId);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  const handleRemoveWishLists = async (itemId: BookId) => {
+    try {
+      await removeWishLists(itemId);
+      setWishLists(prevWishLists => prevWishLists.filter(book => book.itemId !== itemId));
+      console.log('Wish list book removed successfully:', itemId);
     } catch (error) {
       handleError(error);
     }
@@ -157,12 +168,14 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
       {tabIndex === 0 && (
         <>
           <BooksList key="owned-lists" title="簡単登録" books={ownedLists} onRemove={handleRemoveOwnedLists} />
-          {/*<BooksList key="sells" title="出品中の漫画" books={sells} />*/}
+          <BooksListSells key="sells" title="出品中の漫画" books={sells}/>
         </>
       )}
       {tabIndex === 1 && (
-        //<BooksList key="wish-lists" title="欲しい漫画" books={wishLists} />
+        <>
+        <BooksList key="wish-lists" title="欲しい漫画" books={wishLists} onRemove={handleRemoveWishLists} />
         <Typography variant='h1'>aaaa</Typography>
+        </>
       )}
       
       <Typography variant='h1'>aaaa</Typography>

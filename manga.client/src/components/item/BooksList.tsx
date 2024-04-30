@@ -1,6 +1,8 @@
 import React from 'react';
 import { List, ListItem, ListItemText, IconButton, Collapse } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CancelIcon from '@mui/icons-material/Cancel';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { TransitionGroup } from 'react-transition-group';
 
 interface Book {
@@ -24,7 +26,8 @@ const BooksList: React.FC<BooksListProps> = React.memo(({ title, books, onRemove
         <TransitionGroup>
           {books.map((book) => (
             <Collapse key={book.itemId}> 
-              <ListItem 
+              <ListItem
+                 
                 secondaryAction={
                   <IconButton
                     edge="end"
@@ -32,7 +35,7 @@ const BooksList: React.FC<BooksListProps> = React.memo(({ title, books, onRemove
                     title="Delete"
                     onClick={() => onRemove(book.itemId)}
                   >
-                    <DeleteIcon />
+                    <CancelIcon sx={{color:`#D9D9D9`}}/>
                   </IconButton>
                 }
               >

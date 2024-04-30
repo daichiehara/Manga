@@ -51,28 +51,6 @@ export const bookService = {
       throw error;
     }
   },
-  
-  removeOwnedLists: async (sellId: BookId) => {
-    try {
-      await axios.delete(`${API_BASE_URL}/OwnedLists/${sellId}`, { withCredentials: true });
-      console.log('Owned list book removed:', sellId);
-      removeGlobalBook(sellId);
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  },
-  
-  removeWishLists: async (sellId: BookId) => {
-    try {
-      await axios.delete(`${API_BASE_URL}/WishLists/${sellId}`, { withCredentials: true });
-      console.log('Wish list book removed:', sellId);
-      removeGlobalBook(sellId);
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  }
 };
 
 function handleError(error: unknown) {
