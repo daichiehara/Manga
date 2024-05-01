@@ -6,6 +6,7 @@ import { VerifiedUser, CameraAlt } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
 const MpIdVerification: React.FC = () => {
+    window.scrollTo({top:0, behavior: "instant"});
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -86,7 +87,7 @@ const MpIdVerification: React.FC = () => {
                 <Link to="/user/verification/camera">
                 <Button
                     variant="contained"
-                    color="primary"
+                    color="secondary"
                     size='large'
                     fullWidth
                     startIcon={<CameraAlt />}

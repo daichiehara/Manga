@@ -475,9 +475,14 @@ namespace Manga.Server.Controllers
         }
 
         [HttpPost("uploadIdVerificationImage")]
+        [Authorize]
         public async Task<IActionResult> UploadIdVerificationImage(IFormFile file)
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
             var imageUrl = await _s3Service.ProcessImageAsync(file);
 
