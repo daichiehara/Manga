@@ -5,9 +5,6 @@ import BooksList from '../item/BooksList';
 import { useBooks } from '../context/BookContext';
 import AutoStoriesOutlined from '@mui/icons-material/AutoStoriesOutlined';
 import BooksListSells from '../item/BookListSells';
-import IconButton from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { TransitionGroup } from 'react-transition-group';
 
 
 const API_BASE_URL = 'https://localhost:7103/api';
@@ -162,23 +159,26 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
         </Tabs>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center', alignContent: 'center'}}>
-        <Typography variant='subtitle2' sx={{color:'#707070',}}>※ 登録すると検索がしやすくなります!</Typography>
+        <Typography variant='subtitle2' sx={{py:1, color:'#707070',}}>※ 登録すると検索がしやすくなります!</Typography>
       </Box>
       
       {tabIndex === 0 && (
         <>
-          <BooksList key="owned-lists" title="簡単登録" books={ownedLists} onRemove={handleRemoveOwnedLists} />
+          <BooksList  key="owned-lists" title="簡単登録" titleColor='#EB4848' books={ownedLists} onRemove={handleRemoveOwnedLists} />
+          <Typography>全巻持っている漫画を登録しましょう!</Typography>
+          <Typography>例：その日暮らしの諭吉くん</Typography>
+          <Typography>「その日暮らしの諭吉くん」を欲しい人が見つかりやすくなります。</Typography>
           <BooksListSells key="sells" title="出品中の漫画" books={sells}/>
         </>
       )}
       {tabIndex === 1 && (
         <>
-        <BooksList key="wish-lists" title="欲しい漫画" books={wishLists} onRemove={handleRemoveWishLists} />
+        <BooksList key="wish-lists" title="欲しい漫画" titleColor='skyblue' books={wishLists} onRemove={handleRemoveWishLists} />
         <Typography variant='h1'>aaaa</Typography>
         </>
       )}
       
-      <Typography variant='h1'>aaaa</Typography>
+      <Typography color='secondary' variant='h1'>aaaa</Typography>
       <Typography variant='h1'>aaaa</Typography>
     </Box>
   );
