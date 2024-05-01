@@ -9,9 +9,13 @@ const theme = createTheme({
     secondary: {
       main: '#E97032',
     },
+    info:{
+      main: '#E97032',
+    },
     text: {
-      primary: '#212121', // テキストの主色
-      secondary: '#757575', // テキストの副色、ここを変更してください
+      primary: '#212121', // Main text color
+      secondary: '#757575', // Updated secondary text color
+      
     },
     background: {
       default: '#F2F2F2', // 背景色を設定

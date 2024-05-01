@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, ListItem, ListItemText, IconButton, Collapse } from '@mui/material';
+import { List, ListItem, ListItemText, IconButton, Collapse, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -12,22 +12,25 @@ interface Book {
 
 interface BooksListProps {
   title: string;
+  titleColor:string;
   books: Book[];
   onRemove: (itemId: number) => void;  // 'sellId' was changed to 'itemId'
 }
 
-const BooksList: React.FC<BooksListProps> = React.memo(({ title, books, onRemove }) => {
+const BooksList: React.FC<BooksListProps> = React.memo(({ title, titleColor, books, onRemove }) => {
   console.log("Books data:", books);  // Logging data for debugging
 
   return (
     <div>
-      <h2>{title}</h2>
-      <List>
+      <Typography variant="h5"  style={{fontWeight:`bold`, color: titleColor }}>
+        {title}
+      </Typography>
+      <List >
         <TransitionGroup>
           {books.map((book) => (
             <Collapse key={book.itemId}> 
               <ListItem
-                 
+                disableGutters
                 secondaryAction={
                   <IconButton
                     edge="end"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, ListItem, ListItemText, IconButton, Collapse } from '@mui/material';
+import { List, ListItem, ListItemText, IconButton, Collapse, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 interface Book {
   itemId: number;  // 'id' was changed to 'itemId'
@@ -16,7 +16,9 @@ const BooksListSells: React.FC<BooksListSellsProps> = React.memo(({ title, books
 
   return (
     <div>
-      <h2>{title}</h2>
+      <Typography variant="h5" style={{fontWeight:`bold`, color: '#EB4848' }}>
+        {title}
+      </Typography>
       <List>
         {books.map((book) => (
         <Collapse key={book.itemId}> 

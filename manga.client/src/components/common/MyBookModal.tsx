@@ -66,7 +66,7 @@ const MyBookModal: React.FC<MyBookModalProps> = React.memo(({ isOpen, onClose })
             overflow: 'auto',
             
             mb: 2,
-            px: 2
+            px: 5
           }}
           role="presentation"
         >
