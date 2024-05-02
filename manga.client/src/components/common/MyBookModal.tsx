@@ -62,7 +62,7 @@ const MyBookModal: React.FC<MyBookModalProps> = React.memo(({ isOpen, onClose })
           sx={{
             width: 'auto',  // Allows the width to grow with content up to maxWidth
             maxWidth: '640px',  // Maximum width set to 640px
-            height: 500,
+            height: `80vh`,
             overflow: 'auto',
             
             mb: 2,
