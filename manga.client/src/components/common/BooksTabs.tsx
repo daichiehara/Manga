@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Tab, Tabs, Box, Typography } from '@mui/material';
 import axios from 'axios';
-import BooksList from '../item/BooksList';
 import { useBooks } from '../context/BookContext';
+import BookListWish from '../item/BookListWish';
 import AutoStoriesOutlined from '@mui/icons-material/AutoStoriesOutlined';
 import BooksListSells from '../item/BookListSells';
+import BookListOwned from '../item/BookListOwned';
 
 
 const API_BASE_URL = 'https://localhost:7103/api';
@@ -133,7 +134,7 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
         </Box>
         {/*<Divider sx={{height:'2px', width: `50px`,borderRadius: '50px', background:'#D9D9D9' }} />*/}
       </Box>
-      <Box sx={{pt:`0.3rem`,display: 'flex', justifyContent: 'center', alignContent: 'center'}}>
+      <Box sx={{py:`0.9rem`,display: 'flex', justifyContent: 'center', alignContent: 'center'}}>
         <Tabs 
           value={tabIndex}
           onChange={handleChange}
@@ -154,26 +155,26 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
             }
           }}
         >
-          <Tab disableRipple sx={{zIndex: 1000, }} label="持っている漫画" />
-          <Tab disableRipple sx={{zIndex: 1000, }} label="欲しい漫画" />
+          <Tab disableRipple sx={{
+            zIndex: 1000,
+            '&.Mui-selected': {color: '#EB4848',}, 
+          }} label="持っている漫画" />
+          <Tab disableRipple sx={{
+            zIndex: 1000, 
+            '&.Mui-selected': {color: `#0F9ED5`,}, 
+          }} label="欲しい漫画" />
         </Tabs>
-      </Box>
-      <Box sx={{display: 'flex', justifyContent: 'center', alignContent: 'center'}}>
-        <Typography variant='subtitle2' sx={{py:1, color:'#707070',}}>※ 登録すると検索がしやすくなります!</Typography>
       </Box>
       
       {tabIndex === 0 && (
         <>
-          <BooksList  key="owned-lists" title="簡単登録" titleColor='#EB4848' books={ownedLists} onRemove={handleRemoveOwnedLists} />
-          <Typography>全巻持っている漫画を登録しましょう!</Typography>
-          <Typography>例：その日暮らしの諭吉くん</Typography>
-          <Typography>「その日暮らしの諭吉くん」を欲しい人が見つかりやすくなります。</Typography>
+          <BookListOwned  key="owned-lists" title="とりあえず登録"  books={ownedLists} onRemove={handleRemoveOwnedLists} />
           <BooksListSells key="sells" title="出品中の漫画" books={sells}/>
         </>
       )}
       {tabIndex === 1 && (
         <>
-        <BooksList key="wish-lists" title="欲しい漫画" titleColor='skyblue' books={wishLists} onRemove={handleRemoveWishLists} />
+        <BookListWish key="wish-lists" title="欲しい漫画" books={wishLists} onRemove={handleRemoveWishLists} />
         <Typography variant='h1'>aaaa</Typography>
         </>
       )}
