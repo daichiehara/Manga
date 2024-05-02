@@ -247,7 +247,7 @@ const MpAdressUpdate: React.FC = () => {
           </Grid>
         </form>
       </Box>
-      <Dialog open={isConfirmationOpen} onClose={handleConfirmCancel}>
+      <Dialog open={isConfirmationOpen} onClose={handleConfirmCancel} disableScrollLock>
       <DialogTitle>確認</DialogTitle>
       <DialogContent>
         <Typography>以下の内容で登録します。よろしいですか？</Typography>

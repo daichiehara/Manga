@@ -17,9 +17,9 @@ const MpIdVerification: React.FC = () => {
     return (
         <>
             <CustomToolbar title='かんたん本人確認' />
-            <Box sx={{ mt: isMobile ? '3.5rem' : '4rem' }} mb={2}>
+            <Box sx={{ pt: { xs: '3.5rem', sm: '4rem' }, pb: 2 }}>
                 <img
-                    src="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/IdVerification.png"
+                    src="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/IdVerification.jpg"
                     alt="Id Verification"
                     style={{ maxWidth: '100%', marginBottom: '2rem' }}
                 />
@@ -83,11 +83,11 @@ const MpIdVerification: React.FC = () => {
                 </Box>
             </Box>
             </Box>
-            <Box position="fixed" bottom={4} left={0} right={0} p={2} maxWidth={'600px'} mx={'auto'}>
+            <Box position="fixed" bottom={10} left={0} right={0} p={2} maxWidth={'600px'} mx={'auto'}>
                 <Link to="/user/verification/camera">
                 <Button
                     variant="contained"
-                    color="secondary"
+                    color="primary"
                     size='large'
                     fullWidth
                     startIcon={<CameraAlt />}
