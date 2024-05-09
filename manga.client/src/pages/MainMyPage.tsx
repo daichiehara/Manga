@@ -237,10 +237,11 @@ const MainMyPage: React.FC = () => {
         open={snackOpen}
         autoHideDuration={6000}
         onClose={() => setSnackOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         style={{ marginBottom: '5rem' }}
+        sx={{ maxWidth: '640px', width: '100%', left: '50%', right: 'auto', transform: 'translateX(-50%)' }} // 追加
       >
-      <Alert severity="success">{snackMessage}</Alert>
+        <Alert severity="success">{snackMessage}</Alert>
       </Snackbar>
       
       {/* 以降の部分は変わらず共通のコンポーネントやUI要素を表示 */}

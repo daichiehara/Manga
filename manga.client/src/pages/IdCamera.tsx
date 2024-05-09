@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, IconButton, useTheme, useMediaQuery, Typography, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useNavigationType } from 'react-router-dom';
 import CustomToolbar from '../components/common/CustumToolbar';
 import { Check, CameraAlt } from '@mui/icons-material';
 import axios from 'axios';
@@ -14,7 +14,12 @@ const CameraPage: React.FC = () => {
   const notLgMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
-
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  
+  
+  
   const handleClose = () => {
     setOpen(false);
   };
@@ -35,6 +40,7 @@ const CameraPage: React.FC = () => {
       };
   
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      setVideoStream(stream);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
 
@@ -78,7 +84,32 @@ const CameraPage: React.FC = () => {
       }
   };
   
-    
+  const stopCamera = () => {
+    console.log('Attempting to stop camera. Current videoRef:', videoRef.current);
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      console.log('Tracks to stop:', tracks.length);
+      tracks.forEach(track => {
+        track.stop();
+        console.log('Track stopped:', track);
+      });
+      videoRef.current.srcObject = null;
+    } else {
+      console.log('No video or stream found.');
+    }
+  };
+  
+  useEffect(() => {
+    return () => {
+      if (videoStream) {
+        console.log("Stopping camera");
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [videoStream]);  // videoStreamを依存配列に追加
+  
+
     const handleCapture = () => {
         if (videoRef.current) {
           const videoWidth = videoRef.current.videoWidth;
@@ -117,6 +148,7 @@ const CameraPage: React.FC = () => {
             }
           }
         }
+        stopCamera();
     };
 
   const generateRandomString = (length: number): string => {
