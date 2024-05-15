@@ -159,6 +159,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
       
       
       
+      
       <Box sx={{mt:'7rem',pt:`1rem`, pb:`6rem`}}>
       {/* データ取得中のインジケーター */}
       {loading && <div>ローディング中...</div>}
