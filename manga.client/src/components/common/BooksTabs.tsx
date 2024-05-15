@@ -175,12 +175,8 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
       {tabIndex === 1 && (
         <>
         <BookListWish key="wish-lists" title="欲しい漫画" books={wishLists} onRemove={handleRemoveWishLists} />
-        <Typography variant='h1'>aaaa</Typography>
         </>
       )}
-      
-      <Typography color='secondary' variant='h1'>aaaa</Typography>
-      <Typography variant='h1'>aaaa</Typography>
     </Box>
   );
 };
