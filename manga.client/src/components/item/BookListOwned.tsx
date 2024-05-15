@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box, Divider, Button, Fade } from '@mui/material';
+import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box, Divider, Button, } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from 'react-transition-group';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -37,7 +37,9 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
             {title}
           </Typography>
         </Box>
-        <HelpOutlineIcon sx={{fontsize:'3rem', ml: 1, alignSelf: 'center', color: '#BFBFBF' }}/>
+        <IconButton>
+          <HelpOutlineIcon sx={{fontsize:'3rem', ml: 1, alignSelf: 'center', color: '#BFBFBF' }}/>
+        </IconButton>
       </Box>
       <Box  sx={{pt:2, display: 'flex', alignItems: 'center',}}>
         <Button disableRipple onClick={handleOpen}>

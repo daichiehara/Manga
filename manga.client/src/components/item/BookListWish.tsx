@@ -1,8 +1,11 @@
-import React from 'react';
-import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box } from '@mui/material';
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box, Button,Divider} from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from 'react-transition-group';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import AddIcon from '@mui/icons-material/Add';
+import WishSearchModal from '../common/WishSearchModal';
 
 interface Book {
   itemId: number;  // 'id' was changed to 'itemId'
@@ -16,25 +19,42 @@ interface BookListWishProps {
 }
 
 const BookListWish: React.FC<BookListWishProps> = React.memo(({ title, books, onRemove }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const handleOpen = () => setIsOpen(true);
+    const handleClose = () => setIsOpen(false);
+    const handleSearch = useCallback((query: string) => {
+        // 検索処理
+    }, []);  // 依存配列が空なので、コンポーネントのライフタイムで一度だけ生成される
+
 
   return (
     <div>
-      <Box sx={{display: 'flex', alignContent: 'center',}}>
-      <RocketLaunchIcon sx={{mr:1,alignSelf: 'center' ,color: `#0F9ED5`}}/>
-      <Typography variant="subtitle1"  sx={{fontWeight:`bold`, color: '#757575'}}>
-        {title}
-      </Typography>
+      <Box sx={{display: 'flex', alignItems: 'center',}}>
+        <RocketLaunchIcon sx={{ fontsize:'1rem',mr: 1, alignSelf: 'center', color: `#0F9ED5` }}/>
+        <Box sx={{display: 'flex', flexDirection: 'column',}}>
+          <Typography variant="subtitle1" sx={{fontWeight: 'bold', color: '#757575'}}>
+            {title}
+          </Typography>
+        </Box>
+        <IconButton>
+          <HelpOutlineIcon sx={{fontsize:'3rem', ml: 1, alignSelf: 'center', color: '#BFBFBF' }}/>
+        </IconButton>
       </Box>
-      <Box sx={{display: 'flex', alignContent: 'center'}}>
-        <Typography variant='subtitle2' sx={{py:1, color:'#707070',}}>出品で必要になります。</Typography>
+      <Box  sx={{pt:2, display: 'flex', alignItems: 'center',}}>
+        <Button disableRipple onClick={handleOpen}>
+        <AddIcon sx={{color: '#0F9ED5', }}/>
+        <Typography variant="subtitle2" sx={{color: '#0F9ED5', }}>
+          あなたが欲しい漫画を追加する
+        </Typography>
+        </Button>
       </Box>
+        <WishSearchModal  onSearch={handleSearch} isOpen={isOpen} onClose={handleClose} />
       <List >
         <TransitionGroup>
           {books.map((book) => (
             <Collapse key={book.itemId}> 
               <ListItem
-                disableGutters
-                secondaryAction={
+                disableGutters secondaryAction={
                   <IconButton
                     edge="end"
                     aria-label="delete"
@@ -47,6 +67,7 @@ const BookListWish: React.FC<BookListWishProps> = React.memo(({ title, books, on
               >
                 <ListItemText primary={book.title} />
               </ListItem>
+              <Divider sx={{ width: '100%' }}/>
             </Collapse>
           ))}
         </TransitionGroup>

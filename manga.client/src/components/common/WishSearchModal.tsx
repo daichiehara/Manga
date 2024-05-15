@@ -3,13 +3,13 @@ import { Box, Typography, Button, Fade, Paper, InputBase, IconButton, SwipeableD
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 
-interface OwnedSearchModalProps {
+interface WishSearchModalProps {
     onSearch: (query: string) => void;
     isOpen: boolean;
     onClose: () => void;
 }
 
-const OwnedSearchModal: React.FC<OwnedSearchModalProps> = ({ onSearch, isOpen, onClose }) => {
+const WishSearchModal: React.FC<WishSearchModalProps> = ({ onSearch, isOpen, onClose }) => {
     const [query, setQuery] = useState('');
 
     const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
@@ -53,14 +53,14 @@ const OwnedSearchModal: React.FC<OwnedSearchModalProps> = ({ onSearch, isOpen, o
                     />
                 </Paper>
                 <Box sx={{pt:'25vh',px:'2rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',}}>
-                    <Typography variant='h6' sx={{color:`red`, fontWeight:'bold'}}>
-                        全巻持っている漫画を追加しよう! 
+                    <Typography variant='h6' sx={{color:`Blue`, fontWeight:'bold'}}>
+                        欲しい漫画を登録しよう!
                     </Typography>
                     <Typography variant='subtitle1' sx={{pt:1,fontWeight:'bold'}}>
-                        検索であなたの漫画を欲しい人が
+                        出品した漫画に対して、登録した漫画との
                     </Typography>
                     <Typography variant='subtitle1' sx={{fontWeight:'bold'}}>
-                        見つかりやすくなります!
+                        交換リクエストが来ます。
                     </Typography>
                 </Box>
             </Box>
@@ -98,4 +98,4 @@ const OwnedSearchModal: React.FC<OwnedSearchModalProps> = ({ onSearch, isOpen, o
     );
 };
 
-export default OwnedSearchModal;
+export default WishSearchModal;
