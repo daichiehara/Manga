@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation, useNavigationType } from 'react-router-
 import CustomToolbar from '../components/common/CustumToolbar';
 import { Check, CameraAlt } from '@mui/icons-material';
 import axios from 'axios';
+import CameraVideoComponent from '../components/common/CameraVideo';
 
 const CameraPage: React.FC = () => {
   window.scrollTo({top:0, behavior: "instant"});
@@ -286,34 +287,7 @@ const CameraPage: React.FC = () => {
         </>
       ) : (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: {xs :'15vh' , sm :'4rem'}}}>
-            <Box sx={{ width: '100%', maxWidth: notLgMobile ? '640px' : '430px', aspectRatio: '1/1', position: 'relative' }}>
-                <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                }}
-                />
-                <Box
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '85.6%',
-                    height: '54.0%',
-                    border: '4px solid #1E90FF',
-                    borderRadius: '10px',
-                    boxSizing: 'border-box',
-                }}
-                />
-            </Box>
-            </Box>
+            <CameraVideoComponent showFrame={true} videoRef={videoRef} />
             
             <Box
             position="fixed"

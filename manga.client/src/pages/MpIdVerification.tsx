@@ -29,7 +29,7 @@ const MpIdVerification: React.FC = () => {
                     <Typography variant='h6' fontWeight={'bold'} textAlign={'center'}>かんたん本人確認の方法</Typography>
                 </Box>
             </Box>
-            <Box px={4}>
+            <Box px={4} pb={12}>
             <Box border={3} borderColor="#90EE90" borderRadius={4} mb={2}>
                 <Grid container alignItems="center">
                     <Grid item xs={1}></Grid>
