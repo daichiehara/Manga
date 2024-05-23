@@ -23,6 +23,7 @@ import MpMySell from './pages/MpMySell.tsx';
 import MpMatchedSell from './pages/MpMatchedSell.tsx';
 import MpIdVerification from './pages/MpIdVerification.tsx';
 import IdCamera from './pages/IdCamera.tsx';
+import SellForm from './pages/MainSell.tsx';
 
 
 const App = () => {
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="/mpmatchedsell" element={<MpMatchedSell />} />
             <Route path="/user/verification" element={<MpIdVerification />} />
             <Route path="/user/verification/camera" element={<IdCamera />} />
+            <Route path="/sell" element={<SellForm />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>

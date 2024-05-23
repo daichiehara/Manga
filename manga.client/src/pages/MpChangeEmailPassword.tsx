@@ -137,7 +137,7 @@ const MpChangeEmailPassword: React.FC = () => {
     <>
       {/* CustomToolbarはそのままにする */}
       <CustomToolbar title='メール・パスワード' />
-      <Box mt={9} px={2}>
+      <Box pt={9} px={2}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={12}>

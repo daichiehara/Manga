@@ -5,6 +5,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import MenuBar from '../components/menu/MenuBar';
 import CustomToolbar from '../components/common/CustumToolbar';
+import { Link } from 'react-router-dom';
 
 interface MSell {
   title: string; 
@@ -54,6 +55,7 @@ const MSell: React.FC= () => {
           }} >
         出品する
       </Typography>
+      <Link to="/sell">
         <Button
           variant="outlined" sx={{ 
             borderWidth:`1px`,
@@ -67,6 +69,7 @@ const MSell: React.FC= () => {
           <CameraAltOutlinedIcon sx={{pr:`0.6rem`, fontSize: '1.5rem' }} />
           漫画全巻を出品する
         </Button>
+      </Link>
       </Box>
 
 
