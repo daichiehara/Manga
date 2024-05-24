@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import CustomToolbar from '../components/common/CustumToolbar';
+import ImageList from '../components/common/SellImageList';
 import {
   TextField,
   Select,
@@ -15,7 +16,11 @@ import {
   List,
   ListItem,
   ListItemText,
+  IconButton,
+  Alert,
+  AlertTitle
 } from '@mui/material';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 import { prefectures } from '../components/common/Prefectures';
 
@@ -66,31 +71,11 @@ const SellForm: React.FC = () => {
     <>
         <CustomToolbar title='出品情報を入力' />
             <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container sx={{pt: '6rem', px: 2}}>
-                <Grid item xs={12} mb={2} >
-                    <Controller
-                    name="sellImages"
-                    control={control}
-                    defaultValue={null}
-                    rules={{ required: '商品画像は必須です' }}
-                    render={({ field: { onChange, onBlur, ref }, fieldState: { error } }) => (
-                        <Box>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={(event) => {
-                            onChange(event.target.files);
-                            }}
-                            onBlur={onBlur}
-                            ref={ref}
-                        />
-                        {error && <Typography color="error">{error.message}</Typography>}
-                        </Box>
-                    )}
-                    />
-                </Grid>
-                <Grid item xs={12} mb={2}>
+            <Box sx={{pt: '4rem'}}>
+                <ImageList />
+            </Box>
+            <Grid container sx={{px: 2}}>
+                <Grid item xs={12} mb={2} mt={2}>
                 <Typography variant='body2' fontWeight={'bold'} color={'secondary'} mb={1}>作品タイトル</Typography>
                 <Controller
                     name="title"
@@ -131,17 +116,17 @@ const SellForm: React.FC = () => {
                     />
                     )}
                 />
-                    <Box sx={{ mb: 2, mt: 2, color: 'error.main'}}>
-                        <Typography variant='body2'>確認事項</Typography>
-                        <List sx={{ listStyleType: 'decimal', pl: 3, py: 0 }}>
-                            <ListItem sx={{ display: 'list-item', px: 0 }}>
+                    <Alert severity="info" sx={{ mb: 2, mt: 2}}>
+                    <AlertTitle sx={{m: 0}}>確認事項</AlertTitle>
+                        <List sx={{ listStyleType: 'decimal', pl: 2, py: 0 }}>
+                            <ListItem sx={{ display: 'list-item', px: 0, py: 0 }}>
                                 <ListItemText primary="出品には、その作品の発売済みの全巻が必要です。" primaryTypographyProps={{ variant: 'body2' }} />
                             </ListItem>
-                            <ListItem sx={{ display: 'list-item', px: 0 }}>
+                            <ListItem sx={{ display: 'list-item', px: 0, py: 0 }}>
                                 <ListItemText primary="不足している巻がないことを確認してください。" primaryTypographyProps={{ variant: 'body2' }} />
                             </ListItem>
                         </List>
-                    </Box>
+                    </Alert>
                 </Grid>
                 <Grid item xs={12} mb={2}>
                 <Controller

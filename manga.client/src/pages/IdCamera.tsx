@@ -5,6 +5,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import { Check, CameraAlt } from '@mui/icons-material';
 import axios from 'axios';
 import CameraVideoComponent from '../components/common/CameraVideo';
+import ImageShow from '../components/common/ImageShow';
 
 const CameraPage: React.FC = () => {
   window.scrollTo({top:0, behavior: "instant"});
@@ -15,8 +16,6 @@ const CameraPage: React.FC = () => {
   const notLgMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
-  const location = useLocation();
-  const navigationType = useNavigationType();
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   
   
@@ -251,19 +250,8 @@ const CameraPage: React.FC = () => {
                         </Grid>
                     </Grid>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Box sx={{ width: '100%', maxWidth: notLgMobile ? '640px' : '430px', aspectRatio: '1/1' }}>
-                        <img
-                        src={capturedImage}
-                        alt="Captured"
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                        }}
-                        />
-                    </Box>
-                </Box>
+                
+                <ImageShow selectedImage={capturedImage} mt={false} />
                 <Typography variant='body2' color={'error'} mt={2} textAlign={'center'}>すべての項目が隠れずに鮮明に写っていますか？</Typography>
                 <Box display="flex" justifyContent="space-around" mt={2}> 
                 <Button
