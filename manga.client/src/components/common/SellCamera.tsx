@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Button, Grid, useTheme, useMediaQuery } from '@mui/material';
+import { Box } from '@mui/material';
 import CameraVideoComponent from './CameraVideo';
 import ImageShow from './ImageShow';
+import CameraButton from './CameraButton';
 import { useNavigate } from 'react-router-dom';
 
 const SellCamera: React.FC = () => {
@@ -10,9 +11,8 @@ const SellCamera: React.FC = () => {
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const navigate = useNavigate();
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
-  const theme = useTheme();
-  const notLgMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const startCamera = async () => {
@@ -72,6 +72,22 @@ const SellCamera: React.FC = () => {
 
     startCamera();
   }, []);
+
+  const stopCamera = () => {
+    console.log('Attempting to stop camera. Current videoRef:', videoRef.current);
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      console.log('Tracks to stop:', tracks.length);
+      tracks.forEach(track => {
+        track.stop();
+        console.log('Track stopped:', track);
+      });
+      videoRef.current.srcObject = null;
+    } else {
+      console.log('No video or stream found.');
+    }
+  };
   
   useEffect(() => {
     return () => {
@@ -82,7 +98,27 @@ const SellCamera: React.FC = () => {
     };
   }, [videoStream]);  // videoStreamを依存配列に追加
 
-  
+  const handleAlbumClick = () => {
+    console.log('open const handleAlbumClick');
+    if (fileInputRef.current) {
+      console.log('select file');
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageUrl = e.target?.result as string;
+          setCapturedImages(prevImages => [...prevImages, imageUrl]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
 
   const handleCapture = () => {
     if (videoRef.current) {
@@ -122,7 +158,7 @@ const SellCamera: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{pb: '7rem'}}>
       {selectedImageIndex !== null ? (
         <ImageShow selectedImage={capturedImages[selectedImageIndex]} />
       ) : (
@@ -165,11 +201,15 @@ const SellCamera: React.FC = () => {
               </Box>
             ))}
         </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-          <Button variant="contained" onClick={handleCapture}>
-            撮影
-          </Button>
-        </Box>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          ref={fileInputRef}
+        />
+        <CameraButton onCameraClick={handleCapture} onAlbumClick={handleAlbumClick} />
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, IconButton, Typography, Drawer } from '@mui/material';
+import { Box, IconButton, Button, Drawer } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import SellCamera from './SellCamera';
 
@@ -65,16 +65,31 @@ const ImageList: React.FC = () => {
         disableScrollLock
         PaperProps={{
           style: {
-            height: '97%', // Drawerの高さを80%に設定
-            width: '100%', // Drawerの幅を100%に設定
+            height: '97%',
+            width: '100%',
             maxWidth: '640px',
             margin: 'auto',
-            borderTopLeftRadius: 15, // 左上の角を丸くする
-            borderTopRightRadius: 15, // 右上の角を丸くする
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
           },
         }}
       >
-        <SellCamera />
+        <Box sx={{ position: 'relative' }}>
+          <Button
+            variant="text"
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              zIndex: 1,
+              //color: 'white',
+            }}
+            onClick={handleCameraClose}
+          >
+            キャンセル
+          </Button>
+          <SellCamera />
+        </Box>
       </Drawer>
     </>
   );

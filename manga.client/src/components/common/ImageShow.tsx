@@ -3,29 +3,43 @@ import { Box, useTheme, useMediaQuery } from '@mui/material';
 
 interface ShowImageProps {
   selectedImage: string;
-  mt?: boolean; // mtをオプショナルなプロパティとして追加
+  mt?: boolean;
 }
 
 const ImageShow: React.FC<ShowImageProps> = ({ selectedImage, mt = true }) => {
   const theme = useTheme();
   const notLgMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('ise'));
 
   return (
     <Box
       sx={{
         display: 'flex',
         justifyContent: 'center',
-        mt: mt ? { xs: '15vh', sm: '4rem' } : 0, // mtがtrueの場合にのみ適用
+        mt: mt ? (isSmallScreen ? '3.5rem' : { xs: '15vh', sm: '4rem' }) : 0,
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: notLgMobile ? '640px' : '430px', aspectRatio: '1/1' }}>
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: notLgMobile ? '640px' : '430px',
+          aspectRatio: '1/1',
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <img
           src={selectedImage}
           alt="Captured"
           style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
+            width: 'auto',
+            height: 'auto',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
           }}
         />
       </Box>

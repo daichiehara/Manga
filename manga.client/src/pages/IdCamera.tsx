@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Button, IconButton, useTheme, useMediaQuery, Typography, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { Link, useNavigate, useLocation, useNavigationType } from 'react-router-dom';
+import { Box, Button, useTheme, useMediaQuery, Typography, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import CustomToolbar from '../components/common/CustumToolbar';
-import { Check, CameraAlt } from '@mui/icons-material';
+import { Check } from '@mui/icons-material';
 import axios from 'axios';
 import CameraVideoComponent from '../components/common/CameraVideo';
 import ImageShow from '../components/common/ImageShow';
+import CameraButton from '../components/common/CameraButton';
 
 const CameraPage: React.FC = () => {
   window.scrollTo({top:0, behavior: "instant"});
@@ -17,7 +18,7 @@ const CameraPage: React.FC = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   
   const handleClose = () => {
@@ -97,6 +98,12 @@ const CameraPage: React.FC = () => {
       videoRef.current.srcObject = null;
     } else {
       console.log('No video or stream found.');
+    }
+  };
+
+  const handleAlbumClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
   
@@ -228,7 +235,7 @@ const CameraPage: React.FC = () => {
       
         {capturedImage ? (
           <>
-            <Box px={2}>
+            <Box px={2} pb={2}>
                 <Box sx={{ pt: { xs: '4.5rem', sm: '5rem' }, mb: 2 }}>
                     <Typography variant='h6' textAlign={'center'} mb={1}>撮影画像の確認</Typography>
                     <Grid container alignItems="center" mb={2}>
@@ -276,49 +283,7 @@ const CameraPage: React.FC = () => {
       ) : (
         <>
             <CameraVideoComponent showFrame={true} videoRef={videoRef} />
-            
-            <Box
-            position="fixed"
-            bottom={'4vh'}
-            left={0}
-            right={0}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height={'8rem'}
-            padding={1}
-            bgcolor="white"
-            mx={'auto'}
-            sx={{ backgroundColor: 'rgba(255, 255, 255, 0)' }}
-            >
-                <Box
-                    sx={{
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    padding: '0.25rem',
-                    border: '3px solid',
-                    borderColor: 'primary.main',
-                    }}
-                >
-                    <IconButton
-                    sx={{
-                        backgroundColor: 'primary.main',
-                        color: 'white',
-                        border: '3px solid white',
-                        borderRadius: '50%',
-                        width: '4rem',
-                        height: '4rem',
-                        '&:hover': {
-                        backgroundColor: 'primary.dark',
-                        },
-                    }}
-                    size="medium"
-                    onClick={handleCapture}
-                    >
-                    <CameraAlt sx={{ fontSize: '2rem' }} />
-                    </IconButton>
-                </Box>
-            </Box>         
+            <CameraButton onCameraClick={handleCapture} onAlbumClick={handleAlbumClick} />
         </>
         )}
       

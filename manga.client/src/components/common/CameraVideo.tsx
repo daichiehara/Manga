@@ -9,10 +9,11 @@ interface CameraComponentProps {
 const CameraVideoComponent: React.FC<CameraComponentProps> = ({ showFrame, videoRef }) => {
     const theme = useTheme();
     const notLgMobile = useMediaQuery(theme.breakpoints.down('lg'));
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('ise'));
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: '15vh', sm: '4rem' } }}>
-      <Box sx={{ width: '100%', maxWidth: notLgMobile ? '640px' : '430px', aspectRatio: '1/1', position: 'relative' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: isSmallScreen ? '3.5rem' : { xs: '15vh', sm: '4rem' } }}>
+      <Box sx={{ width: '100%', maxWidth: notLgMobile ? '640px' : '300px', aspectRatio: '1/1', position: 'relative' }}>
         <video
           ref={videoRef}
           autoPlay
