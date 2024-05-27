@@ -22,7 +22,7 @@ const ImageShow: React.FC<ShowImageProps> = ({ selectedImage, mt = true }) => {
       <Box
         sx={{
           width: '100%',
-          maxWidth: notLgMobile ? '640px' : '430px',
+          maxWidth: notLgMobile ? '640px' : '300px',
           aspectRatio: '1/1',
           position: 'relative',
           overflow: 'hidden',
