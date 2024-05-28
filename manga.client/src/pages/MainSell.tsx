@@ -39,6 +39,11 @@ const SellForm: React.FC = () => {
   const { control, handleSubmit } = useForm<FormData>();
   const [selectedBookState, setSelectedBookState] = useState<number | null>(null);
   const [selectedSendDay, setSelectedSendDay] = useState<number | null>(null);
+  const [capturedImages, setCapturedImages] = useState<string[]>([]);
+
+  const handleCapturedImagesChange = (images: string[]) => {
+    setCapturedImages(images);
+  };
 
   const sendDayOptions = [
     { label: '1～2日で発送', value: 1 },
@@ -72,7 +77,10 @@ const SellForm: React.FC = () => {
         <CustomToolbar title='出品情報を入力' />
             <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{pt: '4rem'}}>
-                <ImageList />
+            <ImageList
+                capturedImages={capturedImages}
+                onCapturedImagesChange={handleCapturedImagesChange}
+            />
             </Box>
             <Grid container sx={{px: 2}}>
                 <Grid item xs={12} mb={2} mt={2}>

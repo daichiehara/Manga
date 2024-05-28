@@ -3,8 +3,14 @@ import { Box, IconButton, Button, Drawer } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import SellCamera from './SellCamera';
 
-const ImageList: React.FC = () => {
+interface ImageListProps {
+  capturedImages: string[];
+  onCapturedImagesChange: (images: string[]) => void;
+}
+
+const ImageList: React.FC<ImageListProps> = ({ capturedImages, onCapturedImagesChange }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
   const handleCameraClick = () => {
     setIsCameraOpen(true);
@@ -12,19 +18,17 @@ const ImageList: React.FC = () => {
 
   const handleCameraClose = () => {
     setIsCameraOpen(false);
+    setSelectedImageIndex(null);
+  };
+
+  const handleImageClick = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsCameraOpen(true);
   };
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          overflowX: 'auto',
-          whiteSpace: 'nowrap',
-          py: 2,
-          px: 2,
-        }}
-      >
+      <Box sx={{ display: 'flex', overflowX: 'auto', whiteSpace: 'nowrap', py: 2, px: 2 }}>
         {Array.from({ length: 10 }).map((_, index) => (
           <Box
             key={index}
@@ -34,13 +38,21 @@ const ImageList: React.FC = () => {
               width: 80,
               height: 80,
               border: '1px solid #ccc',
-              borderRadius: 1,
+              borderRadius: 2,
               ml: index === 0 ? 0 : 1,
               textAlign: 'center',
               boxSizing: 'border-box',
+              cursor: capturedImages[index] ? 'pointer' : 'default',
             }}
+            onClick={() => capturedImages[index] && handleImageClick(index)}
           >
-            {index === 0 ? (
+            {capturedImages[index] ? (
+              <img
+                src={capturedImages[index]}
+                alt={`Captured ${index}`}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            ) : index === capturedImages.length ? (
               <Box
                 sx={{
                   display: 'flex',
@@ -48,11 +60,11 @@ const ImageList: React.FC = () => {
                   justifyContent: 'center',
                   flexDirection: 'column',
                   height: '100%',
+                  cursor: 'pointer',
                 }}
+                onClick={handleCameraClick}
               >
-                <IconButton onClick={handleCameraClick}>
-                  <CameraAltIcon sx={{ fontSize: 30, color: '#005FFF' }} />
-                </IconButton>
+                <CameraAltIcon sx={{ fontSize: 30, color: '#005FFF' }} />
               </Box>
             ) : null}
           </Box>
@@ -80,15 +92,18 @@ const ImageList: React.FC = () => {
             sx={{
               position: 'absolute',
               top: 8,
-              left: 8,
+              right: 8,
               zIndex: 1,
-              //color: 'white',
             }}
             onClick={handleCameraClose}
           >
-            キャンセル
+            完了
           </Button>
-          <SellCamera />
+          <SellCamera
+            capturedImages={capturedImages}
+            onCapturedImagesChange={onCapturedImagesChange}
+            initialSelectedImageIndex={selectedImageIndex}
+          />
         </Box>
       </Drawer>
     </>

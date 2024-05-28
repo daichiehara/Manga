@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Select, MenuItem, Button, Typography } from '@mui/material';
 import CameraVideoComponent from './CameraVideo';
 import ImageShow from './ImageShow';
 import CameraButton from './CameraButton';
@@ -7,14 +7,25 @@ import { useNavigate } from 'react-router-dom';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import DeleteBottomButton from './DeleteBottomButton';
 
-const SellCamera: React.FC = () => {
+interface SellCameraProps {
+  capturedImages: string[];
+  onCapturedImagesChange: (images: string[]) => void;
+  initialSelectedImageIndex: number | null;
+}
+
+const SellCamera: React.FC<SellCameraProps> = ({ capturedImages, onCapturedImagesChange, initialSelectedImageIndex }) => {
   window.scrollTo({top:0, behavior: "instant"});
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const navigate = useNavigate();
-  const [capturedImages, setCapturedImages] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isReorderMode, setIsReorderMode] = useState(false);
+  const [selectedReorderIndex, setSelectedReorderIndex] = useState(0);
+
+  const setInitialSelectedImageIndex = () => {
+    setSelectedImageIndex(initialSelectedImageIndex);
+  };
 
   const startCamera = async () => {
     try {
@@ -73,6 +84,7 @@ const SellCamera: React.FC = () => {
 
   useEffect(() => {
     startCamera();
+    setInitialSelectedImageIndex();
   }, []);
 
   const stopCamera = () => {
@@ -115,13 +127,10 @@ const SellCamera: React.FC = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const imageUrl = e.target?.result as string;
-          setCapturedImages(prevImages => {
-            const updatedImages = [...prevImages, imageUrl];
-            if (updatedImages.length === 10) {
-              setSelectedImageIndex(9);
-            }
-            return updatedImages;
-          });
+          onCapturedImagesChange([...capturedImages, imageUrl]);
+          if (capturedImages.length + 1 === 10) {
+            setSelectedImageIndex(9);
+          }
         };
         reader.readAsDataURL(file);
       });
@@ -156,13 +165,10 @@ const SellCamera: React.FC = () => {
         );
   
         const capturedImage = canvas.toDataURL('image/png');
-        setCapturedImages(prevImages => {
-          const updatedImages = [...prevImages, capturedImage];
-          if (updatedImages.length === 10) {
-            setSelectedImageIndex(9);
-          }
-          return updatedImages;
-        });
+        onCapturedImagesChange([...capturedImages, capturedImage]);
+        if (capturedImages.length + 1 === 10) {
+          setSelectedImageIndex(9);
+        }
       }
     }
   };
@@ -187,14 +193,38 @@ const SellCamera: React.FC = () => {
 
   const handleDeleteImage = () => {
     if (selectedImageIndex !== null) {
-      setCapturedImages(prevImages => {
-        const updatedImages = [...prevImages];
-        updatedImages.splice(selectedImageIndex, 1);
-        return updatedImages;
-      });
+      const updatedImages = [...capturedImages];
+      updatedImages.splice(selectedImageIndex, 1);
+      onCapturedImagesChange(updatedImages);
       handleCameraVideoPlay();
     }
   };
+
+  const handleReorderClick = () => {
+    setIsReorderMode(true);
+    setSelectedReorderIndex(selectedImageIndex || 0);
+  };
+
+  const handleReorderConfirm = () => {
+    if (selectedImageIndex !== null) {
+      const updatedImages = [...capturedImages];
+      const [removedImage] = updatedImages.splice(selectedImageIndex, 1);
+      updatedImages.splice(selectedReorderIndex, 0, removedImage);
+      onCapturedImagesChange(updatedImages);
+      setSelectedImageIndex(selectedReorderIndex);
+      setIsReorderMode(false);
+    }
+  };
+
+  const handleReorderCancel = () => {
+    setIsReorderMode(false);
+  };
+
+  useEffect(() => {
+    if (selectedImageIndex !== null) {
+      setSelectedReorderIndex(selectedImageIndex);
+    }
+  }, [selectedImageIndex]);
 
   return (
     <Box sx={{ pb: '7rem' }}>
@@ -216,15 +246,18 @@ const SellCamera: React.FC = () => {
               height: 60,
               ml: index === 0 ? 0 : 1,
               cursor: capturedImages[index] ? 'pointer' : 'default',
+              bgcolor: '#EEEEEE',
               border: (selectedImageIndex === null && index === capturedImages.length) ||
                       (selectedImageIndex !== null && index === selectedImageIndex)
                       ? '3px solid' 
-                      : '1px solid',
+                      : '',
                       borderColor: (selectedImageIndex === null && index === capturedImages.length) ||
                       (selectedImageIndex !== null && index === selectedImageIndex)
                       ? 'primary.main'
-                      : '#ccc',
-              borderRadius: 2,
+                      : '',
+              overflow: 'hidden',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
             }}
             onClick={() => capturedImages[index] && handleImageClick(index)}
           >
@@ -233,10 +266,10 @@ const SellCamera: React.FC = () => {
                 src={capturedImages[index]}
                 alt={`Captured ${index}`}
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  width: 60,
+                  height: 60,
                   objectFit: 'cover',
-                  borderRadius: '4px',
+                  borderRadius: '8px',
                 }}
               />
             ) : (
@@ -247,12 +280,12 @@ const SellCamera: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
+                  cursor: index === capturedImages.length && selectedImageIndex !== null ? 'pointer' : 'default',
                 }}
+                onClick={index === capturedImages.length && selectedImageIndex !== null ? handleCameraIconClick : undefined}
               >
                 {index === capturedImages.length && selectedImageIndex !== null && (
-                  <IconButton onClick={handleCameraIconClick}>
-                    <CameraAltIcon />
-                  </IconButton>
+                  <CameraAltIcon color='secondary' />
                 )}
               </Box>
             )}
@@ -269,9 +302,32 @@ const SellCamera: React.FC = () => {
       />
       {selectedImageIndex === null && capturedImages.length < 10 ? (
         <CameraButton onCameraClick={handleCapture} onAlbumClick={handleAlbumClick} />
-      ):(        
-        <DeleteBottomButton onDelete={handleDeleteImage} />
-        )}
+      ) : isReorderMode ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'fixed', bottom: '4vh', left: 0, right: 0, zIndex: 1000 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Select value={selectedReorderIndex} onChange={(e) => setSelectedReorderIndex(Number(e.target.value))}>
+              {capturedImages.map((_, index) => (
+                <MenuItem key={index} value={index}>
+                  {index + 1}
+                </MenuItem>
+              ))}
+            </Select>
+            <Typography variant="body1" sx={{ ml: 1 }}>
+              枚目に移動
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 2 }}>
+            <Button variant="outlined" color="primary" onClick={handleReorderCancel} sx={{mr: 2}}>
+              キャンセル
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleReorderConfirm}>
+              確定
+            </Button>
+          </Box>
+        </Box>
+      ) : (
+        <DeleteBottomButton onDelete={handleDeleteImage} onReorder={handleReorderClick} />
+      )}
       </Box>
   );
 };
