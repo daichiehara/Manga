@@ -2,6 +2,7 @@
 {
     public class MatchDto
     {
+        public int MySellId { get; set; }
         public int PartnerSellId { get; set; }
         public string MyTitle { get; set; }
         public string PartnerTitle { get; set; }

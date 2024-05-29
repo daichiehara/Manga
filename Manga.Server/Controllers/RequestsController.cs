@@ -421,6 +421,10 @@ namespace Manga.Server.Controllers
                     ? m.Request.ResponderSell.Title
                     : m.Request.RequesterSell.Title;
 
+                var mySellId = m.Request.RequesterId == userId
+                    ? m.Request.RequesterSell.SellId
+                    : m.Request.ResponderSell.SellId;
+
                 var partnerSellId = m.Request.RequesterId == userId
                     ? m.Request.ResponderSell.SellId
                     : m.Request.RequesterSell.SellId;
@@ -435,6 +439,7 @@ namespace Manga.Server.Controllers
 
                 return new MatchDto
                 {
+                    MySellId = mySellId,
                     PartnerSellId = partnerSellId,
                     MyTitle = myTitle,
                     PartnerTitle = partnerTitle,
