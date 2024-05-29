@@ -7,7 +7,7 @@ namespace Manga.Server.Models
         public int SellId { get; set; }
 
         [Display(Name = "作品タイトル")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [Display(Name = "発送元の地域")]
         public string SendPrefecture { get; set; }
@@ -16,13 +16,13 @@ namespace Manga.Server.Models
         public string SendDay { get; set; }
 
         [Display(Name = "出品日時")]
-        public DateTime SellTime { get; set; }
+        public DateTime? SellTime { get; set; }
 
         [Display(Name = "商品状態")]
         public string BookState { get; set; }
 
         [Display(Name = "全巻巻数")]
-        public int NumberOfBooks { get; set; }
+        public int? NumberOfBooks { get; set; }
 
         [Display(Name = "メッセージ")]
         public string SellMessage { get; set; }

@@ -29,13 +29,15 @@ namespace Manga.Server.Controllers
         private readonly UserManager<UserAccount> _userManager;
         private readonly HttpClient _httpClient;
         private readonly ILogger<SellsController> _logger;
+        private readonly S3Service _s3Service;
 
-        public SellsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IHttpClientFactory httpClientFactory, ILogger<SellsController> logger)
+        public SellsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IHttpClientFactory httpClientFactory, ILogger<SellsController> logger, S3Service s3Service)
         {
             _context = context;
             _userManager = userManager;
             _httpClient = httpClientFactory.CreateClient();
             _logger = logger;
+            _s3Service = s3Service;
         }
 
         // GET: api/Sells
@@ -476,6 +478,7 @@ namespace Manga.Server.Controllers
 
         // PUT: api/Sells/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /*
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSell(int id, Sell sell)
         {
@@ -504,9 +507,11 @@ namespace Manga.Server.Controllers
 
             return NoContent();
         }
+        */
 
         // POST: api/Sells
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /*
         [HttpPost]
         public async Task<ActionResult<Sell>> PostSell(Sell sell)
         {
@@ -514,6 +519,127 @@ namespace Manga.Server.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSell", new { id = sell.SellId }, sell);
+        }
+        */
+        [HttpPost]
+        public async Task<IActionResult> CreateSell([FromForm] SellCreateDto sellCreateDto)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var sell = new Sell
+            {
+                Title = sellCreateDto.Title,
+                SendPrefecture = sellCreateDto.SendPrefecture,
+                SendDay = sellCreateDto.SendDay,
+                BookState = sellCreateDto.BookState,
+                NumberOfBooks = sellCreateDto.NumberOfBooks,
+                SellMessage = sellCreateDto.SellMessage,
+                SellStatus = sellCreateDto.SellStatus,
+                SellTime = DateTime.Now,
+                UserAccountId = userId
+            };
+
+            var sellImages = new List<SellImage>();
+
+            foreach (var imageDto in sellCreateDto.SellImages)
+            {
+                var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
+                sellImages.Add(new SellImage
+                {
+                    ImageUrl = imageUrl,
+                    Order = imageDto.Order,
+                    SellId = sell.SellId
+                });
+            }
+
+            sell.SellImages = sellImages;
+
+            _context.Sell.Add(sell);
+            await _context.SaveChangesAsync();
+
+            if (sellCreateDto.SellStatus == SellStatus.Recruiting)
+            {
+                return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, sell);
+            }
+            else
+            {
+                return Ok(sell);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutSell(int id, [FromForm] SellCreateDto sellUpdateDto)
+        {
+            var sell = await _context.Sell.Include(s => s.SellImages).FirstOrDefaultAsync(s => s.SellId == id);
+
+            if (sell == null)
+            {
+                return NotFound();
+            }
+
+            sell.Title = sellUpdateDto.Title;
+            sell.SendPrefecture = sellUpdateDto.SendPrefecture;
+            sell.SendDay = sellUpdateDto.SendDay;
+            sell.BookState = sellUpdateDto.BookState;
+            sell.NumberOfBooks = sellUpdateDto.NumberOfBooks;
+            sell.SellMessage = sellUpdateDto.SellMessage;
+            sell.SellStatus = sellUpdateDto.SellStatus;
+
+            // 既存の画像を取得
+            var existingImages = sell.SellImages.ToDictionary(si => si.ImageUrl);
+
+            // 削除対象の画像URLを取得
+            var imagesToDelete = existingImages.Keys.Except(sellUpdateDto.SellImages.Select(si => si.ImageUrl)).ToList();
+
+            foreach (var imageUrl in imagesToDelete)
+            {
+                // 画像のURLからファイル名を抽出
+                var fileName = Path.GetFileName(imageUrl);
+                // S3から画像を削除
+                await _s3Service.DeleteFileFromS3Async(fileName, "manga-img-bucket");
+
+                // データベースから画像レコードを削除
+                var imageToDelete = existingImages[imageUrl];
+                _context.SellImage.Remove(imageToDelete);
+            }
+
+            foreach (var imageDto in sellUpdateDto.SellImages)
+            {
+                if (!string.IsNullOrEmpty(imageDto.ImageUrl))
+                {
+                    // 既存の画像のorderを更新
+                    if (existingImages.ContainsKey(imageDto.ImageUrl))
+                    {
+                        var existingImage = existingImages[imageDto.ImageUrl];
+                        existingImage.Order = imageDto.Order;
+                    }
+                }
+                else
+                {
+                    // 新しい画像をS3にアップロードし、追加
+                    var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
+                    var newImage = new SellImage
+                    {
+                        ImageUrl = imageUrl,
+                        Order = imageDto.Order,
+                        SellId = sell.SellId
+                    };
+                    sell.SellImages.Add(newImage);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // DELETE: api/Sells/5
@@ -690,7 +816,8 @@ namespace Manga.Server.Controllers
                 //var encodedTitle = Uri.EscapeDataString(title);
                 var encodedNdc = 726.1;
                 var dpid = "iss-ndl-opac";
-                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/opensearch?dpid={dpid}&title={title}&any={title}&ndc={encodedNdc}&cnt=500";
+                var mediatipe = "booklet";
+                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/opensearch?dpid={dpid}&any={title}&ndc={encodedNdc}&cnt=270";
 
 
                 using var client = new HttpClient();

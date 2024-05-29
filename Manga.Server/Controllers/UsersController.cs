@@ -484,13 +484,13 @@ namespace Manga.Server.Controllers
                 return NotFound();
             }
 
-            var imageUrl = await _s3Service.ProcessImageAsync(file);
+            var imageUrl = await _s3Service.ProcessIdVerificationImageAsync(file);
 
             if (!string.IsNullOrEmpty(user?.IdVerificationImage))
             {
                 // 既存の画像をS3から削除
                 var existingImageFileName = Path.GetFileName(user.IdVerificationImage);
-                await _s3Service.DeleteFileFromS3Async(existingImageFileName);
+                await _s3Service.DeleteFileFromS3Async(existingImageFileName, "IdVerificationBucketName");
             }
 
             if (!string.IsNullOrEmpty(imageUrl))

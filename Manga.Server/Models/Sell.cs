@@ -6,32 +6,28 @@ namespace Manga.Server.Models
     {
         public int SellId { get; set; }
 
-        [Required]
         [Display(Name = "作品タイトル")]
-        public string Title { get; set;}
+        public string? Title { get; set;}
 
-        [Required]
         [Display(Name = "発送元の地域")]
-        public SendPrefecture SendPrefecture { get; set;}
+        public SendPrefecture? SendPrefecture { get; set;}
 
-        [Required]
         [Display(Name = "発送までの日数")]
-        public SendDay SendDay { get; set; }
+        public SendDay? SendDay { get; set; }
 
         [Display(Name = "出品日時")]
-        public DateTime SellTime { get; set;}
+        public DateTime? SellTime { get; set;}
 
-        [Required]
         [Display(Name = "商品状態")]
-        public BookState BookState { get; set;}
+        public BookState? BookState { get; set;}
 
-        [Required]
         [Display(Name = "全巻巻数")]
-        public int NumberOfBooks { get; set;}
+        public int? NumberOfBooks { get; set;}
 
         [Display(Name = "メッセージ")]
-        public string SellMessage { get; set;}
+        public string? SellMessage { get; set;}
 
+        [Required]
         [Display(Name = "出品状態")]
         public SellStatus SellStatus { get; set; }
 
@@ -75,6 +71,8 @@ namespace Manga.Server.Models
         Suspended = 2,
         [Display(Name = "成立")]
         Established = 3,
+        [Display(Name = "下書き")]
+        Draft = 4,
     }
 
     public enum SendPrefecture
