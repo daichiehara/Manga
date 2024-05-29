@@ -421,6 +421,10 @@ namespace Manga.Server.Controllers
                     ? m.Request.ResponderSell.Title
                     : m.Request.RequesterSell.Title;
 
+                var partnerSellId = m.Request.RequesterId == userId
+                    ? m.Request.ResponderSell.SellId
+                    : m.Request.RequesterSell.SellId;
+
                 var myImage = m.Request.RequesterId == userId
                     ? m.Request.RequesterSell.SellImages.OrderBy(si => si.Order).FirstOrDefault()?.ImageUrl
                     : m.Request.ResponderSell.SellImages.OrderBy(si => si.Order).FirstOrDefault()?.ImageUrl;
@@ -431,6 +435,7 @@ namespace Manga.Server.Controllers
 
                 return new MatchDto
                 {
+                    PartnerSellId = partnerSellId,
                     MyTitle = myTitle,
                     PartnerTitle = partnerTitle,
                     MyImage = myImage,
