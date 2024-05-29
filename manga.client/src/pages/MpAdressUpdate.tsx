@@ -148,7 +148,7 @@ const MpAdressUpdate: React.FC = () => {
   return (
     <>
       <CustomToolbar title='住所の登録・更新' />
-      <Box mt={11} px={2}>
+      <Box pt={11} px={2}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -247,7 +247,7 @@ const MpAdressUpdate: React.FC = () => {
           </Grid>
         </form>
       </Box>
-      <Dialog open={isConfirmationOpen} onClose={handleConfirmCancel}>
+      <Dialog open={isConfirmationOpen} onClose={handleConfirmCancel} disableScrollLock>
       <DialogTitle>確認</DialogTitle>
       <DialogContent>
         <Typography>以下の内容で登録します。よろしいですか？</Typography>

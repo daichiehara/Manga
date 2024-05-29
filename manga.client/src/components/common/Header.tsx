@@ -4,14 +4,14 @@ import SearchIcon from '@mui/icons-material/Search';
 import TabsComponent from './TabsComponent';
 
 // 検索バーとタブを持つコンポーネントのPropsの型定義
-interface SearchBarProps {
+interface HeaderProps {
   onSearch: (query: string) => void;
   selectedTab: number;
   onTabChange: (event: React.SyntheticEvent, newValue: number) => void;
 }
 
 // 検索バーとタブコンポーネントの実装
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, selectedTab, onTabChange }) => {
+const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange }) => {
   const [query, setQuery] = useState('');  // 検索クエリのローカルステート
 
   // 検索を実行するハンドラー
@@ -62,4 +62,4 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, selectedTab, onTabChang
 };
 
 // パフォーマンス最適化のためにReact.memoでコンポーネントをラップ
-export default memo(SearchBar);
+export default memo(Header);
