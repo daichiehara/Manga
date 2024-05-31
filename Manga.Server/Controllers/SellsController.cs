@@ -544,7 +544,7 @@ namespace Manga.Server.Controllers
                 NumberOfBooks = sellCreateDto.NumberOfBooks,
                 SellMessage = sellCreateDto.SellMessage,
                 SellStatus = sellCreateDto.SellStatus,
-                SellTime = DateTime.Now,
+                SellTime = DateTime.UtcNow,
                 UserAccountId = userId
             };
 
