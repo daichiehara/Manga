@@ -21,7 +21,7 @@ const CameraButton: React.FC<CameraButtonProps> = ({ onCameraClick, onAlbumClick
       mx={'auto'}
       sx={{ backgroundColor: 'rgba(255, 255, 255, 0)' }}
     >
-      <Box sx={{ mr: 2 }}>
+      <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-370%)' }}>
         <IconButton onClick={onAlbumClick}>
           <PhotoLibrary sx={{ fontSize: '2rem', color: 'primary.main' }} />
         </IconButton>
