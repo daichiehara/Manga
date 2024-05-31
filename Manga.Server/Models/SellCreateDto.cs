@@ -35,7 +35,6 @@ namespace Manga.Server.Models
 
         public IFormFile? ImageBlob { get; set; }
 
-        [Required]
-        public int Order { get; set; }
+        public int? Order { get; set; }
     }
 }
