@@ -556,7 +556,7 @@ namespace Manga.Server.Controllers
                 sellImages.Add(new SellImage
                 {
                     ImageUrl = imageUrl,
-                    Order = imageDto.Order,
+                    Order = (int)imageDto.Order,
                     SellId = sell.SellId
                 });
             }
@@ -620,7 +620,7 @@ namespace Manga.Server.Controllers
                     if (existingImages.ContainsKey(imageDto.ImageUrl))
                     {
                         var existingImage = existingImages[imageDto.ImageUrl];
-                        existingImage.Order = imageDto.Order;
+                        existingImage.Order = (int)imageDto.Order;
                     }
                 }
                 else
@@ -630,7 +630,7 @@ namespace Manga.Server.Controllers
                     var newImage = new SellImage
                     {
                         ImageUrl = imageUrl,
-                        Order = imageDto.Order,
+                        Order = (int)imageDto.Order,
                         SellId = sell.SellId
                     };
                     sell.SellImages.Add(newImage);
