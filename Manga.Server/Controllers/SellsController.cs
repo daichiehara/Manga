@@ -550,15 +550,19 @@ namespace Manga.Server.Controllers
 
             var sellImages = new List<SellImage>();
 
-            foreach (var imageDto in sellCreateDto.SellImages)
+            if (sellCreateDto.SellImages != null)
             {
-                var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
-                sellImages.Add(new SellImage
+
+                foreach (var imageDto in sellCreateDto.SellImages)
                 {
-                    ImageUrl = imageUrl,
-                    Order = (int)imageDto.Order,
-                    SellId = sell.SellId
-                });
+                    var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
+                    sellImages.Add(new SellImage
+                    {
+                        ImageUrl = imageUrl,
+                        Order = (int)imageDto.Order,
+                        SellId = sell.SellId
+                    });
+                }
             }
 
             sell.SellImages = sellImages;
