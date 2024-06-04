@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, ButtonBase, CardMedia, Grid, Typography } from '@mui/material';
+import { Box, ButtonBase, CardMedia, Grid, Typography , Divider} from '@mui/material';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import CustomToolbar from '../components/common/CustumToolbar';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+
 
 interface MpMatchedSell {
   mySellId: number;
@@ -42,7 +44,7 @@ const MpMatchedSellComponent: React.FC = () => {
     fetchMpMatchedSell();
   }, [authState.isAuthenticated]); // isAuthenticatedに依存しているため、この値が変わるとエフェクトが再実行されます
 
-  function formatTitle(title: string, maxLength: number = 5): string {
+  function formatTitle(title: string, maxLength: number = 9): string {
     if (title.length > maxLength) {
       return title.substring(0, maxLength) + '...';
     }
@@ -55,13 +57,34 @@ const MpMatchedSellComponent: React.FC = () => {
     return date.toLocaleDateString('ja-JP', options);
   }
 
+
+    //通知がない場合の表示
+    if (mpmatchedSell.length === 0) {
+      return (
+        <>
+          {/* 見出しのToolbar */}
+          <CustomToolbar title='交換した漫画'/>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pt: 9 }}>
+            <ImportContactsIcon sx={{ fontSize: 60, color: 'action.active', padding:9}} />  {/* アイコンのサイズと色、下のマージンを調整 */}
+            <Typography variant="subtitle1">
+              交換した漫画はありません
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1}}>
+              ここでは交換した漫画が表示されます
+            </Typography>
+          </Box>
+        </>
+      );
+    }
+
+
   return (
     <>
       <CustomToolbar title="交換した漫画" />
       <Grid container sx={{ pt: { xs: '3.5rem', sm: '4rem', mb: 10  } }}>
       <Grid container>
                 <Grid item xs={6}>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr:'2rem', pt:'1rem'  }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr:'2rem', pt:'1rem' , pb:'0.5rem' }}>
                     <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#707070', textAlign: 'center' }}>
                       自分の出品
                     </Typography>
@@ -84,12 +107,11 @@ const MpMatchedSellComponent: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'relative',
-                borderBottom: index !== mpmatchedSell.length - 1 ? '2px solid #eee' : 'none',
                 backgroundColor: 'white',
               }}
             >
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#707070', textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#707070', textAlign: 'center', pt:'0.5rem' }}>
                   {formatDate(exchange.matchDate)}
                 </Typography>
               </Box>
@@ -107,15 +129,15 @@ const MpMatchedSellComponent: React.FC = () => {
                 >
                   <CardMedia
                     component="img"
-                    sx={{ width: 70, height: 70, borderRadius: '5px', objectFit: 'cover' }}
+                    sx={{ width: 50, height: 50, borderRadius: '5px', objectFit: 'cover' }}
                     image={exchange.myImage}
                     alt={exchange.myTitle}
                   />
-                  <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                  <Typography variant="subtitle2" sx={{ mt: 1 }} >
                     {formatTitle(exchange.myTitle)}
                   </Typography>
                 </ButtonBase>
-                <SyncAltIcon sx={{ mx: 2, color: 'action.active', fontSize: 40 }} />
+                <SyncAltIcon sx={{ mx: 2, fontSize: 40 }} color='primary' />
                 <ButtonBase
                   onClick={() => navigate(`/item/${exchange.partnerSellId}`)}
                   sx={{
@@ -129,16 +151,17 @@ const MpMatchedSellComponent: React.FC = () => {
                 >
                   <CardMedia
                     component="img"
-                    sx={{ width: 70, height: 70, borderRadius: '5px', objectFit: 'cover' }}
+                    sx={{ width: 50, height: 50, borderRadius: '5px', objectFit: 'cover' }}
                     image={exchange.partnerImage}
                     alt={exchange.partnerTitle}
                   />
-                  <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                  <Typography variant="subtitle2" sx={{ mt: 1 }} >
                     {formatTitle(exchange.partnerTitle)}
                   </Typography>
                 </ButtonBase>
               </Box>
             </Box>
+            <Divider variant= "middle"  />
           </Grid>
         ))}
       </Grid>

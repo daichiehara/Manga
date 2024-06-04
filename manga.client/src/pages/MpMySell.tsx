@@ -94,7 +94,7 @@ const MpMySell: React.FC = () => {
       <>
         {/* 見出しのToolbar */}
         <CustomToolbar title='出品した漫画'/>
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 9 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pt: 9 }}>
           <NotificationsNoneIcon sx={{ fontSize: 60, color: 'action.active', padding:9}} />  {/* アイコンのサイズと色、下のマージンを調整 */}
           <Typography variant="subtitle1">
             出品した漫画はありません

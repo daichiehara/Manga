@@ -67,11 +67,9 @@ const MainMpFavoList: React.FC = () => {
     <>
       {/* 見出しのToolbar */}
       <CustomToolbar title='いいね！一覧'/>    
-      {/* 戻るボタン */}
-      <BackButton handleBack={handleBack} />
 
       {/* いいねした商品の表示（無い場合もテキストを表示する） */}
-      <Box sx={{ marginTop: 7, paddingBottom: 6 }}>
+      <Box sx={{ pt: 7, paddingBottom: 6 }}>
         {mangaData.length > 0 ? (
           mangaData.map((item, index) => (
             <MangaListItem
@@ -84,12 +82,12 @@ const MainMpFavoList: React.FC = () => {
             />
           ))
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 15 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pt: 15 }}>
           <FavoriteIcon sx={{ fontSize: 60, color: 'red', mb:5}} /> {/* ハートアイコンの設定 */}
           <Typography variant="subtitle1" >
             「いいね！」した商品はありません
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1}}>
+          <Typography variant="body2" color="text.secondary" sx={{ px: 5, pt: 1}}>
             商品ページから「いいね！」すると、ここで見ることができます。
           </Typography>
 
