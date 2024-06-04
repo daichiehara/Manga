@@ -283,7 +283,7 @@ const CameraPage: React.FC = () => {
       ) : (
         <>
             <CameraVideoComponent showFrame={true} videoRef={videoRef} />
-            <CameraButton onCameraClick={handleCapture} onAlbumClick={handleAlbumClick} />
+            <CameraButton onCameraClick={handleCapture} onAlbumClick={handleAlbumClick} showAlbumIcon={false} />
         </>
         )}
       

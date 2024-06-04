@@ -544,21 +544,25 @@ namespace Manga.Server.Controllers
                 NumberOfBooks = sellCreateDto.NumberOfBooks,
                 SellMessage = sellCreateDto.SellMessage,
                 SellStatus = sellCreateDto.SellStatus,
-                SellTime = DateTime.Now,
+                SellTime = DateTime.UtcNow,
                 UserAccountId = userId
             };
 
             var sellImages = new List<SellImage>();
 
-            foreach (var imageDto in sellCreateDto.SellImages)
+            if (sellCreateDto.SellImages != null)
             {
-                var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
-                sellImages.Add(new SellImage
+
+                foreach (var imageDto in sellCreateDto.SellImages)
                 {
-                    ImageUrl = imageUrl,
-                    Order = imageDto.Order,
-                    SellId = sell.SellId
-                });
+                    var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
+                    sellImages.Add(new SellImage
+                    {
+                        ImageUrl = imageUrl,
+                        Order = (int)imageDto.Order,
+                        SellId = sell.SellId
+                    });
+                }
             }
 
             sell.SellImages = sellImages;
@@ -620,7 +624,7 @@ namespace Manga.Server.Controllers
                     if (existingImages.ContainsKey(imageDto.ImageUrl))
                     {
                         var existingImage = existingImages[imageDto.ImageUrl];
-                        existingImage.Order = imageDto.Order;
+                        existingImage.Order = (int)imageDto.Order;
                     }
                 }
                 else
@@ -630,7 +634,7 @@ namespace Manga.Server.Controllers
                     var newImage = new SellImage
                     {
                         ImageUrl = imageUrl,
-                        Order = imageDto.Order,
+                        Order = (int)imageDto.Order,
                         SellId = sell.SellId
                     };
                     sell.SellImages.Add(newImage);

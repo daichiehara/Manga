@@ -26,7 +26,7 @@ namespace Manga.Server.Models
         [Display(Name = "出品状態")]
         public SellStatus SellStatus { get; set; }
 
-        public List<SellImageCreateDto> SellImages { get; set; }
+        public List<SellImageCreateDto>? SellImages { get; set; }
     }
 
     public class SellImageCreateDto
@@ -35,7 +35,6 @@ namespace Manga.Server.Models
 
         public IFormFile? ImageBlob { get; set; }
 
-        [Required]
-        public int Order { get; set; }
+        public int? Order { get; set; }
     }
 }
