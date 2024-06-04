@@ -16,7 +16,8 @@ import {
   ListItem,
   ListItemText,
   Alert,
-  AlertTitle
+  AlertTitle,
+  Divider
 } from '@mui/material';
 import axios from 'axios';
 
@@ -323,7 +324,7 @@ const SellForm: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} mb={2}>
-            <hr />
+            <Divider />
           </Grid>
           <Grid item xs={12} mb={2}>
             <Typography fontWeight={'bold'} mb={2}>

@@ -5,9 +5,10 @@ import { CameraAlt, PhotoLibrary } from '@mui/icons-material';
 interface CameraButtonProps {
   onCameraClick: () => void;
   onAlbumClick: () => void;
+  showAlbumIcon?: boolean; // 新しいプロパティを追加
 }
 
-const CameraButton: React.FC<CameraButtonProps> = ({ onCameraClick, onAlbumClick }) => {
+const CameraButton: React.FC<CameraButtonProps> = ({ onCameraClick, onAlbumClick, showAlbumIcon = true }) => {
   return (
     <Box
       position="fixed"
@@ -21,11 +22,13 @@ const CameraButton: React.FC<CameraButtonProps> = ({ onCameraClick, onAlbumClick
       mx={'auto'}
       sx={{ backgroundColor: 'rgba(255, 255, 255, 0)' }}
     >
-      <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-370%)' }}>
-        <IconButton onClick={onAlbumClick}>
-          <PhotoLibrary sx={{ fontSize: '2rem', color: 'primary.main' }} />
-        </IconButton>
-      </Box>
+      {showAlbumIcon && ( // showAlbumIconがtrueの場合にのみPhotoLibraryアイコンを表示
+        <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-370%)' }}>
+          <IconButton onClick={onAlbumClick}>
+            <PhotoLibrary sx={{ fontSize: '2rem', color: 'primary.main' }} />
+          </IconButton>
+        </Box>
+      )}
       <Box
         sx={{
           backgroundColor: 'white',
