@@ -278,11 +278,14 @@ namespace Manga.Server.Controllers
                     continue; // 出品が見つからない、または出品者が申請者自身でない場合はスキップ
                 }
 
+                //削除検討
+                /*
                 // WishListにrequesterSellのTitleが含まれているか確認
                 if (!responderSell.UserAccount.WishLists.Any(wl => wl.Title == requesterSell.Title))
                 {
                     continue; // WishListに含まれない場合はスキップ
                 }
+                */
 
                 // 相手からの交換申請を検索
                 var reciprocalRequest = await _context.Request

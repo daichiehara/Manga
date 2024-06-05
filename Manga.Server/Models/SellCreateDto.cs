@@ -4,6 +4,8 @@ namespace Manga.Server.Models
 {
     public class SellCreateDto
     {
+        public int? SellId { get; set; }
+
         [Display(Name = "作品タイトル")]
         public string? Title { get; set; }
 

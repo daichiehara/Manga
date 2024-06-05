@@ -70,6 +70,7 @@ namespace Manga.Server.Controllers
 
             var sells = await _context.Sell
                           .Include(s => s.SellImages)
+                          .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
                           .OrderByDescending(s => s.SellTime)
                           .ToListAsync();
 
@@ -126,6 +127,7 @@ namespace Manga.Server.Controllers
             // 直接一致するSellのレコードを取得
             var matchingSells = await _context.Sell
                 .Include(s => s.SellImages)
+                .Where(s => s.Title.Contains(title) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
                 .Where(s => s.Title.Contains(title))
                 .ToListAsync();
 
@@ -138,7 +140,7 @@ namespace Manga.Server.Controllers
             // wishMatchingUserIdsに含まれるユーザーのSellのレコードを取得
             var wishMatchingSells = await _context.Sell
                 .Include(s => s.SellImages)
-                .Where(s => wishMatchingUserIds.Contains(s.UserAccountId))
+                .Where(s => wishMatchingUserIds.Contains(s.UserAccountId) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
                 .ToListAsync();
 
             // リストを結合し、SellTimeの降順で並び替え
@@ -196,7 +198,7 @@ namespace Manga.Server.Controllers
             // wishMatchingUserIdsに含まれるユーザーのSellのレコードを取得
             var wishMatchingSells = await _context.Sell
                 .Include(s => s.SellImages)
-                .Where(s => wishMatchingUserIds.Contains(s.UserAccountId))
+                .Where(s => wishMatchingUserIds.Contains(s.UserAccountId) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
                 .OrderByDescending(s => s.SellTime)
                 .ToListAsync();
 
@@ -253,7 +255,7 @@ namespace Manga.Server.Controllers
             // 上記IDを使用して、Sellの詳細を取得
             var sells = await _context.Sell
                 .Include(s => s.SellImages)
-                .Where(s => myListSellIds.Contains(s.SellId))
+                .Where(s => myListSellIds.Contains(s.SellId) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
                 .OrderByDescending(s => s.SellTime)
                 .ToListAsync();
 
@@ -316,18 +318,19 @@ namespace Manga.Server.Controllers
             // 自分のOwnedListのタイトルまたはSellのタイトルと、WishListのタイトルが一致するユーザーのSellを取得
             var matchingUserSells = await _context.Sell
                 .Include(s => s.SellImages)
-                .Where(s => _context.WishList.Any(w => w.UserAccountId == s.UserAccountId && userTitles.Contains(w.Title)))
+                .Where(s => _context.WishList.Any(w => w.UserAccountId == s.UserAccountId && userTitles.Contains(w.Title)) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
                 .ToListAsync();
 
             // 自分のWishListと同じタイトルのSellを取得
             var wishMatchingSells = await _context.Sell
                 .Include(s => s.SellImages)
-                .Where(s => wishTitles.Contains(s.Title))
+                .Where(s => wishTitles.Contains(s.Title) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
                 .ToListAsync();
 
             // すべてのSellを新着順に取得
             var allSells = await _context.Sell
                 .Include(s => s.SellImages)
+                .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
                 .OrderByDescending(s => s.SellTime)
                 .ToListAsync();
 
@@ -462,6 +465,7 @@ namespace Manga.Server.Controllers
                 BookState = sell.BookState.GetDisplayName(),
                 NumberOfBooks = sell.NumberOfBooks,
                 SellMessage = sell.SellMessage,
+                SellStatus = sell.SellStatus,
                 UserName = sell.UserAccount.NickName,
                 ProfileIcon = sell.UserAccount.ProfileIcon,
                 HasIdVerificationImage = !string.IsNullOrEmpty(sell.UserAccount.IdVerificationImage),
@@ -578,6 +582,66 @@ namespace Manga.Server.Controllers
             {
                 return Ok(sell);
             }
+        }
+
+        [HttpGet("Drafts")]
+        public async Task<ActionResult<IEnumerable<SellDraftDto>>> GetDrafts()
+        {
+            // 現在のユーザーIDを取得
+            var userId = _userManager.GetUserId(User);
+
+            // 自分の下書きのみをフィルタリング
+            var drafts = await _context.Sell
+                .Where(s => s.SellStatus == SellStatus.Draft && s.UserAccountId == userId)
+                .Select(s => new SellDraftDto
+                {
+                    SellId = s.SellId,
+                    Title = s.Title,
+                    ImageUrl = s.SellImages
+                        .OrderBy(si => si.Order)
+                        .Select(si => si.ImageUrl)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return Ok(drafts);
+        }
+
+        [HttpGet("EditDraft/{Id}")]
+        public async Task<ActionResult<SellCreateDto>> GetDraftForEdit(int Id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // sellIdとuserIdが一致し、SellStatusがDraftのSellを取得
+            var sell = await _context.Sell
+                .Include(s => s.SellImages)
+                .Where(s => s.SellId == Id && s.UserAccountId == userId && s.SellStatus == SellStatus.Draft)
+                .FirstOrDefaultAsync();
+
+            if (sell == null)
+            {
+                return NotFound();
+            }
+
+            // SellCreateDtoにマッピング
+            var sellCreateDto = new SellCreateDto
+            {
+                SellId=Id,
+                Title = sell.Title,
+                SendPrefecture = sell.SendPrefecture,
+                SendDay = sell.SendDay,
+                BookState = sell.BookState,
+                NumberOfBooks = sell.NumberOfBooks,
+                SellMessage = sell.SellMessage,
+                SellStatus = sell.SellStatus,
+                SellImages = sell.SellImages.Select(si => new SellImageCreateDto
+                {
+                    ImageUrl = si.ImageUrl,
+                    Order = si.Order
+                }).ToList()
+            };
+
+            return Ok(sellCreateDto);
         }
 
         [HttpPut("{id}")]

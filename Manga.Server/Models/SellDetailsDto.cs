@@ -27,6 +27,9 @@ namespace Manga.Server.Models
         [Display(Name = "メッセージ")]
         public string SellMessage { get; set; }
 
+        [Display(Name = "出品状態")]
+        public SellStatus SellStatus { get; set; }
+
         [Display(Name = "ユーザー名")]
         public string UserName { get; set;}
 
