@@ -563,8 +563,7 @@ namespace Manga.Server.Controllers
                     sellImages.Add(new SellImage
                     {
                         ImageUrl = imageUrl,
-                        Order = (int)imageDto.Order,
-                        SellId = sell.SellId
+                        Order = (int)imageDto.Order
                     });
                 }
             }
@@ -572,6 +571,13 @@ namespace Manga.Server.Controllers
             sell.SellImages = sellImages;
 
             _context.Sell.Add(sell);
+            await _context.SaveChangesAsync();
+
+            foreach (var sellImage in sellImages)
+            {
+                sellImage.SellId = sell.SellId;
+                _context.SellImage.Add(sellImage);
+            }
             await _context.SaveChangesAsync();
 
             if (sellCreateDto.SellStatus == SellStatus.Recruiting)
