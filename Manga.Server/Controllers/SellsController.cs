@@ -567,13 +567,17 @@ namespace Manga.Server.Controllers
                     {
                         ImageUrl = imageUrl,
                         Order = (int)imageDto.Order,
-                        SellId = sell.SellId
                     });
                 }
             }
 
             sell.SellImages = sellImages;
 
+            foreach (var sellImage in sellImages)
+            {
+                sellImage.SellId = sell.SellId;
+                _context.SellImage.Add(sellImage);
+            }
             await _context.SaveChangesAsync();
 
             if (sellCreateDto.SellStatus == SellStatus.Recruiting)
