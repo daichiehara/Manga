@@ -164,7 +164,7 @@ const SellCamera: React.FC<SellCameraProps> = ({ capturedImages, onCapturedImage
           cropSize
         );
   
-        const capturedImage = canvas.toDataURL('image/png');
+        const capturedImage = canvas.toDataURL('image/webp');
         onCapturedImagesChange([...capturedImages, capturedImage]);
         if (capturedImages.length + 1 === 10) {
           setSelectedImageIndex(9);

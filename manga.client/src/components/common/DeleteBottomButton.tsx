@@ -27,7 +27,7 @@ const DeleteBottomButton: React.FC<DeleteBottomButtonProps> = ({ onDelete, onReo
         variant="text"
         color="secondary"
         size="large"
-        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 2 }}
+        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 4 }}
         onClick={onReorder}
       >
         <ReorderIcon sx={{ fontSize: '30px' }} />
