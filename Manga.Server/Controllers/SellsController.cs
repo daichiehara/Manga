@@ -889,9 +889,9 @@ namespace Manga.Server.Controllers
             {
                 //var encodedTitle = Uri.EscapeDataString(title);
                 var encodedNdc = 726.1;
-                var dpid = "iss-ndl-opac";
-                var mediatipe = "booklet";
-                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/opensearch?dpid={dpid}&any={title}&ndc={encodedNdc}&cnt=270";
+                var dpid = "iss-ndl-opac-bib";
+                var mediatype = "booklet";
+                var apiUrl = $"https://ndlsearch.ndl.go.jp/api/opensearch?dpid={dpid}&title={title}&ndc={encodedNdc}&cnt=270";
 
 
                 using var client = new HttpClient();
