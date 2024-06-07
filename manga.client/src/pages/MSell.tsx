@@ -6,6 +6,8 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import MenuBar from '../components/menu/MenuBar';
 import CustomToolbar from '../components/common/CustumToolbar';
 import { Link } from 'react-router-dom';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import { useSnackbar } from '../hooks/useSnackbar';
 
 interface MSell {
   title: string; 
@@ -16,6 +18,8 @@ const MSell: React.FC= () => {
     console.log('Button clicked!');
     // Add your logic here
   };
+  
+  useSnackbar();
 
   return (
     <>
@@ -70,8 +74,21 @@ const MSell: React.FC= () => {
           漫画全巻を出品する
         </Button>
       </Link>
-      </Box>
 
+      <Link to="/sell/draft">
+        <Button
+          variant="outlined" 
+          size='small'
+          sx={{ 
+            width: '100%',
+            mt: 2
+          }}
+        >
+          <BorderColorIcon sx={{pr: '0.6rem'}} />
+          下書き一覧
+        </Button>
+      </Link>
+      </Box>
 
       {/* 出品の流れの説明 */}
     <Box sx={{ ml:4, mr:4, mb:1.5}}>

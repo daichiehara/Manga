@@ -582,11 +582,11 @@ namespace Manga.Server.Controllers
 
             if (sellCreateDto.SellStatus == SellStatus.Recruiting)
             {
-                return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, sell);
+                return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, new { id = sell.SellId, status = "Recruiting" });
             }
             else
             {
-                return Ok(sell);
+                return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, new { id = sell.SellId, status = "Draft" });
             }
         }
 

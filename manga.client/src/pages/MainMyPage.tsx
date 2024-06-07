@@ -18,7 +18,7 @@ import { AuthContext } from '../components/context/AuthContext';
 import { Link } from 'react-router-dom';
 import LogoutList from '../components/mypage/LogoutList';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-
+import { useSnackbar } from '../hooks/useSnackbar';
 
 interface MainMyPage {
   title: string; 
@@ -34,15 +34,8 @@ const MainMyPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [snackMessage, setSnackMessage] = useState('');
   const location = useLocation();
-  useEffect(() => {
-    if (location.state?.snackOpen) {
-      setSnackMessage(location.state.snackMessage);
-      setSnackOpen(true);
-    }
-  }, [location]);
+  useSnackbar();
 
   // useCallbackを使用して関数が再生成されるのを避ける
   const handleLogin = useCallback(() => {
@@ -233,16 +226,8 @@ const MainMyPage: React.FC = () => {
 
       )}
 
-      <Snackbar
-        open={snackOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        style={{ marginBottom: '5rem' }}
-        sx={{ maxWidth: '640px', width: '100%', left: '50%', right: 'auto', transform: 'translateX(-50%)' }} // 追加
-      >
-        <Alert severity="success">{snackMessage}</Alert>
-      </Snackbar>
+      
+      
       
       {/* 以降の部分は変わらず共通のコンポーネントやUI要素を表示 */}
       <MenuBar />

@@ -17,9 +17,11 @@ import {
   ListItemText,
   Alert,
   AlertTitle,
-  Divider
+  Divider,
+  CircularProgress
 } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 import { prefectures } from '../components/common/Prefectures';
 
@@ -42,6 +44,10 @@ const SellForm: React.FC = () => {
   const [isDraft, setIsDraft] = useState<boolean>(false);
   const isDraftRef = useRef<boolean>(false);
   const [sellImageError, setSellImageError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSellLoading, setIsSellLoading] = useState(false);
+  const [isDraftLoading, setIsDraftLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -117,6 +123,9 @@ const SellForm: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     if (!validateForm(data)) {
+      setIsLoading(false);
+      setIsSellLoading(false);
+      setIsDraftLoading(false);
       return;
     }
   
@@ -159,22 +168,28 @@ const SellForm: React.FC = () => {
         },
         withCredentials: true,
       });
-  
+    
       console.log('Form submitted successfully:', response.data);
+    
+      if (response.data.status === 'Recruiting') {
+        navigate(`/item/${response.data.id}`, { state: { snackOpen: true, snackMessage: '出品に成功しました。' } });
+      } else if (response.data.status === 'Draft') {
+        navigate('/main-sell', { state: { snackOpen: true, snackMessage: '下書きに保存されました。' } });
+      }
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            // AxiosErrorの場合
-            console.error('Error submitting form:', error.response?.data);
-          } else {
-            // その他のエラー
-            console.error('Error submitting form:', error);
-          }
+      if (axios.isAxiosError(error)) {
+        console.error('Error submitting form:', error.response?.data);
+      } else {
+        console.error('Error submitting form:', error);
+      }
     }
   };
   
 
   useEffect(() => {
     if (isDraft) {
+      setIsLoading(true);
+      setIsDraftLoading(true);
       handleSubmit((data) => onSubmit({ ...data, sellStatus: 4 }))();
     }
   }, [isDraft, handleSubmit]);
@@ -191,6 +206,8 @@ const SellForm: React.FC = () => {
   const handleSell = () => {
     isDraftRef.current = false;
     setIsDraft(false);
+    setIsLoading(true);
+    setIsSellLoading(true);
     handleSubmit((data) => onSubmit({ ...data, sellStatus: 1 }))();
   };
 
@@ -389,8 +406,9 @@ const SellForm: React.FC = () => {
               fullWidth
               size="large"
               onClick={handleSell}
+              disabled={isLoading}
             >
-              出品する
+              {isSellLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '出品する'}
             </Button>
           </Grid>
           <Grid item xs={12} mb={2}>
@@ -400,8 +418,9 @@ const SellForm: React.FC = () => {
               color="primary"
               fullWidth
               onClick={handleSaveAsDraft}
+              disabled={isLoading}
             >
-              下書きに保存
+              {isDraftLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '下書きに保存'}
             </Button>
           </Grid>
         </Grid>

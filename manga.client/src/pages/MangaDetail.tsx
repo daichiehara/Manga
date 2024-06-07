@@ -14,6 +14,7 @@ import SellerInfo from '../components/common/SellerInfo';
 import ImageModal from '../components/common/ImageModal';
 import RecentCommentsDisplay from '../components/item/RecentCommentsDisplay'; 
 import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply インターフェイスのインポート
+import { useSnackbar } from '../hooks/useSnackbar';
 import axios from 'axios';
 
 /**
@@ -49,6 +50,7 @@ const MangaDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
+  useSnackbar();
 
   const handleBack = () => {
     navigate(-1); // 前のページに戻る

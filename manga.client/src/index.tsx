@@ -6,6 +6,7 @@ import App from './App';
 import theme from './theme/theme';
 import { AuthProvider } from './components/context/AuthContext';
 import { BooksProvider } from './components/context/BookContext';
+import { SnackbarProvider } from './components/context/SnackbarContext';
 import './utils/http'
 
 
@@ -14,8 +15,10 @@ ReactDOM.render(
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <BooksProvider>
-          <App />
-          </BooksProvider>
+          <SnackbarProvider>
+            <App />
+          </SnackbarProvider>
+        </BooksProvider>
       </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>,

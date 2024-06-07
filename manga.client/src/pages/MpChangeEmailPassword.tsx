@@ -230,7 +230,7 @@ const MpChangeEmailPassword: React.FC = () => {
               {serverError}
             </Typography>
           )}
-          <Button type="submit" variant="contained" color="primary" fullWidth sx={{my:1, background: 'linear-gradient(to right, #FCCF31, #F55555)'}} disabled={isLoading}>
+          <Button type="submit" variant="contained" color="primary" size='large' fullWidth disabled={isLoading}>
           {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '更新する'}
           </Button>
         </form>
