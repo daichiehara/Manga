@@ -713,7 +713,14 @@ namespace Manga.Server.Controllers
 
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            if (sellUpdateDto.SellStatus == SellStatus.Recruiting)
+            {
+                return Ok(new { status = "Recruiting" });
+            }
+            else
+            {
+                return Ok(new { status = "Draft" });
+            }
         }
 
         // DELETE: api/Sells/5
