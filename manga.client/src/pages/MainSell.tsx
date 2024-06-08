@@ -18,10 +18,16 @@ import {
   Alert,
   AlertTitle,
   Divider,
-  CircularProgress
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import LoadingComponent from '../components/common/LoadingComponent';
 
 import { prefectures } from '../components/common/Prefectures';
 
@@ -37,7 +43,7 @@ interface FormData {
 }
 
 const SellForm: React.FC = () => {
-  const { control, handleSubmit, setError, clearErrors } = useForm<FormData>();
+  const { control, handleSubmit, setError, clearErrors, setValue } = useForm<FormData>();
   const [selectedBookState, setSelectedBookState] = useState<number | null>(null);
   const [selectedSendDay, setSelectedSendDay] = useState<number | null>(null);
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -47,7 +53,10 @@ const SellForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSellLoading, setIsSellLoading] = useState(false);
   const [isDraftLoading, setIsDraftLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const { sellId } = useParams<{ sellId?: string }>();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -185,6 +194,11 @@ const SellForm: React.FC = () => {
     }
   };
   
+  useEffect(() => {
+    if(!sellId) {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (isDraft) {
@@ -211,9 +225,72 @@ const SellForm: React.FC = () => {
     handleSubmit((data) => onSubmit({ ...data, sellStatus: 1 }))();
   };
 
+  useEffect(() => {
+    if (sellId) {
+      fetchDraftData(parseInt(sellId, 10));
+    }
+  }, [sellId]);
+  
+  const fetchDraftData = async (sellId: number) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`https://localhost:7103/api/Sells/EditDraft/${sellId}`, {
+        withCredentials: true,
+      });
+      const draftData = response.data;
+  
+      // フォームフィールドに下書きデータを設定
+      setValue('title', draftData.title ?? '');
+      setValue('sendPrefecture', draftData.sendPrefecture ?? 0);
+      setValue('sendDay', draftData.sendDay ?? null);
+      setValue('bookState', draftData.bookState ?? null);
+      setSelectedBookState(draftData.bookState ?? null);
+      setSelectedSendDay(draftData.sendDay ?? null);
+      setValue('numberOfBooks', draftData.numberOfBooks ?? '');
+      setValue('sellMessage', draftData.sellMessage ?? '');
+      setValue('sellStatus', draftData.sellStatus);
+  
+      // 画像データの設定
+      if (draftData.sellImages && draftData.sellImages.length > 0) {
+        const imageUrls = draftData.sellImages.map((image: any) => image.imageUrl);
+        setCapturedImages(imageUrls);
+      }
+  
+    } catch (error) {
+      console.error('Error fetching draft data:', error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching data
+    }
+  };
+
+  const handleDeleteDraft = () => {
+    setIsDialogOpen(true);
+  };
+  
+  const handleConfirmDelete = async () => {
+    setIsDialogOpen(false);
+    try {
+      setIsLoading(true);
+      await axios.delete(`https://localhost:7103/api/Sells/${sellId}`, {
+        withCredentials: true,
+      });
+      console.log('Draft deleted successfully');
+      navigate('/main-sell', { state: { snackOpen: true, snackMessage: '下書きを削除しました。' } });
+    } catch (error) {
+      console.error('Error deleting draft:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleCancelDelete = () => {
+    setIsDialogOpen(false);
+  };
+
   return (
     <>
       <CustomToolbar title="出品情報を入力" />
+      {loading && <LoadingComponent />}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box sx={{ pt: '4rem', mb: 3 }}>
             <ImageList
@@ -411,7 +488,7 @@ const SellForm: React.FC = () => {
               {isSellLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '出品する'}
             </Button>
           </Grid>
-          <Grid item xs={12} mb={2}>
+          <Grid item xs={12} mb={3}>
             <Button
               type="button"
               variant="outlined"
@@ -423,8 +500,38 @@ const SellForm: React.FC = () => {
               {isDraftLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '下書きに保存'}
             </Button>
           </Grid>
+          {sellId && (
+            <Grid item xs={12} mb={2}>
+              <Button
+                type="button"
+                variant="text"
+                color="error"
+                fullWidth
+                onClick={handleDeleteDraft}
+                disabled={isLoading}
+              >
+                この下書きを削除する
+              </Button>
+            </Grid>
+          )}
         </Grid>
       </form>
+      <Dialog open={isDialogOpen} onClose={handleCancelDelete}>
+        <DialogTitle>下書きの削除</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            この下書きを削除しますか？この操作は元に戻せません。
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            キャンセル
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+            削除
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
