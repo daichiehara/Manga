@@ -640,11 +640,13 @@ namespace Manga.Server.Controllers
                 NumberOfBooks = sell.NumberOfBooks,
                 SellMessage = sell.SellMessage,
                 SellStatus = sell.SellStatus,
-                SellImages = sell.SellImages.Select(si => new SellImageCreateDto
-                {
-                    ImageUrl = si.ImageUrl,
-                    Order = si.Order
-                }).ToList()
+                SellImages = sell.SellImages
+                    .OrderBy(si => si.Order)
+                    .Select(si => new SellImageCreateDto
+                    {
+                        ImageUrl = si.ImageUrl,
+                        Order = si.Order
+                    }).ToList()
             };
 
             return Ok(sellCreateDto);
