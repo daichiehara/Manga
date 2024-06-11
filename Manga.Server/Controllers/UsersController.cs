@@ -537,14 +537,34 @@ namespace Manga.Server.Controllers
 
             if (profileIcon != null && profileIcon.Length > 0)
             {
+                // 古い画像のURLを保持
+                var oldImageUrl = user.ProfileIcon;
+
+                // 新しい画像をS3にアップロード
                 var imageUrl = await _s3Service.ProcessMangaImageAsync(profileIcon);
                 user.ProfileIcon = imageUrl;
+
+                // ユーザー情報を更新
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.Errors);
+                }
+
+                // 古い画像をS3から削除
+                if (!string.IsNullOrEmpty(oldImageUrl))
+                {
+                    var fileName = Path.GetFileName(new Uri(oldImageUrl).LocalPath);
+                    await _s3Service.DeleteFileFromS3Async(fileName, "manga-img-bucket");
+                }
+
+                return Ok();
             }
 
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded)
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(updateResult.Errors);
             }
 
             return Ok();
