@@ -10,10 +10,10 @@ import { ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 
 const SettingList: React.FC = () => {
   const menuItems = [
-    { name: 'プロフィール設定', path: '/mpfavolist' },
-    { name: 'メール・パスワード', path: '/mpchangeemailpassword' },
-    { name: '住所', path: '/mpadressupdate' },
-    { name: '本人確認', path: '/user/verification' },
+    { name: 'プロフィール設定', path: '/mypage/profile' },
+    { name: 'メール・パスワード', path: '/mypage/changeemailpassword' },
+    { name: '住所', path: '/mypage/adressupdate' },
+    { name: '本人確認', path: '/mypage/verification' },
   ];
 
   return (

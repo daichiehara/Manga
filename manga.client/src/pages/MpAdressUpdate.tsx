@@ -133,7 +133,7 @@ const MpAdressUpdate: React.FC = () => {
         withCredentials: true,
       });
       console.log('更新されました。');
-      navigate('/main-page', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
+      navigate('/mypage', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
     } catch (error) {
       console.error('Error updating address:', error);
     }
@@ -241,7 +241,7 @@ const MpAdressUpdate: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary" size='large' fullWidth disabled={isLoading}>
-            {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '更新する'}
+            {isLoading ? <CircularProgress size={24} /> : '更新する'}
             </Button>
             </Grid>
           </Grid>

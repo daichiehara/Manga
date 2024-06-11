@@ -96,8 +96,7 @@ const MpChangeEmailPassword: React.FC = () => {
       if (response.status === 200) {
         // Handle success
         console.log('更新されました。');
-        //navigate(-1);
-        navigate('/main-page', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
+        navigate('/mypage', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
       } else {
         // Handle error
         console.error('Failed to update account');
@@ -231,7 +230,7 @@ const MpChangeEmailPassword: React.FC = () => {
             </Typography>
           )}
           <Button type="submit" variant="contained" color="primary" size='large' fullWidth disabled={isLoading}>
-          {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '更新する'}
+          {isLoading ? <CircularProgress size={24} /> : '更新する'}
           </Button>
         </form>
       </Box>

@@ -25,6 +25,7 @@ import MpIdVerification from './pages/MpIdVerification.tsx';
 import IdCamera from './pages/IdCamera.tsx';
 import SellForm from './pages/MainSell.tsx';
 import DraftList from './pages/DraftList.tsx';
+import MpProfile from './pages/MpProfile.tsx';
 
 
 const App = () => {
@@ -49,19 +50,20 @@ const App = () => {
             <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
             <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
             <Route path="/main-sell" element={<MSell />} />
-            <Route path="/main-page" element={<MainMyPage />} /> {/* マイページのルート */}
+            <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
             <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
             <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
-            <Route path="/mpfavolist" element={<MpFavoList />} /> {/* test */}
-            <Route path="/mpchangeemailpassword" element={<MpChangeEmailPassword />} />
-            <Route path="/mpadressupdate" element={<MpAdressUpadate />} />
-            <Route path="/mpmysell" element={<MpMySell />} />
-            <Route path="/mpmatchedsell" element={<MpMatchedSell />} />
-            <Route path="/user/verification" element={<MpIdVerification />} />
-            <Route path="/user/verification/camera" element={<IdCamera />} />
+            <Route path="/mypage/favolist" element={<MpFavoList />} /> {/* test */}
+            <Route path="/mypage/changeemailpassword" element={<MpChangeEmailPassword />} />
+            <Route path="/mypage/adressupdate" element={<MpAdressUpadate />} />
+            <Route path="/mypage/mysell" element={<MpMySell />} />
+            <Route path="/mypage/matchedsell" element={<MpMatchedSell />} />
+            <Route path="/mypage/verification" element={<MpIdVerification />} />
+            <Route path="/mypage/verification/camera" element={<IdCamera />} />
             <Route path="/sell" element={<SellForm />} />
             <Route path="/sell/:sellId" element={<SellForm />} />
             <Route path="/sell/draft" element={<DraftList />} />
+            <Route path="/mypage/profile" element={<MpProfile />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>

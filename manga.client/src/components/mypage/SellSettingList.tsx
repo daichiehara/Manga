@@ -10,9 +10,9 @@ import { ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 
 const SellSettingList: React.FC = () => {
   const menuItems = [
-    { name: 'いいね一覧', path: '/mpfavolist' },
-    { name: '出品した漫画', path: '/mpmysell' },
-    { name: '交換した漫画', path: '/mpmatchedsell' },
+    { name: 'いいね一覧', path: '/mypage/favolist' },
+    { name: '出品した漫画', path: '/mypage/mysell' },
+    { name: '交換した漫画', path: '/mypage/matchedsell' },
   ];
 
   return (

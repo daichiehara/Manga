@@ -122,7 +122,7 @@ const MainMyPage: React.FC = () => {
             </Box>
         </Grid>
         <Grid container display="flex" alignItems="center" justifyContent="center" sx={{px:2,pb:3,}}>
-        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mpfavolist' } sx={{textDecoration: 'none'}}>
+        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mypage/favolist' } sx={{textDecoration: 'none'}}>
           <Box
             bgcolor="grey.300" // グレーの背景色
             borderRadius="50%" // 円形にする
@@ -138,7 +138,7 @@ const MainMyPage: React.FC = () => {
             {`いいね一覧`}
           </Typography>
         </Grid>
-        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mpmysell' }sx={{textDecoration: 'none'}}>
+        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mypage/mysell' }sx={{textDecoration: 'none'}}>
           <Box
             bgcolor="#F2F2F2" // グレーの背景色
             borderRadius="50%" // 円形にする
@@ -153,7 +153,7 @@ const MainMyPage: React.FC = () => {
             {`出品した漫画`}
           </Typography>
         </Grid>
-        <Grid item xs={4} display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mpmatchedsell' }sx={{textDecoration: 'none'}}>
+        <Grid item xs={4} display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mypage/matchedsell' }sx={{textDecoration: 'none'}}>
           <Box
             bgcolor="grey.300" // グレーの背景色
             borderRadius="50%" // 円形にする

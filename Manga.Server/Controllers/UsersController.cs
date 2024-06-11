@@ -503,8 +503,26 @@ namespace Manga.Server.Controllers
             return BadRequest("Failed to process image.");
         }
 
+        [HttpGet("GetUserProfile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userProfile = new
+            {
+                NickName = user.NickName,
+                ProfileIcon = user.ProfileIcon
+            };
+
+            return Ok(userProfile);
+        }
+
         [HttpPut("UpdateProfile")]
-        public async Task<IActionResult> UpdateProfile(string? nickName, IFormFile? profileIcon)
+        public async Task<IActionResult> UpdateProfile([FromForm] string? nickName, [FromForm] IFormFile? profileIcon)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
