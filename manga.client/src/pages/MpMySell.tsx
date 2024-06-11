@@ -117,7 +117,7 @@ const MpMySell: React.FC = () => {
           borderBottom: index !== mpmysell.length - 1 ? '1px solid #e0e0e0' : '' 
           }}>
             <Card elevation={0} sx={{ display: 'flex', alignItems: 'center'}}>
-              <CardActionArea onClick={() => navigate(`/products/${item.sellId}`)}>
+              <CardActionArea onClick={() => navigate(`/item/${item.sellId}`)}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <CardMedia
                   component="img"
