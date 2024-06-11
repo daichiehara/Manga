@@ -503,6 +503,35 @@ namespace Manga.Server.Controllers
             return BadRequest("Failed to process image.");
         }
 
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile(string? nickName, IFormFile? profileIcon)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (!string.IsNullOrWhiteSpace(nickName))
+            {
+                user.NickName = nickName;
+            }
+
+            if (profileIcon != null && profileIcon.Length > 0)
+            {
+                var imageUrl = await _s3Service.ProcessMangaImageAsync(profileIcon);
+                user.ProfileIcon = imageUrl;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok();
+        }
+
 
         [HttpGet("protected")]
         [Authorize]
