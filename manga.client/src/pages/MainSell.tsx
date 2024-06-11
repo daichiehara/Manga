@@ -57,6 +57,7 @@ const SellForm: React.FC = () => {
   const navigate = useNavigate();
   const { sellId } = useParams<{ sellId?: string }>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [draftData, setDraftData] = useState<any>(null);
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -140,12 +141,21 @@ const SellForm: React.FC = () => {
   
     const sellImages = await Promise.all(
       capturedImages.map(async (image, index) => {
-        const response = await fetch(image);
-        const blob = await response.blob();
-        return {
-          imageBlob: new File([blob], `image${index}.webp`, { type: 'image/webp' }),
-          order: index + 1,
-        };
+        if (image.startsWith('http')) {
+          // 既存の画像の場合
+          return {
+            imageUrl: image,
+            order: index + 1,
+          };
+        } else {
+          // 新しい画像の場合
+          const response = await fetch(image);
+          const blob = await response.blob();
+          return {
+            imageBlob: new File([blob], `image${index}.webp`, { type: 'image/webp' }),
+            order: index + 1,
+          };
+        }
       })
     );
   
@@ -161,7 +171,12 @@ const SellForm: React.FC = () => {
     formData.append('sellStatus', data.sellStatus.toString()); // Required field
   
     sellImages.forEach((image, index) => {
-      formData.append(`sellImages[${index}].ImageBlob`, image.imageBlob);
+      if (image.imageBlob) {
+        formData.append(`sellImages[${index}].ImageBlob`, image.imageBlob);
+      }
+      if (image.imageUrl) {
+        formData.append(`sellImages[${index}].ImageUrl`, image.imageUrl);
+      }
       formData.append(`sellImages[${index}].Order`, image.order.toString());
     });
   
@@ -171,7 +186,12 @@ const SellForm: React.FC = () => {
     });
   
     try {
-      const response = await axios.post('https://localhost:7103/api/Sells', formData, {
+      const url = sellId
+        ? `https://localhost:7103/api/Sells/${sellId}`
+        : 'https://localhost:7103/api/Sells';
+      const method = sellId ? 'put' : 'post';
+
+      const response = await axios[method](url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -179,11 +199,27 @@ const SellForm: React.FC = () => {
       });
     
       console.log('Form submitted successfully:', response.data);
+
+      let snackMessage = '';
+
+      if (!sellId) {
+        snackMessage = '下書きに保存されました。';
+      } else {
+        if (response.data.status === 2) {
+          if (draftData?.sellStatus !== 2) {
+            snackMessage = '出品を非公開にしました。';
+          } else {
+            snackMessage = '変更を保存しました。'
+          }
+        } else if (response.data.status === 4) {
+          snackMessage = '変更を保存しました。';
+        }
+      }
     
-      if (response.data.status === 'Recruiting') {
+      if (response.data.status === 1) {
         navigate(`/item/${response.data.id}`, { state: { snackOpen: true, snackMessage: '出品に成功しました。' } });
-      } else if (response.data.status === 'Draft') {
-        navigate('/main-sell', { state: { snackOpen: true, snackMessage: '下書きに保存されました。' } });
+      } else if (response.data.status === 2 || response.data.status === 4) {
+        navigate('/main-sell', { state: { snackOpen: true, snackMessage } });
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -204,7 +240,14 @@ const SellForm: React.FC = () => {
     if (isDraft) {
       setIsLoading(true);
       setIsDraftLoading(true);
-      handleSubmit((data) => onSubmit({ ...data, sellStatus: 4 }))();
+      
+      if (draftData?.sellStatus === 2) {
+        handleSubmit((data) => onSubmit({ ...data, sellStatus: 2 }))();
+      } else if (draftData?.sellStatus === 1){
+        handleSubmit((data) => onSubmit({ ...data, sellStatus: 2 }))();
+      } else {
+        handleSubmit((data) => onSubmit({ ...data, sellStatus: 4 }))();
+      }
     }
   }, [isDraft, handleSubmit]);
 
@@ -237,23 +280,26 @@ const SellForm: React.FC = () => {
       const response = await axios.get(`https://localhost:7103/api/Sells/EditDraft/${sellId}`, {
         withCredentials: true,
       });
-      const draftData = response.data;
+      const data = response.data;
+      setDraftData(data);
   
-      // フォームフィールドに下書きデータを設定
-      setValue('title', draftData.title ?? '');
-      setValue('sendPrefecture', draftData.sendPrefecture ?? 0);
-      setValue('sendDay', draftData.sendDay ?? null);
-      setValue('bookState', draftData.bookState ?? null);
-      setSelectedBookState(draftData.bookState ?? null);
-      setSelectedSendDay(draftData.sendDay ?? null);
-      setValue('numberOfBooks', draftData.numberOfBooks ?? '');
-      setValue('sellMessage', draftData.sellMessage ?? '');
-      setValue('sellStatus', draftData.sellStatus);
+      if (data) {
+        // フォームフィールドに下書きデータを設定
+        setValue('title', data.title ?? '');
+        setValue('sendPrefecture', data.sendPrefecture ?? 0);
+        setValue('sendDay', data.sendDay ?? null);
+        setValue('bookState', data.bookState ?? null);
+        setSelectedBookState(data.bookState ?? null);
+        setSelectedSendDay(data.sendDay ?? null);
+        setValue('numberOfBooks', data.numberOfBooks ?? '');
+        setValue('sellMessage', data.sellMessage ?? '');
+        setValue('sellStatus', data.sellStatus);
   
-      // 画像データの設定
-      if (draftData.sellImages && draftData.sellImages.length > 0) {
-        const imageUrls = draftData.sellImages.map((image: any) => image.imageUrl);
-        setCapturedImages(imageUrls);
+        // 画像データの設定
+        if (data.sellImages && data.sellImages.length > 0) {
+          const imageUrls = data.sellImages.map((image: any) => image.imageUrl);
+          setCapturedImages(imageUrls);
+        }
       }
   
     } catch (error) {
@@ -275,7 +321,14 @@ const SellForm: React.FC = () => {
         withCredentials: true,
       });
       console.log('Draft deleted successfully');
-      navigate('/main-sell', { state: { snackOpen: true, snackMessage: '下書きを削除しました。' } });
+
+      let snackMessage = '';
+      if (draftData?.sellStatus === 4) {
+        snackMessage = '下書きを削除しました。'
+      } else {
+        snackMessage = '出品を削除しました。'
+      }
+      navigate('/main-sell', { state: { snackOpen: true, snackMessage } });
     } catch (error) {
       console.error('Error deleting draft:', error);
     } finally {
@@ -485,7 +538,13 @@ const SellForm: React.FC = () => {
               onClick={handleSell}
               disabled={isLoading}
             >
-              {isSellLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '出品する'}
+              {isSellLoading ? <CircularProgress size={24} /> : 
+              <>
+                {!sellId && '出品する'}
+                {draftData?.sellStatus === 1 && '変更する'}
+                {draftData?.sellStatus === 2 && '出品を再開する'}
+                {draftData?.sellStatus === 4 && '出品する'}
+              </>}
             </Button>
           </Grid>
           <Grid item xs={12} mb={3}>
@@ -497,7 +556,13 @@ const SellForm: React.FC = () => {
               onClick={handleSaveAsDraft}
               disabled={isLoading}
             >
-              {isDraftLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : '下書きに保存'}
+              {isDraftLoading ? <CircularProgress size={24} /> : 
+              <>
+                {!sellId && '下書きに保存する'}
+                {draftData?.sellStatus === 1 && 'この出品を非公開にする'}
+                {draftData?.sellStatus === 2 && '変更する'}
+                {draftData?.sellStatus === 4 && '上書き保存する'}
+              </>}
             </Button>
           </Grid>
           {sellId && (
@@ -510,17 +575,18 @@ const SellForm: React.FC = () => {
                 onClick={handleDeleteDraft}
                 disabled={isLoading}
               >
-                この下書きを削除する
+                {draftData?.sellStatus === 4 ? 'この下書きを削除する' : 'この出品を削除する'}
               </Button>
             </Grid>
           )}
         </Grid>
       </form>
       <Dialog open={isDialogOpen} onClose={handleCancelDelete}>
-        <DialogTitle>下書きの削除</DialogTitle>
+        <DialogTitle>{draftData?.sellStatus === 4 ? '下書きの削除' : '出品の削除'}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            この下書きを削除しますか？この操作は元に戻せません。
+            {draftData?.sellStatus === 4 ? 'この下書きを削除しますか？' : 'この出品を削除しますか？'}
+            この操作は元に戻せません。
           </DialogContentText>
         </DialogContent>
         <DialogActions>

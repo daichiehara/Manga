@@ -85,6 +85,7 @@ namespace Manga.Server.Controllers
                                                    Title = w.Title,
                                                    IsOwned = userTitles.Contains(w.Title)
                                                })
+                                               .OrderByDescending(w => w.IsOwned)
                                                .ToListAsync();
 
                 var dto = new HomeDto
@@ -162,6 +163,7 @@ namespace Manga.Server.Controllers
                         Title = w.Title,
                         IsOwned = userTitles.Contains(w.Title)
                     })
+                    .OrderByDescending(w => w.IsOwned)
                     .ToList(),
                 SellImage = sell.SellImages.OrderBy(si => si.Order).FirstOrDefault()?.ImageUrl
             }).ToList();
@@ -215,6 +217,7 @@ namespace Manga.Server.Controllers
                         Title = w.Title,
                         IsOwned = userTitles.Contains(w.Title)
                     })
+                    .OrderByDescending(w => w.IsOwned)
                     .ToList(),
                 SellImage = sell.SellImages.OrderBy(si => si.Order).FirstOrDefault()?.ImageUrl
             }).ToList();
@@ -270,6 +273,7 @@ namespace Manga.Server.Controllers
                                                    Title = w.Title,
                                                    IsOwned = userTitles.Contains(w.Title)
                                                })
+                                               .OrderByDescending(w => w.IsOwned)
                                                .ToListAsync();
 
                 var dto = new HomeDto
@@ -359,6 +363,7 @@ namespace Manga.Server.Controllers
                         Title = w.Title,
                         IsOwned = userTitles.Contains(w.Title)
                     })
+                    .OrderByDescending(w => w.IsOwned)
                     .ToListAsync();
 
                 var dto = new HomeDto
@@ -580,14 +585,7 @@ namespace Manga.Server.Controllers
             }
             await _context.SaveChangesAsync();
 
-            if (sellCreateDto.SellStatus == SellStatus.Recruiting)
-            {
-                return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, new { id = sell.SellId, status = "Recruiting" });
-            }
-            else
-            {
-                return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, new { id = sell.SellId, status = "Draft" });
-            }
+            return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, new { id = sell.SellId, status = sell.SellStatus });
         }
 
         [HttpGet("Drafts")]
@@ -621,7 +619,7 @@ namespace Manga.Server.Controllers
             // sellIdとuserIdが一致し、SellStatusがDraftのSellを取得
             var sell = await _context.Sell
                 .Include(s => s.SellImages)
-                .Where(s => s.SellId == Id && s.UserAccountId == userId && s.SellStatus == SellStatus.Draft)
+                .Where(s => s.SellId == Id && s.UserAccountId == userId)
                 .FirstOrDefaultAsync();
 
             if (sell == null)
@@ -669,6 +667,7 @@ namespace Manga.Server.Controllers
             sell.NumberOfBooks = sellUpdateDto.NumberOfBooks;
             sell.SellMessage = sellUpdateDto.SellMessage;
             sell.SellStatus = sellUpdateDto.SellStatus;
+            sell.SellTime = DateTime.UtcNow;
 
             // 既存の画像を取得
             var existingImages = sell.SellImages.ToDictionary(si => si.ImageUrl);
@@ -715,14 +714,7 @@ namespace Manga.Server.Controllers
 
             await _context.SaveChangesAsync();
 
-            if (sellUpdateDto.SellStatus == SellStatus.Recruiting)
-            {
-                return Ok(new { status = "Recruiting" });
-            }
-            else
-            {
-                return Ok(new { status = "Draft" });
-            }
+            return Ok(new { id = sell.SellId, status = sell.SellStatus });
         }
 
         // DELETE: api/Sells/5
@@ -946,7 +938,8 @@ namespace Manga.Server.Controllers
             }
 
             var sells = await _context.Sell
-                .Where(s => s.UserAccountId == userId)
+                .Where(s => s.UserAccountId == userId && s.SellStatus != SellStatus.Draft)
+                .OrderByDescending(s => s.SellTime)
                 .Select(s => new MySellDto
                 {
                     SellId = s.SellId,
