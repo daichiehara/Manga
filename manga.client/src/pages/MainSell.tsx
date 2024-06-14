@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import CustomToolbar from '../components/common/CustumToolbar';
 import ImageList from '../components/common/SellImageList';
+import BookAutocomplete from '../components/common/BookAutocomplete';
 import {
   TextField,
   Select,
@@ -362,19 +363,21 @@ const SellForm: React.FC = () => {
               作品タイトル
             </Typography>
             <Controller
-              name="title"
-              control={control}
-              defaultValue=""
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  error={!!error}
-                  helperText={error?.message}
-                  placeholder="例) サザエさん"
-                />
-              )}
-            />
+    name="title"
+    control={control}
+    defaultValue=""
+    render={({ field: { ref, onChange, value, ...rest }, fieldState: { error } }) => (
+      <BookAutocomplete
+        {...rest}
+        inputValue={value}
+        onInputChange={(_, newInputValue) => {
+          onChange(newInputValue);
+        }}
+        error={!!error}
+        helperText={error?.message}
+      />
+    )}
+  />
           </Grid>
           <Grid item xs={12} mb={2}>
             <Typography variant="body2" fontWeight={'bold'} color={'secondary'} mb={1}>
