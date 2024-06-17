@@ -112,39 +112,38 @@ namespace Manga.Server.Controllers
         */
 
         [HttpPost]
-        public async Task<IActionResult> AddToWishList([FromQuery] string title)
+        public async Task<IActionResult> AddToWishList([FromQuery] List<string> titles)
         {
-            if (string.IsNullOrEmpty(title))
+            if (titles == null || titles.Count == 0)
             {
                 return BadRequest("タイトルは必須です。");
             }
-
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
                 return NotFound("ユーザー認証に失敗しました。");
             }
-
-            // すでに同じタイトルがWishListに存在するか確認
-            var existingEntry = await _context.WishList
-                                              .FirstOrDefaultAsync(w => w.UserAccountId == userId && w.Title == title);
-            if (existingEntry != null)
+            var addedTitles = new List<string>();
+            foreach (var title in titles)
             {
-                return BadRequest("このタイトルはすでにWishListに登録されています。");
+                // すでに同じタイトルがWishListに存在するか確認
+                var existingEntry = await _context.WishList
+                                                  .FirstOrDefaultAsync(w => w.UserAccountId == userId && w.Title == title);
+                if (existingEntry == null)
+                {
+                    // ユーザーIDとタイトルを使用して新しいWishListエントリーを作成
+                    var wishListEntry = new WishList
+                    {
+                        Title = title,
+                        UserAccountId = userId
+                    };
+                    // データベースにエントリーを追加
+                    _context.WishList.Add(wishListEntry);
+                    addedTitles.Add(title);
+                }
             }
-
-            // ユーザーIDとタイトルを使用して新しいWishListエントリーを作成
-            var wishListEntry = new WishList
-            {
-                Title = title,
-                UserAccountId = userId
-            };
-
-            // データベースにエントリーを追加
-            _context.WishList.Add(wishListEntry);
             await _context.SaveChangesAsync();
-
-            return Ok($"タイトル '{title}' がWishListに追加されました。");
+            return Ok($"タイトル '{string.Join(", ", addedTitles)}' がWishListに追加されました。");
         }
 
         // DELETE: api/WishLists/5
