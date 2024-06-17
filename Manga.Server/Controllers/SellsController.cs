@@ -669,11 +669,14 @@ namespace Manga.Server.Controllers
             sell.SellStatus = sellUpdateDto.SellStatus;
             sell.SellTime = DateTime.UtcNow;
 
+            // nullチェックを追加してデフォルトの空リストを使用
+            var sellImages = sellUpdateDto.SellImages ?? new List<SellImageCreateDto>();
+
             // 既存の画像を取得
             var existingImages = sell.SellImages.ToDictionary(si => si.ImageUrl);
 
             // 削除対象の画像URLを取得
-            var imagesToDelete = existingImages.Keys.Except(sellUpdateDto.SellImages.Select(si => si.ImageUrl)).ToList();
+            var imagesToDelete = existingImages.Keys.Except(sellImages.Select(si => si.ImageUrl)).ToList();
 
             foreach (var imageUrl in imagesToDelete)
             {
@@ -687,7 +690,7 @@ namespace Manga.Server.Controllers
                 _context.SellImage.Remove(imageToDelete);
             }
 
-            foreach (var imageDto in sellUpdateDto.SellImages)
+            foreach (var imageDto in sellImages)
             {
                 if (!string.IsNullOrEmpty(imageDto.ImageUrl))
                 {
@@ -716,6 +719,7 @@ namespace Manga.Server.Controllers
 
             return Ok(new { id = sell.SellId, status = sell.SellStatus });
         }
+
 
         // DELETE: api/Sells/5
         [HttpDelete("{id}")]

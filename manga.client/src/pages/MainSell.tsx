@@ -59,6 +59,7 @@ const SellForm: React.FC = () => {
   const { sellId } = useParams<{ sellId?: string }>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
+  const [inputValue, setInputValue] = useState('');
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -287,6 +288,7 @@ const SellForm: React.FC = () => {
       if (data) {
         // フォームフィールドに下書きデータを設定
         setValue('title', data.title ?? '');
+        setInputValue(data.title ?? '');
         setValue('sendPrefecture', data.sendPrefecture ?? 0);
         setValue('sendDay', data.sendDay ?? null);
         setValue('bookState', data.bookState ?? null);
@@ -363,21 +365,22 @@ const SellForm: React.FC = () => {
               作品タイトル
             </Typography>
             <Controller
-    name="title"
-    control={control}
-    defaultValue=""
-    render={({ field: { ref, onChange, value, ...rest }, fieldState: { error } }) => (
-      <BookAutocomplete
-        {...rest}
-        inputValue={value}
-        onInputChange={(_, newInputValue) => {
-          onChange(newInputValue);
-        }}
-        error={!!error}
-        helperText={error?.message}
-      />
-    )}
-  />
+            name="title"
+            control={control}
+            defaultValue=""
+            render={({ field: { ref, onChange, value, ...rest }, fieldState: { error } }) => (
+              <BookAutocomplete
+                {...rest}
+                inputValue={inputValue}
+                onInputChange={(_, newInputValue) => {
+                  onChange(newInputValue);
+                  setInputValue(newInputValue);
+                }}
+                error={!!error}
+                helperText={error?.message}
+              />
+            )}
+            />
           </Grid>
           <Grid item xs={12} mb={2}>
             <Typography variant="body2" fontWeight={'bold'} color={'secondary'} mb={1}>
