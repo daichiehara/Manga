@@ -16,13 +16,17 @@ interface BookListOwnedProps {
   title: string;
   books: Book[];
   onRemove: (itemId: number) => void;  // 'sellId' was changed to 'itemId'
+  onRefreshOwnedList: () => void;
 }
 
-const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, onRemove }) => {
+const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, onRemove, onRefreshOwnedList }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
+  const handleClose = () => {
+    setIsOpen(false);
+    onRefreshOwnedList();
+  };
 
   const handleSearch = useCallback((query: string) => {
     // 検索処理
@@ -49,7 +53,7 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
         </Typography>
         </Button>
       </Box>
-      <OwnedSearchModal onSearch={handleSearch} isOpen={isOpen} onClose={handleClose} />
+      <OwnedSearchModal isOpen={isOpen} onClose={handleClose} onRefreshOwnedList={onRefreshOwnedList} />
       <List >
         <TransitionGroup>
           {books.map((book) => (

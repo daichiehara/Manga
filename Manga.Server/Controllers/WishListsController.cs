@@ -112,7 +112,7 @@ namespace Manga.Server.Controllers
         */
 
         [HttpPost]
-        public async Task<IActionResult> AddToWishList([FromQuery] List<string> titles)
+        public async Task<IActionResult> AddToWishList([FromBody] List<string> titles)
         {
             if (titles == null || titles.Count == 0)
             {
