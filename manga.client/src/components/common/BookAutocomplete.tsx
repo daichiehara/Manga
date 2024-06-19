@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Autocomplete, TextField, CircularProgress, ListItem, InputAdornment } from '@mui/material';
-import { debounce } from 'lodash';
 import SearchIcon from '@mui/icons-material/Search';
 import axios from 'axios';
 
@@ -17,11 +16,10 @@ const parseXmlResponse = (xmlString: string) => {
     let title = titleElement ? titleElement.textContent : "";
     if (title && title.trim()) {
       title = title.replace(/\.$/, ""); // 末尾のピリオドを削除
+      title = title.replace(/★/g, "・").replace(/☆/g, "・");
       titles.push(title);
     }
   }
-
-  console.log('Parsed Titles:', titles); // 取得したタイトルをログ出力
 
   return titles;
 };
@@ -42,6 +40,17 @@ interface BookAutocompleteProps {
   helperText?: string;
 }
 
+const famousTitles = [
+    { Title: 'ONE PIECE', Count: 1 },
+    { Title: '呪術廻戦', Count: 1 },
+    { Title: '鬼滅の刃', Count: 1 },
+    { Title: 'ダンジョン飯', Count: 1 },
+    { Title: '転生したらスライムだった件', Count: 1 },
+    { Title: '美味しんぼ', Count: 1 },
+    { Title: '花より男子', Count: 1 },
+  ];
+  
+
 const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
   inputValue,
   onInputChange,
@@ -49,14 +58,12 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
   helperText,
   ...rest
 }) => {
-  const [options, setOptions] = useState<TitleCount[]>([]);
+  const [options, setOptions] = useState<TitleCount[]>(famousTitles);
   const [isLoading, setIsLoading] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
 
   const processTitles = (titles: string[]) => {
-    console.log(titles);
-    // タイトルをグルーピングして頻度をカウント
     const titleCountsMap: { [key: string]: TitleCount } = titles.reduce((acc, title) => {
       const normalized = normalizeTitle(title);
       if (!acc[normalized]) {
@@ -64,17 +71,13 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
       }
       acc[normalized].Count += 1;
 
-      // 既にエントリーが存在する場合、大文字に統一する
       if (title.toUpperCase() === title) {
         acc[normalized].Title = title;
       }
       return acc;
     }, {} as { [key: string]: TitleCount });
 
-    // 出現回数を降順にソート
     const titleCounts = Object.values(titleCountsMap).sort((a, b) => b.Count - a.Count);
-
-    console.log('Sorted Titles:', titleCounts);  // ソートされた結果をログ出力
 
     return titleCounts;
   };
@@ -85,12 +88,10 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
     const apiUrl = `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve&recordPacking=xml&query=dpid=${dpid}%20AND%20ndc=${encodedNdc}%20AND%20title=${encodeURIComponent(query)}%20AND%20sortBy=issued_date/sort.ascending`;
 
     try {
-      // 前のリクエストをキャンセル
       if (cancelTokenSource) {
         cancelTokenSource.cancel('Operation canceled due to new request.');
       }
 
-      // 新しいキャンセルトークンを作成
       const newCancelTokenSource = axios.CancelToken.source();
       setCancelTokenSource(newCancelTokenSource);
 
@@ -102,19 +103,12 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
         cancelToken: newCancelTokenSource.token,
       });
 
-      // 取得したXMLレスポンスをログ出力
-      console.log('XML Response:', response.data);
-
       const titles = parseXmlResponse(response.data);
-
-      // 取得したデータをコンソールに表示
-      console.log('Fetched titles:', titles);
 
       const processedTitles = processTitles(titles);
 
-      // 処理されたデータを setOptions で設定
       setOptions(processedTitles);
-      setIsLoading(false); // データフェッチ完了後にローディングを終了
+      setIsLoading(false);
 
     } catch (error) {
       if (axios.isCancel(error)) {
@@ -122,29 +116,23 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
       } else {
         console.error('Error fetching manga titles:', error);
         setIsLoading(false);
-        setOptions([]); // エラー時に空リストを設定
+        setOptions([]);
       }
     }
   };
 
-  // デバウンスを利用した入力処理
-  const debouncedFetch = useCallback(
-    debounce(async (query: string) => {
-      if (query && !isSelected) {
-        await fetchMangaTitles(query);
-      } else {
-        setOptions([]);
-        setIsLoading(false); // クエリが空の時にローディングを終了
-      }
-    }, 600), // 600ミリ秒のデバウンス
-    [isSelected]
-  );
-
-  useEffect(() => {
-    if (!isSelected) {
-      debouncedFetch(inputValue);
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      fetchMangaTitles(inputValue);
     }
-  }, [inputValue, debouncedFetch]);
+  };
+
+  const handleFocus = () => {
+    if (!inputValue) {
+      setOptions(famousTitles);
+    }
+  };
 
   // フィルタリングを無効にするカスタムフィルターを作成
   const filterOptions = (options: TitleCount[]) => options;
@@ -165,7 +153,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
             {option.Title}
           </ListItem>
         )}
-        noOptionsText="作品タイトルを入力してください"
+        noOptionsText="作品タイトルを選択してください"
         renderInput={(params) => (
           <TextField
             {...params}
@@ -176,8 +164,22 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
                   {isLoading ? <CircularProgress size={20} /> : <SearchIcon />}
                 </InputAdornment>
               ),
+              sx: {
+                borderRadius: 50, // 角を丸める
+                '& input[type=search]::-webkit-search-cancel-button': {
+                  '-webkit-appearance': 'none', // デフォルトの検索キャンセルボタンを非表示
+                  display: 'none',
+                },
+                '& input[type=search]::-webkit-search-decoration': {
+                  '-webkit-appearance': 'none', // デフォルトの検索デコレーションを非表示
+                  display: 'none',
+                },
+              },
+              onKeyDown: handleKeyDown,
+              onFocus: handleFocus,
             }}
             placeholder='例) ONE PIECE'
+            type='search'
             error={error}
             helperText={helperText}
           />
@@ -188,6 +190,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
           setIsSelected(false); // 入力が変更されたときにisSelectedをfalseに設定
           if (!newInputValue) {
             setIsLoading(false); // 入力がクリアされたときにローディングを終了
+            setOptions(famousTitles);
           }
         }}
         onChange={(_, newValue) => {

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { Box, Typography, Button, Fade, Paper, InputBase, IconButton, SwipeableDrawer, List, ListItem, ListItemText, ListItemSecondaryAction, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, Fade, Paper, InputBase, IconButton, SwipeableDrawer, List, ListItem, ListItemText, ListItemSecondaryAction, CircularProgress, Chip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CheckIcon from '@mui/icons-material/Check';
-import { debounce } from 'lodash';
 import axios from 'axios';
 import { SnackbarContext } from '../context/SnackbarContext';
 import PropTypes from 'prop-types';
@@ -35,6 +34,7 @@ const parseXmlResponse = (xmlString: string) => {
     let title = titleElement ? titleElement.textContent : "";
     if (title && title.trim()) {
       title = title.replace(/\.$/, ""); // 末尾のピリオドを削除
+      title = title.replace(/★/g, "・").replace(/☆/g, "・");
       titles.push(title);
     }
   }
@@ -50,6 +50,17 @@ interface TitleCount {
   Title: string;
   Count: number;
 }
+
+const famousTitles = [
+  'ONE PIECE',
+  '呪術廻戦',
+  '鬼滅の刃',
+  '手塚治虫',
+  '高橋留美子',
+  '美味しんぼ',
+  '花より男子',
+  'キングダム'
+];
 
 const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshList, apiEndpoint, placeholder, completeMessage, noSelectionMessage, message1, message2, message3, messageColor }) => {
   const { showSnackbar } = useContext(SnackbarContext);
@@ -117,23 +128,9 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
     }
   };
 
-  const debouncedFetch = useCallback(
-    debounce(async (query: string) => {
-      if (query) {
-        await fetchMangaTitles(query);
-      } else {
-        setOptions([]);
-      }
-    }, 600),
-    []
-  );
-
-  useEffect(() => {
-    debouncedFetch(query);
-  }, [query, debouncedFetch]);
-
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    fetchMangaTitles(query);
   };
 
   const handleAddTitle = (title: string) => {
@@ -174,82 +171,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
     }
   };
 
-  const modalContent = (
-    <Box sx={{
-      maxWidth: '640px',
-      width: '100%',
-      height: '85vh',
-      bgcolor: 'background.paper',
-      borderRadius: `20px`,
-      overflow: 'auto',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <Box sx={{ p: 1 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Button onClick={onClose} sx={{ pt: 1, justifyContent: 'flex-start' }}>
-            <CloseIcon />
-          </Button>
-          <Button onClick={handleSubmit} sx={{ pt: 1, justifyContent: 'flex-end' }}>
-            追加
-          </Button>
-        </Box>
-        <Paper component="form" sx={{
-          mt: 2,
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-          borderRadius: '50px',
-          boxShadow: `none`,
-          border: '0.8px solid #bfbfbf',
-        }} onSubmit={handleSearch}
-        >
-          {isLoading ?
-            <CircularProgress sx={{ p: '10px' }} size={20} /> :
-            <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-              <SearchIcon />
-            </IconButton>
-          }
-          <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            placeholder={placeholder}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </Paper>
-        <List>
-          {options.map((option) => (
-            <ListItem key={option}>
-              <ListItemText primary={option} />
-              <ListItemSecondaryAction>
-                {selectedTitles.includes(option) ? (
-                  <IconButton edge="end" aria-label="remove" onClick={() => handleRemoveTitle(option)}>
-                    <CheckIcon sx={{ color: '#0F9ED5' }} />
-                  </IconButton>
-                ) : (
-                  <IconButton edge="end" aria-label="add" onClick={() => handleAddTitle(option)}>
-                    <AddCircleIcon />
-                  </IconButton>
-                )}
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-        <Box sx={{ pt: '25vh', px: '2rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', }}>
-          <Typography variant='h6' sx={{ color: messageColor, fontWeight: 'bold' }}>
-            {message1}
-          </Typography>
-          <Typography variant='subtitle1' sx={{ pt: 1, fontWeight: 'bold' }}>
-            {message2}
-          </Typography>
-          <Typography variant='subtitle1' sx={{ fontWeight: 'bold' }}>
-            {message3}
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
-  );
-
   return (
     <SwipeableDrawer
       disableScrollLock
@@ -273,7 +194,104 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       }}
     >
       <Fade in={isOpen}>
-        {modalContent}
+        <Box sx={{
+          maxWidth: '640px',
+          width: '100%',
+          height: '85vh',
+          bgcolor: 'background.paper',
+          borderRadius: `20px`,
+          overflow: 'auto',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <Box sx={{ p: 1 }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Button onClick={onClose} sx={{ pt: 1, justifyContent: 'flex-start' }}>
+                <CloseIcon />
+              </Button>
+              <Button onClick={handleSubmit} sx={{ pt: 1, justifyContent: 'flex-end' }}>
+                追加
+              </Button>
+            </Box>
+            <Paper component="form" sx={{
+              mt: 2,
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              borderRadius: '50px',
+              boxShadow: `none`,
+              border: '0.8px solid #bfbfbf',
+            }} onSubmit={handleSearch}
+            >
+              {isLoading ?
+                <CircularProgress sx={{ p: '10px' }} size={20} /> :
+                <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+                  <SearchIcon />
+                </IconButton>
+              }
+              <InputBase
+                sx={{
+                  ml: 1, flex: 1,
+                  '& input[type=search]::-webkit-search-cancel-button': {
+                    '-webkit-appearance': 'none', // デフォルトの検索キャンセルボタンを非表示
+                    display: 'none',
+                  },
+                  '& input[type=search]::-webkit-search-decoration': {
+                    '-webkit-appearance': 'none', // デフォルトの検索デコレーションを非表示
+                    display: 'none',
+                  },
+                }}
+                placeholder={placeholder}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                type='search'
+              />
+            </Paper>
+            <List>
+              {options.map((option) => (
+                <ListItem key={option}>
+                  <ListItemText primary={option} />
+                  <ListItemSecondaryAction>
+                    {selectedTitles.includes(option) ? (
+                      <IconButton edge="end" aria-label="remove" onClick={() => handleRemoveTitle(option)}>
+                        <CheckIcon sx={{ color: '#0F9ED5' }} />
+                      </IconButton>
+                    ) : (
+                      <IconButton edge="end" aria-label="add" onClick={() => handleAddTitle(option)}>
+                        <AddCircleIcon />
+                      </IconButton>
+                    )}
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+            <Typography variant='body2' sx={{pb: 1, px: 2}}>検索候補</Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, px: 2 }}>
+              {famousTitles.map((title) => (
+                <Chip
+                  key={title}
+                  label={title}
+                  variant='outlined'
+                  onClick={() => {
+                    setQuery(title);
+                    fetchMangaTitles(title);
+                  }}
+                />
+              ))}
+            </Box>
+            <Box sx={{ pt: '10vh', px: '2rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', }}>
+              <Typography variant='h6' sx={{ color: messageColor, fontWeight: 'bold' }}>
+                {message1}
+              </Typography>
+              <Typography variant='subtitle1' sx={{ pt: 1, fontWeight: 'bold' }}>
+                {message2}
+              </Typography>
+              <Typography variant='subtitle1' sx={{ fontWeight: 'bold' }}>
+                {message3}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
       </Fade>
     </SwipeableDrawer>
   );

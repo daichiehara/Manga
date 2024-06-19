@@ -362,7 +362,7 @@ const SellForm: React.FC = () => {
         <Grid container sx={{ px: 2 }}>
           <Grid item xs={12} mb={2}>
             <Typography variant="body2" fontWeight={'bold'} color={'secondary'} mb={1}>
-              作品タイトル
+              作品タイトル (選択)
             </Typography>
             <Controller
             name="title"
