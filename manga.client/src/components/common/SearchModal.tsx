@@ -22,6 +22,14 @@ interface SearchModalProps {
   messageColor: string;
 }
 
+const titleMapping: { [key: string]: string } = {
+    'Hunter×hunter': 'HUNTER×HUNTER',
+    'ハンター×ハンター': 'HUNTER×HUNTER',
+    'Slam dunk': 'SLAM DUNK',
+    'One piece': 'ONE PIECE'
+    // 他の必要なマッピングをここに追加
+};
+
 const parseXmlResponse = (xmlString: string) => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "application/xml");
@@ -80,6 +88,9 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
 
       if (title.toUpperCase() === title) {
         acc[normalized].Title = title;
+      }
+      if (titleMapping[acc[normalized].Title]){
+        acc[normalized].Title = titleMapping[title];
       }
       return acc;
     }, {} as { [key: string]: TitleCount });
@@ -224,7 +235,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
             }} onSubmit={handleSearch}
             >
               {isLoading ?
-                <CircularProgress sx={{ p: '10px' }} size={20} /> :
+                <CircularProgress sx={{ p: '10px' }} size={24} /> :
                 <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
                   <SearchIcon />
                 </IconButton>
@@ -233,11 +244,11 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
                 sx={{
                   ml: 1, flex: 1,
                   '& input[type=search]::-webkit-search-cancel-button': {
-                    '-webkit-appearance': 'none', // デフォルトの検索キャンセルボタンを非表示
+                    WebkitAppearance: 'none', // デフォルトの検索キャンセルボタンを非表示
                     display: 'none',
                   },
                   '& input[type=search]::-webkit-search-decoration': {
-                    '-webkit-appearance': 'none', // デフォルトの検索デコレーションを非表示
+                    WebkitAppearance: 'none', // デフォルトの検索デコレーションを非表示
                     display: 'none',
                   },
                 }}
@@ -248,8 +259,8 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
               />
             </Paper>
             <List>
-              {options.map((option) => (
-                <ListItem key={option}>
+              {options.map((option, index) => (
+                <ListItem key={`${option}-${index}`}>
                   <ListItemText primary={option} />
                   <ListItemSecondaryAction>
                     {selectedTitles.includes(option) ? (

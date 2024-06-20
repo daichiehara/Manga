@@ -3,25 +3,33 @@ import { Autocomplete, TextField, CircularProgress, ListItem, InputAdornment } f
 import SearchIcon from '@mui/icons-material/Search';
 import axios from 'axios';
 
+const titleMapping: { [key: string]: string } = {
+    'Hunter×hunter': 'HUNTER×HUNTER',
+    'ハンター×ハンター': 'HUNTER×HUNTER',
+    'Slam dunk': 'SLAM DUNK',
+    'One piece': 'ONE PIECE'
+    // 他の必要なマッピングをここに追加
+};
+
 // XMLレスポンスをパースして必要なデータを抽出する関数
 const parseXmlResponse = (xmlString: string) => {
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, "application/xml");
-
-  const items = xmlDoc.getElementsByTagName("record");
-  const titles: string[] = [];
-
-  for (let i = 0; i < items.length; i++) {
-    const titleElement = items[i].getElementsByTagName("dc:title")[0];
-    let title = titleElement ? titleElement.textContent : "";
-    if (title && title.trim()) {
-      title = title.replace(/\.$/, ""); // 末尾のピリオドを削除
-      title = title.replace(/★/g, "・").replace(/☆/g, "・");
-      titles.push(title);
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+  
+    const items = xmlDoc.getElementsByTagName("record");
+    const titles: string[] = [];
+  
+    for (let i = 0; i < items.length; i++) {
+      const titleElement = items[i].getElementsByTagName("dc:title")[0];
+      let title = titleElement ? titleElement.textContent : "";
+      if (title && title.trim()) {
+        title = title.replace(/\.$/, ""); // 末尾のピリオドを削除
+        title = title.replace(/★/g, "・").replace(/☆/g, "・");
+        titles.push(title);
+      }
     }
-  }
-
-  return titles;
+  
+    return titles;
 };
 
 const normalizeTitle = (title: string) => {
@@ -60,12 +68,13 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
 }) => {
   const [options, setOptions] = useState<TitleCount[]>(famousTitles);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSelected, setIsSelected] = useState(false);
+  //const [isSelected, setIsSelected] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
 
   const processTitles = (titles: string[]) => {
     const titleCountsMap: { [key: string]: TitleCount } = titles.reduce((acc, title) => {
-      const normalized = normalizeTitle(title);
+      let normalized = normalizeTitle(title);
+      
       if (!acc[normalized]) {
         acc[normalized] = { Title: title, Count: 0 };
       }
@@ -73,6 +82,9 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
 
       if (title.toUpperCase() === title) {
         acc[normalized].Title = title;
+      }
+      if (titleMapping[acc[normalized].Title]){
+        acc[normalized].Title = titleMapping[title];
       }
       return acc;
     }, {} as { [key: string]: TitleCount });
@@ -149,7 +161,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
           option.Title === value.Title
         }
         renderOption={(props, option: TitleCount) => (
-          <ListItem {...props} key={option.Title}>
+          <ListItem {...props} key={`${option.Title}-${option.Count}`}>
             {option.Title}
           </ListItem>
         )}
@@ -160,20 +172,20 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
             InputProps={{
               ...params.InputProps,
               startAdornment: (
-                <InputAdornment position="start">
-                  {isLoading ? <CircularProgress size={20} /> : <SearchIcon />}
+                <InputAdornment position="start" sx={{pl: 1}}>
+                  {isLoading ? <CircularProgress size={24} /> : <SearchIcon />}
                 </InputAdornment>
               ),
               sx: {
                 borderRadius: 50, // 角を丸める
                 '& input[type=search]::-webkit-search-cancel-button': {
-                  '-webkit-appearance': 'none', // デフォルトの検索キャンセルボタンを非表示
-                  display: 'none',
-                },
-                '& input[type=search]::-webkit-search-decoration': {
-                  '-webkit-appearance': 'none', // デフォルトの検索デコレーションを非表示
-                  display: 'none',
-                },
+                    WebkitAppearance: 'none', // デフォルトの検索キャンセルボタンを非表示
+                    display: 'none',
+                  },
+                  '& input[type=search]::-webkit-search-decoration': {
+                    WebkitAppearance: 'none', // デフォルトの検索デコレーションを非表示
+                    display: 'none',
+                  },
               },
               onKeyDown: handleKeyDown,
               onFocus: handleFocus,
@@ -187,7 +199,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
         inputValue={inputValue}
         onInputChange={(_, newInputValue) => {
           onInputChange(_, newInputValue);
-          setIsSelected(false); // 入力が変更されたときにisSelectedをfalseに設定
+          //setIsSelected(false); // 入力が変更されたときにisSelectedをfalseに設定
           if (!newInputValue) {
             setIsLoading(false); // 入力がクリアされたときにローディングを終了
             setOptions(famousTitles);
@@ -195,7 +207,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
         }}
         onChange={(_, newValue) => {
           onInputChange(_, newValue ? newValue.Title : '');
-          setIsSelected(true); // 選択されたときにisSelectedをtrueに設定
+          //setIsSelected(true); // 選択されたときにisSelectedをtrueに設定
         }}
       />
     </>
