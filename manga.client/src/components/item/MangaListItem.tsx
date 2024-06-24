@@ -12,18 +12,30 @@ interface MangaListItemProps {
   wishTitles: { title: string; isOwned: boolean }[];
 }
 
+// タイトルが15文字以上かどうかをチェックする関数
+const isLongTitle1 = (sellTitle: string): boolean => {
+  return sellTitle.length >= 13;
+};
+const isLongTitle2 = (sellTitle: string): boolean => {
+  return sellTitle.length >= 26;
+};
+const isLongTitle3 = (sellTitle: string): boolean => {
+  return sellTitle.length >= 39;
+};
+
 // MangaListItemコンポーネントの定義
 const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles }) => {
+
   return (
     <Link to={`/item/${sellId}`} style={{ textDecoration: 'none' }}>
       <Card 
         sx={{ 
           display: 'flex', 
           margin: 0.9, 
-          height: '13rem', 
+          height: '13.5rem', 
           padding: 0,
           border: '0.05px solid rgba(0, 0, 0, 0.1)', // 薄い灰色の境界線を追加
-          borderRadius: '4px', // 角の丸みを追加
+          borderRadius: '3px', // 角の丸みを追加
           boxShadow: 'none' // カードの影をなくす
         }}
       >
@@ -47,7 +59,7 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
           />
         </Box>
         <CardContent sx={{ 
-          pt:1.5,
+          pt:0.8,
           pl: 1.3,
           pr:0.5,
           width: '55%',  // 右側のテキスト領域を55%に設定
@@ -65,7 +77,7 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
                 display: '-webkit-box',
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
-                WebkitLineClamp: 3,  // テキストを3行に制限
+                WebkitLineClamp: 2,  // テキストを3行に制限
                 textOverflow: 'ellipsis' // テキストが溢れた場合に省略記号を表示
               }}
             >
@@ -77,15 +89,18 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
             <Box component="span" sx={{ color: '#757575',pl:1 }}>({numberOfBooks}巻)</Box>
           </Typography>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', pt: 2 }}>
-            <ShoppingCartIcon sx={{ fontSize: '1.2rem', mr: 0.5, color: '#F3B13D' }} />
-            <Typography variant="subtitle2" component="span" sx={{ color: "#0F9ED5", fontWeight:`bold` }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', py: 0.1 }}>
+            <ShoppingCartIcon sx={{ fontSize: '1.1rem', mr: 0.5, color: '#F3B13D' }} />
+            <Typography variant="subtitle2" component="span" sx={{mb:0.2, color: "#0F9ED5", fontWeight:`bold` }}>
               want
+            </Typography>
+            <Typography variant="subtitle2" component="span" sx={{ml:0.5, mb:0.2, color: "#757575", fontSize:'0.7rem' }}>
+              交換希望の漫画
             </Typography>
             
           </Box>
           {/* WishListDisplayにwishTitlesを渡す */}
-          {wishTitles && <WishListDisplay wishTitles={wishTitles} />}
+          {wishTitles && <WishListDisplay wishTitles={wishTitles} shouldTruncate={true} />}
         </CardContent>
       </Card>
     </Link>

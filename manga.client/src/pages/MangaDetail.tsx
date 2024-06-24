@@ -37,7 +37,7 @@ interface MangaDetail {
     profileIcon: string;
     userName: string;
     sellMessage: string;
-    wishTitles: { title: string }[];
+    wishTitles: { title: string; isOwned: boolean }[];
     sendPrefecture: string;
     sendDay: string;
     hasIdVerificationImage: boolean;
@@ -130,7 +130,7 @@ const MangaDetail = () => {
                 この人が欲しい漫画
               </Typography>
               {mangaDetail && (
-                <WishListDisplay wishTitles={mangaDetail.wishTitles} />
+                <WishListDisplay wishTitles={mangaDetail.wishTitles} shouldTruncate={false}/>
               )}
 
               <Typography variant="body1" gutterBottom sx={{mt:1, pt:1.5, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
