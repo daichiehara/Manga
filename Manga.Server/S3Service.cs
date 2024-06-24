@@ -1,5 +1,7 @@
 ﻿using Amazon.S3.Model;
 using Amazon.S3;
+using Amazon.Runtime;
+using Amazon.Runtime.CredentialManagement;
 
 namespace Manga.Server
 {
@@ -7,6 +9,27 @@ namespace Manga.Server
     {
         private const string IdVerificationBucketName = "tocaeru-idverification-image";
         private const string MangaImageBucketName = "manga-img-bucket";
+        private readonly IAmazonS3 _s3Client;
+
+        public S3Service(IConfiguration configuration)
+        {
+            // 設定ファイルからリージョンを読み込む
+            var regionName = configuration["AWS:Region"];
+            var region = Amazon.RegionEndpoint.GetBySystemName(regionName);
+
+            // AWSの認証情報を取得（環境変数やAWS認証情報ファイルから）
+            var chain = new CredentialProfileStoreChain();
+            AWSCredentials awsCredentials;
+            if (chain.TryGetAWSCredentials("default", out awsCredentials))
+            {
+                _s3Client = new AmazonS3Client(awsCredentials, region);
+            }
+            else
+            {
+                // 認証情報が見つからない場合、デフォルトの認証情報プロバイダーチェーンを使用
+                _s3Client = new AmazonS3Client(region);
+            }
+        }
 
         public async Task<string> UploadIdVerificationFileToS3Async(Stream fileStream, string fileName, string contentType)
         {
@@ -18,7 +41,7 @@ namespace Manga.Server
                 ContentType = contentType
             };
 
-            await new AmazonS3Client().PutObjectAsync(uploadRequest);
+            await _s3Client.PutObjectAsync(uploadRequest);
             return $"https://{IdVerificationBucketName}.s3.amazonaws.com/{fileName}";
         }
 
@@ -63,7 +86,7 @@ namespace Manga.Server
                 ContentType = "image/webp"
             };
 
-            await new AmazonS3Client().PutObjectAsync(uploadRequest);
+            await _s3Client.PutObjectAsync(uploadRequest);
             return $"https://{MangaImageBucketName}.s3.amazonaws.com/{fileName}";
         }
 
@@ -91,7 +114,7 @@ namespace Manga.Server
                 Key = fileName
             };
 
-            await new AmazonS3Client().DeleteObjectAsync(deleteObjectRequest);
+            await _s3Client.DeleteObjectAsync(deleteObjectRequest);
         }
     }
 }
