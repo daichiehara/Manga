@@ -118,9 +118,9 @@ namespace Manga.Server.Controllers
         */
 
         [HttpPost]
-        public async Task<IActionResult> AddToOwnedList([FromQuery] string title)
+        public async Task<IActionResult> AddToOwnedList([FromBody] List<string> titles)
         {
-            if (string.IsNullOrEmpty(title))
+            if (titles == null || titles.Count == 0)
             {
                 return BadRequest("タイトルは必須です。");
             }
@@ -131,27 +131,33 @@ namespace Manga.Server.Controllers
                 return NotFound("ユーザー認証に失敗しました。");
             }
 
-            // すでに同じタイトルがWishListに存在するか確認
-            var existingEntry = await _context.OwnedList
-                                              .FirstOrDefaultAsync(w => w.UserAccountId == userId && w.Title == title);
-            if (existingEntry != null)
+            var addedTitles = new List<string>();
+
+            foreach (var title in titles)
             {
-                return BadRequest("このタイトルはすでにWishListに登録されています。");
+                // すでに同じタイトルがOwnedListに存在するか確認
+                var existingEntry = await _context.OwnedList
+                                                .FirstOrDefaultAsync(w => w.UserAccountId == userId && w.Title == title);
+                if (existingEntry == null)
+                {
+                    // ユーザーIDとタイトルを使用して新しいOwnedListエントリーを作成
+                    var ownedListEntry = new OwnedList
+                    {
+                        Title = title,
+                        UserAccountId = userId
+                    };
+
+                    // データベースにエントリーを追加
+                    _context.OwnedList.Add(ownedListEntry);
+                    addedTitles.Add(title);
+                }
             }
 
-            // ユーザーIDとタイトルを使用して新しいOwnedListエントリーを作成
-            var ownedListEntry = new OwnedList
-            {
-                Title = title,
-                UserAccountId = userId
-            };
-
-            // データベースにエントリーを追加
-            _context.OwnedList.Add(ownedListEntry);
             await _context.SaveChangesAsync();
 
-            return Ok($"タイトル '{title}' が所有リストに追加されました。");
+            return Ok($"タイトル '{string.Join(", ", addedTitles)}' が所有リストに追加されました。");
         }
+
 
         // DELETE: api/OwnedLists/5
         [HttpDelete("{id}")]

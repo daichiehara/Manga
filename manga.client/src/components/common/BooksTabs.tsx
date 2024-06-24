@@ -7,7 +7,6 @@ import AutoStoriesOutlined from '@mui/icons-material/AutoStoriesOutlined';
 import BooksListSells from '../item/BookListSells';
 import BookListOwned from '../item/BookListOwned';
 
-
 const API_BASE_URL = 'https://localhost:7103/api';
 
 interface Book {
@@ -104,9 +103,6 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
     setTabIndex(newValue);
   };
 
-  
-  
-
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ 
@@ -168,13 +164,13 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
       
       {tabIndex === 0 && (
         <>
-          <BookListOwned  key="owned-lists" title="とりあえず登録"  books={ownedLists} onRemove={handleRemoveOwnedLists} />
+          <BookListOwned  key="owned-lists" title="とりあえず登録"  books={ownedLists} onRemove={handleRemoveOwnedLists} onRefreshOwnedList={fetchBooksData} />
           <BooksListSells key="sells" title="出品中の漫画" books={sells}/>
         </>
       )}
       {tabIndex === 1 && (
         <>
-        <BookListWish key="wish-lists" title="欲しい漫画" books={wishLists} onRemove={handleRemoveWishLists} />
+        <BookListWish key="wish-lists" title="欲しい漫画" books={wishLists} onRemove={handleRemoveWishLists} onRefreshWishList={fetchWishLists} />
         </>
       )}
     </Box>
