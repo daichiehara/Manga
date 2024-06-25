@@ -26,11 +26,11 @@ const ImageModal: React.FC<ImageModalProps> = ({ isOpen, images, currentIndex, o
     <Modal
       open={isOpen}
       onClose={onClose}
-      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 20000 }}
     >
       <Box sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'rgba(0, 0, 0, 0.7)'}}>
         <IconButton
-          sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1000}}
+          sx={{ position: 'absolute', top: 8, right: 8, zIndex: 25000 }}
           onClick={onClose}
         >
           <CloseIcon sx={{ color: 'white' }} />

@@ -42,7 +42,7 @@ const WishListDisplay: React.FC<WishListProps> = ({ wishTitles, shouldTruncate }
   const remainingCount = wishTitles.length - finalDisplayTitles.length;
 
   return (
-    <Box sx={{ mt: 0.5, pb: 3, display: 'flex', flexWrap: 'wrap'}}>
+    <Box sx={{ pt:0.6 ,display: 'flex', flexWrap: 'wrap'}}>
       {finalDisplayTitles.map((wish, index) => (
         <Box
         key={index}
@@ -53,7 +53,7 @@ const WishListDisplay: React.FC<WishListProps> = ({ wishTitles, shouldTruncate }
           color: wish.isOwned ? 'white' : 'inherit',
           borderRadius: '100px',
           border: '1px solid',
-          borderColor: wish.isOwned ? '#0F9ED5' : 'rgba(0, 0, 0, 0.23)', // 透明な背景の場合の境界線
+          borderColor: wish.isOwned ? '#B12704' : 'rgba(0, 0, 0, 0.23)', // 透明な背景の場合の境界線
           '&:hover': {
             backgroundColor: wish.isOwned ? 'darkred' : 'inherit',
           },
@@ -68,16 +68,16 @@ const WishListDisplay: React.FC<WishListProps> = ({ wishTitles, shouldTruncate }
             px:1.3,
             py:0.4,
             fontSize: '0.75rem', 
-            color: wish.isOwned ? 'black' : '#757575',
+            color: wish.isOwned ? 'black' : '#909090',
             textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
+            whiteSpace: shouldTruncate ? 'nowrap' : 'nomal'
           }}
         >
           {shouldTruncate ? truncateTitle(wish.title) : wish.title}
         </Typography>
       </Box>
       ))}
-      {moreExists && (
+      {moreExists && remainingCount > 0 && (
         <Typography component="span" sx={{ ml: 0.5, alignSelf: 'center', fontSize: '0.75rem',color:'#757575' }}>
           その他 {remainingCount} 点
         </Typography>

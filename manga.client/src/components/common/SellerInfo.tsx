@@ -11,7 +11,7 @@ interface SellerInfoProps {
   const SellerInfo: React.FC<SellerInfoProps> = ({ profileIcon, userName, hasIdVerificationImage }) => {
     return (
         
-        <Grid container spacing={0.5} sx={{py:2}}>
+        <Grid container spacing={0.5} sx={{}}>
             
             <Grid item xs={2}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 1.8 }}>
