@@ -1,6 +1,6 @@
 import { useEffect, useState} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Grid, Typography, Paper, Divider} from '@mui/material';
+import { Box, Grid, Typography, Paper, SwipeableDrawer, Divider} from '@mui/material';
 import 'swiper/swiper-bundle.css'; 
 import ImageCarousel from '../components/common/ImageCarousel';
 import BackButton from '../components/common/BackButton';
@@ -15,6 +15,7 @@ import ImageModal from '../components/common/ImageModal';
 import RecentCommentsDisplay from '../components/item/RecentCommentsDisplay'; 
 import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply インターフェイスのインポート
 import { useSnackbar } from '../hooks/useSnackbar';
+import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
 import axios from 'axios';
 
 /**
@@ -49,6 +50,7 @@ const MangaDetail = () => {
   const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   useSnackbar();
 
@@ -67,7 +69,9 @@ const MangaDetail = () => {
 
   const handleExchangeRequest = () => {
     // Implementation of the exchange request logic
+    setDrawerOpen(!drawerOpen);
   };  
+  
 
   const [error, setError] = useState<string | null>(null); 
 
@@ -97,10 +101,10 @@ const MangaDetail = () => {
     return <LoadingComponent />;
   }
 
-  return (
+  return  (
     <Box sx={{ p: 0, margin:0 }}>
       {/* 戻るボタン */}
-      <BackButton handleBack={handleBack} />
+      {!drawerOpen && <BackButton handleBack={handleBack} />}
       <Box sx={{ flexGrow: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', minHeight: '100vh', pb: 10 }}>
         
             {/* Image Carousel Integration */}
@@ -178,6 +182,7 @@ const MangaDetail = () => {
       <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: '0px 8px 12px 10px rgba(0, 0, 0, 0.25)' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
       <ActionButton label="交換を希望する" onClick={handleExchangeRequest} />
       </Box>
+      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} />
     </Box>
   );
 };
