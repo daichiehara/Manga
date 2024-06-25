@@ -963,6 +963,24 @@ namespace Manga.Server.Controllers
             return sells;
         }
 
+        [HttpGet("title")]
+        public async Task<IActionResult> SearchManga(string query)
+        {
+            var normalizedQuery = new string(query.Where(c => !new[] { '☆', '★', '・', ' ' }.Contains(c)).ToArray()).ToLower();
+
+            var mangaTitles = await _context.MangaTitles
+                .Select(m => new {
+                    OriginalTitle = m.MainTitle,
+                    NormalizedTitle = new string(m.MainTitle.Where(c => !new[] { '☆', '★', '・', ' ' }.Contains(c)).ToArray()).ToLower()
+                })
+                .Where(m => m.NormalizedTitle.Contains(normalizedQuery))
+                .Select(m => m.OriginalTitle)
+                .Take(10)
+                .ToListAsync();
+
+            return Ok(mangaTitles);
+        }
+
         private string NormalizeTitle(string title)
         {
             return title.Replace("★", "・").Replace("☆", "・");

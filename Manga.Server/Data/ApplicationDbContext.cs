@@ -25,5 +25,22 @@ namespace Manga.Server.Data
         public DbSet<Notification>? Notification { get; set; }
         public DbSet<Match>? Match { get; set; }
         public DbSet<Contact>? Contact { get; set; }
+        public DbSet<MangaTitle>? MangaTitles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<MangaTitle>(entity =>
+            {
+                entity.ToTable("manga_titles");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.MainTitle).HasColumnName("main_title");
+                entity.Property(e => e.YomiTitle).HasColumnName("yomi_title");
+                entity.Property(e => e.Author).HasColumnName("author");
+            });
+
+            // 他のエンティティの設定もここに追加できます
+        }
     }
 }
