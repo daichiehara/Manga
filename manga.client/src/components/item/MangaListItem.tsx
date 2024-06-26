@@ -84,7 +84,7 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
               {sellTitle}
             </Typography>
           </Grid>
-          <Typography variant="subtitle2"  sx={{color: '#E97132', py:0.1}}>
+          <Typography variant="subtitle2"  sx={{color: '#B12704', py:0.1}}>
               全巻
             <Box component="span" sx={{ color: '#757575',pl:1 }}>({numberOfBooks}巻)</Box>
           </Typography>

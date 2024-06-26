@@ -11,14 +11,15 @@ const ActionButton: React.FC<ActionButtonProps> = ({ onClick, label }) => {
     
         <Button
             variant="contained"
-            color="primary"
             sx={{
-            px: 0,
+            mx: 2,
+            maxWidth: '640px',
             width: '100%',
             //background: 'linear-gradient(to right, #E97132, #F2CFEE)',
-            background: 'linear-gradient(to right, #FCCF31, #F55555)',
+            background: '#D83022',
             boxShadow: 'none',
-            color: '#f5f5f5'
+            color: '#f5f5f5',
+            fontWeight:'bold'
             }}
             onClick={onClick}
         >

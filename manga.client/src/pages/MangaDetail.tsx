@@ -1,6 +1,6 @@
 import { useEffect, useState} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Grid, Typography, Paper} from '@mui/material';
+import { Box, Grid, Typography, Paper, SwipeableDrawer, Divider} from '@mui/material';
 import 'swiper/swiper-bundle.css'; 
 import ImageCarousel from '../components/common/ImageCarousel';
 import BackButton from '../components/common/BackButton';
@@ -15,6 +15,7 @@ import ImageModal from '../components/common/ImageModal';
 import RecentCommentsDisplay from '../components/item/RecentCommentsDisplay'; 
 import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply インターフェイスのインポート
 import { useSnackbar } from '../hooks/useSnackbar';
+import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
 import axios from 'axios';
 
 /**
@@ -49,6 +50,7 @@ const MangaDetail = () => {
   const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   useSnackbar();
 
@@ -67,7 +69,9 @@ const MangaDetail = () => {
 
   const handleExchangeRequest = () => {
     // Implementation of the exchange request logic
+    setDrawerOpen(!drawerOpen);
   };  
+  
 
   const [error, setError] = useState<string | null>(null); 
 
@@ -97,12 +101,12 @@ const MangaDetail = () => {
     return <LoadingComponent />;
   }
 
-  return (
+  return  (
     <Box sx={{ p: 0, margin:0 }}>
       {/* 戻るボタン */}
-      <BackButton handleBack={handleBack} />
+      {!drawerOpen && <BackButton handleBack={handleBack} />}
       <Box sx={{ flexGrow: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', minHeight: '100vh', pb: 10 }}>
-        <Grid container spacing={0} style={{ padding: 0, margin:0, marginBottom: 0}}>
+        
             {/* Image Carousel Integration */}
             <ImageCarousel 
               imageUrls={mangaDetail.imageUrls} 
@@ -126,32 +130,36 @@ const MangaDetail = () => {
             />
 
             <Paper elevation={0} sx={{ pt: 0.5, pb: 1, pl: 2.0, pr: 2.0, border: 'none' }}>
-              <Typography variant="body1" gutterBottom sx={{pt:1.5, pb:1, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
+              
+              <Typography variant="body1" sx={{pt:2, color: '#757575', fontWeight:'bold'}}>
                 この人が欲しい漫画
               </Typography>
+              <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
               {mangaDetail && (
                 <WishListDisplay wishTitles={mangaDetail.wishTitles} shouldTruncate={false}/>
               )}
-
-              <Typography variant="body1" gutterBottom sx={{mt:1, pt:1.5, color: '#757575', fontWeight:'bold', borderTop: '2px solid #D9D9D9'}}>
+              <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold'}}>
                 {`出品物の説明`}
               </Typography>
-              <Typography variant="body1" sx={{ mt: 2 }}>
+              <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
+              <Typography variant="body1" sx={{ }}>
                 {mangaDetail.sellMessage}
               </Typography>
               
               <Grid container spacing={0.5} alignItems="center">
                 <Grid item xs={12}>
-                  <Typography variant="body1" gutterBottom sx={{pt:5, pb:1, color: '#757575', fontWeight:'bold',  borderBottom: '2px solid #D9D9D9' }}>
+                  <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold' }}>
                     {`出品物の情報`}
                   </Typography>
+                  <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
                 </Grid>
               </Grid>
               <ShippingInfo sendPrefecture={mangaDetail.sendPrefecture} sendDay={mangaDetail.sendDay} />
               <Grid item xs={12}>
-                  <Typography variant="body1" gutterBottom sx={{mb:3, pt:5, pb:1, color: '#757575', fontWeight:'bold',  borderBottom: '2px solid #D9D9D9' }}>
+                  <Typography variant="body1" sx={{ pt:4, color: '#757575', fontWeight:'bold',  }}>
                     {`出品者`}
                   </Typography>
+                  <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
                 </Grid>
               <SellerInfo 
                 profileIcon={mangaDetail.profileIcon} 
@@ -160,15 +168,21 @@ const MangaDetail = () => {
               />
 
               {/* Add the Recent Comments section */}
+              <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold' }}>
+                {`コメント`}
+              </Typography>
+              <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
               {mangaDetail.replies && <RecentCommentsDisplay replies={mangaDetail.replies} />}
 
+              <Box sx={{pb:5}}></Box>
             </Paper>
           </Grid>
-        </Grid>
+        
       </Box>
-      <Box sx={{ px: 2, py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: '0px 8px 12px 10px rgba(0, 0, 0, 0.25)' , maxWidth: '1024px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
+      <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: '0px 8px 12px 10px rgba(0, 0, 0, 0.25)' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
       <ActionButton label="交換を希望する" onClick={handleExchangeRequest} />
       </Box>
+      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} />
     </Box>
   );
 };

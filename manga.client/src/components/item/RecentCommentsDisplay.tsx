@@ -19,8 +19,7 @@ interface RecentCommentsDisplayProps {
 
 const RecentCommentsDisplay: React.FC<RecentCommentsDisplayProps> = ({ replies }) => {
     return (
-        <Box sx={{ mt: 2 }}>
-            <Typography variant="h6">Comments</Typography>
+        <Box sx={{}}>
             <List>
                 {replies.map((reply) => (
                     <ListItem key={reply.replyId}>
