@@ -968,14 +968,17 @@ namespace Manga.Server.Controllers
         {
             var mangaTitles = await _context.MangaTitles
                 .FromSqlRaw(@"
-            SELECT * FROM manga_titles 
-            WHERE main_title LIKE {0} 
-            ORDER BY main_title =% {1} DESC
-            LIMIT 10",
-                    $"%{query}%", query)
-                .Select(m => m.MainTitle)
+                    SELECT * FROM manga_titles 
+                    WHERE main_title %> {0} OR yomi_title %> {0}
+                    ORDER BY 
+                        CASE 
+                            WHEN main_title =% {1} THEN main_title =% {1}
+                            ELSE yomi_title =% {1}
+                        END DESC
+                    LIMIT 10",
+                    query, query)
+                .Select(m => new { m.MainTitle, m.YomiTitle })
                 .ToListAsync();
-
             return Ok(mangaTitles);
         }
 
