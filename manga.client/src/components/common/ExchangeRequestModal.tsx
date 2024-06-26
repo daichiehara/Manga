@@ -90,7 +90,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         >
             <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
             <Typography variant="body1" sx={{color: '#757575', fontWeight:'bold'}}>
-                XXさんが欲しい漫画がYつあります。あなたが交換に出す漫画（複数選択可）を選んでください。
+                交換に出す漫画（複数選択可）を選んでください。XXさんが欲しい漫画がYつあります。
             </Typography>
             <Box sx={{py:2}}></Box>
             <Typography variant="body2" sx={{color: '#757575', fontWeight:'bold'}}>
