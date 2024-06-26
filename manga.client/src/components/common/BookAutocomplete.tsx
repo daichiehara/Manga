@@ -1,45 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Autocomplete, TextField, CircularProgress, ListItem, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { debounce } from 'lodash';
 import axios from 'axios';
-
-const titleMapping: { [key: string]: string } = {
-    'Hunter×hunter': 'HUNTER×HUNTER',
-    'ハンター×ハンター': 'HUNTER×HUNTER',
-    'Slam dunk': 'SLAM DUNK',
-    'One piece': 'ONE PIECE'
-    // 他の必要なマッピングをここに追加
-};
-
-// XMLレスポンスをパースして必要なデータを抽出する関数
-const parseXmlResponse = (xmlString: string) => {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlString, "application/xml");
-  
-    const items = xmlDoc.getElementsByTagName("record");
-    const titles: string[] = [];
-  
-    for (let i = 0; i < items.length; i++) {
-      const titleElement = items[i].getElementsByTagName("dc:title")[0];
-      let title = titleElement ? titleElement.textContent : "";
-      if (title && title.trim()) {
-        title = title.replace(/\.$/, ""); // 末尾のピリオドを削除
-        title = title.replace(/★/g, "・").replace(/☆/g, "・");
-        titles.push(title);
-      }
-    }
-  
-    return titles;
-};
-
-const normalizeTitle = (title: string) => {
-  return title.toLowerCase();
-};
-
-interface TitleCount {
-  Title: string;
-  Count: number;
-}
 
 interface BookAutocompleteProps {
   inputValue: string;
@@ -49,15 +12,14 @@ interface BookAutocompleteProps {
 }
 
 const famousTitles = [
-    { Title: 'ONE PIECE', Count: 1 },
-    { Title: '呪術廻戦', Count: 1 },
-    { Title: '鬼滅の刃', Count: 1 },
-    { Title: 'ダンジョン飯', Count: 1 },
-    { Title: '転生したらスライムだった件', Count: 1 },
-    { Title: '美味しんぼ', Count: 1 },
-    { Title: '花より男子', Count: 1 },
-  ];
-  
+  'ONE PIECE',
+  '呪術廻戦',
+  '鬼滅の刃',
+  'ダンジョン飯',
+  '転生したらスライムだった件',
+  '美味しんぼ',
+  '花より男子',
+];
 
 const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
   inputValue,
@@ -66,151 +28,108 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
   helperText,
   ...rest
 }) => {
-  const [options, setOptions] = useState<TitleCount[]>(famousTitles);
+  const [options, setOptions] = useState<string[]>(famousTitles);
   const [isLoading, setIsLoading] = useState(false);
-  //const [isSelected, setIsSelected] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
 
-  const processTitles = (titles: string[]) => {
-    const titleCountsMap: { [key: string]: TitleCount } = titles.reduce((acc, title) => {
-      let normalized = normalizeTitle(title);
-      
-      if (!acc[normalized]) {
-        acc[normalized] = { Title: title, Count: 0 };
-      }
-      acc[normalized].Count += 1;
+  const fetchMangaTitles = useCallback(async (query: string) => {
+    if (cancelTokenSource) {
+      cancelTokenSource.cancel('Operation canceled due to new request.');
+    }
 
-      if (title.toUpperCase() === title) {
-        acc[normalized].Title = title;
-      }
-      if (titleMapping[acc[normalized].Title]){
-        acc[normalized].Title = titleMapping[title];
-      }
-      return acc;
-    }, {} as { [key: string]: TitleCount });
+    const newCancelTokenSource = axios.CancelToken.source();
+    setCancelTokenSource(newCancelTokenSource);
 
-    const titleCounts = Object.values(titleCountsMap).sort((a, b) => b.Count - a.Count);
-
-    return titleCounts;
-  };
-
-  const fetchMangaTitles = async (query: string) => {
-    const dpid = "iss-ndl-opac-bib";
-    const encodedNdc = "726.1";
-    const apiUrl = `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve&recordPacking=xml&query=dpid=${dpid}%20AND%20ndc=${encodedNdc}%20AND%20title=${encodeURIComponent(query)}%20AND%20sortBy=issued_date/sort.ascending`;
-
+    setIsLoading(true);
     try {
-      if (cancelTokenSource) {
-        cancelTokenSource.cancel('Operation canceled due to new request.');
-      }
-
-      const newCancelTokenSource = axios.CancelToken.source();
-      setCancelTokenSource(newCancelTokenSource);
-
-      setIsLoading(true);
-      const response = await axios.get(apiUrl, {
-        headers: {
-          'Accept': 'application/xml'
-        },
+      const response = await axios.get(`https://localhost:7103/api/Sells/title?query=${encodeURIComponent(query)}`, {
         cancelToken: newCancelTokenSource.token,
       });
 
-      const titles = parseXmlResponse(response.data);
-
-      const processedTitles = processTitles(titles);
-
-      setOptions(processedTitles);
-      setIsLoading(false);
-
+      setOptions(response.data);
     } catch (error) {
       if (axios.isCancel(error)) {
         console.log('Request canceled', error.message);
       } else {
         console.error('Error fetching manga titles:', error);
-        setIsLoading(false);
         setOptions([]);
       }
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      fetchMangaTitles(inputValue);
-    }
-  };
+  // debounceを適用したfetchMangaTitles
+  const debouncedFetchMangaTitles = useCallback(
+    debounce((query: string) => {
+      if (query.length > 1) {
+        fetchMangaTitles(query);
+      } else if (query.length === 0) {
+        setOptions(famousTitles);
+      }
+    }, 300),
+    [fetchMangaTitles]
+  );
 
-  const handleFocus = () => {
-    if (!inputValue) {
-      setOptions(famousTitles);
-    }
-  };
-
-  // フィルタリングを無効にするカスタムフィルターを作成
-  const filterOptions = (options: TitleCount[]) => options;
+  useEffect(() => {
+    debouncedFetchMangaTitles(inputValue);
+    // コンポーネントのアンマウント時にデバウンス関数をキャンセル
+    return () => debouncedFetchMangaTitles.cancel();
+  }, [inputValue, debouncedFetchMangaTitles]);
 
   return (
-    <>
-      <Autocomplete
-        {...rest}
-        options={options}
-        popupIcon={false}
-        filterOptions={filterOptions}
-        getOptionLabel={(option: TitleCount) => option.Title}
-        isOptionEqualToValue={(option: TitleCount, value: TitleCount) =>
-          option.Title === value.Title
-        }
-        renderOption={(props, option: TitleCount) => (
-          <ListItem {...props} key={`${option.Title}-${option.Count}`}>
-            {option.Title}
-          </ListItem>
-        )}
-        noOptionsText="作品タイトルを選択してください"
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            InputProps={{
-              ...params.InputProps,
-              startAdornment: (
-                <InputAdornment position="start" sx={{pl: 1}}>
-                  {isLoading ? <CircularProgress size={24} /> : <SearchIcon />}
-                </InputAdornment>
-              ),
-              sx: {
-                borderRadius: 50, // 角を丸める
-                '& input[type=search]::-webkit-search-cancel-button': {
-                    WebkitAppearance: 'none', // デフォルトの検索キャンセルボタンを非表示
-                    display: 'none',
-                  },
-                  '& input[type=search]::-webkit-search-decoration': {
-                    WebkitAppearance: 'none', // デフォルトの検索デコレーションを非表示
-                    display: 'none',
-                  },
+    <Autocomplete
+      {...rest}
+      options={options}
+      popupIcon={false}
+      filterOptions={(x) => x}
+      getOptionLabel={(option) => option}
+      renderOption={(props, option) => (
+        <ListItem {...props} key={option}>
+          {option}
+        </ListItem>
+      )}
+      noOptionsText="作品タイトルを選択してください"
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          InputProps={{
+            ...params.InputProps,
+            startAdornment: (
+              <InputAdornment position="start" sx={{pl: 1}}>
+                {isLoading ? <CircularProgress size={24} /> : <SearchIcon />}
+              </InputAdornment>
+            ),
+            sx: {
+              borderRadius: 50,
+              '& input[type=search]::-webkit-search-cancel-button': {
+                WebkitAppearance: 'none',
+                display: 'none',
               },
-              onKeyDown: handleKeyDown,
-              onFocus: handleFocus,
-            }}
-            placeholder='例) ONE PIECE'
-            type='search'
-            error={error}
-            helperText={helperText}
-          />
-        )}
-        inputValue={inputValue}
-        onInputChange={(_, newInputValue) => {
-          onInputChange(_, newInputValue);
-          //setIsSelected(false); // 入力が変更されたときにisSelectedをfalseに設定
-          if (!newInputValue) {
-            setIsLoading(false); // 入力がクリアされたときにローディングを終了
-            setOptions(famousTitles);
-          }
-        }}
-        onChange={(_, newValue) => {
-          onInputChange(_, newValue ? newValue.Title : '');
-          //setIsSelected(true); // 選択されたときにisSelectedをtrueに設定
-        }}
-      />
-    </>
+              '& input[type=search]::-webkit-search-decoration': {
+                WebkitAppearance: 'none',
+                display: 'none',
+              },
+            }
+          }}
+          placeholder='例) ONE PIECE'
+          type='search'
+          error={error}
+          helperText={helperText}
+        />
+      )}
+      inputValue={inputValue}
+      onInputChange={(_, newInputValue) => {
+        onInputChange(_, newInputValue);
+        if (!newInputValue) {
+          setIsLoading(false);
+          setOptions(famousTitles);
+        }
+      }}
+      onChange={(_, newValue) => {
+        onInputChange(_, newValue || '');
+      }}
+    />
   );
 };
 
