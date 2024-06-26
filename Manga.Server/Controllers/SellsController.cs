@@ -964,18 +964,16 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("title")]
-        public async Task<IActionResult> SearchManga(string query)
+        public async Task<IActionResult> SearchManga([FromQuery] string query)
         {
-            var normalizedQuery = new string(query.Where(c => !new[] { '☆', '★', '・', ' ' }.Contains(c)).ToArray()).ToLower();
-
             var mangaTitles = await _context.MangaTitles
-                .Select(m => new {
-                    OriginalTitle = m.MainTitle,
-                    NormalizedTitle = new string(m.MainTitle.Where(c => !new[] { '☆', '★', '・', ' ' }.Contains(c)).ToArray()).ToLower()
-                })
-                .Where(m => m.NormalizedTitle.Contains(normalizedQuery))
-                .Select(m => m.OriginalTitle)
-                .Take(10)
+                .FromSqlRaw(@"
+            SELECT * FROM manga_titles 
+            WHERE main_title LIKE {0} 
+            ORDER BY main_title =% {1} DESC
+            LIMIT 10",
+                    $"%{query}%", query)
+                .Select(m => m.MainTitle)
                 .ToListAsync();
 
             return Ok(mangaTitles);

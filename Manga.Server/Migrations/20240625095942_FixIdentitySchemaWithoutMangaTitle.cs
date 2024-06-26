@@ -6,24 +6,24 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Manga.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateMangaTitleMapping : Migration
+    public partial class FixIdentitySchemaWithoutMangaTitle : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "manga_titles",
+                name: "MangaTitles",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    main_title = table.Column<string>(type: "text", nullable: true),
-                    yomi_title = table.Column<string>(type: "text", nullable: true),
-                    author = table.Column<string>(type: "text", nullable: true)
+                    MainTitle = table.Column<string>(type: "text", nullable: true),
+                    YomiTitle = table.Column<string>(type: "text", nullable: true),
+                    Author = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_manga_titles", x => x.id);
+                    table.PrimaryKey("PK_MangaTitles", x => x.Id);
                 });
         }
 
@@ -31,7 +31,7 @@ namespace Manga.Server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "manga_titles");
+                name: "MangaTitles");
         }
     }
 }

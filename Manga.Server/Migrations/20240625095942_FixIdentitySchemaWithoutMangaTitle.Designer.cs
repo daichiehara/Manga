@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Manga.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240625051432_UpdateMangaTitleMapping")]
-    partial class UpdateMangaTitleMapping
+    [Migration("20240625095942_FixIdentitySchemaWithoutMangaTitle")]
+    partial class FixIdentitySchemaWithoutMangaTitle
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,26 +59,22 @@ namespace Manga.Server.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Author")
-                        .HasColumnType("text")
-                        .HasColumnName("author");
+                        .HasColumnType("text");
 
                     b.Property<string>("MainTitle")
-                        .HasColumnType("text")
-                        .HasColumnName("main_title");
+                        .HasColumnType("text");
 
                     b.Property<string>("YomiTitle")
-                        .HasColumnType("text")
-                        .HasColumnName("yomi_title");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("manga_titles", (string)null);
+                    b.ToTable("MangaTitles");
                 });
 
             modelBuilder.Entity("Manga.Server.Models.Match", b =>

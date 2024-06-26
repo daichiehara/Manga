@@ -91,14 +91,6 @@ builder.Services.AddSwaggerGen(option => {
     });
 });
 
-// Add services to the container.
-string? connectionString = builder.Configuration.GetConnectionString("ApplicationDbContext");
-
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
 
 builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 {
@@ -112,6 +104,15 @@ builder.Services.AddIdentityApiEndpoints<UserAccount>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddErrorDescriber<IdentityErrorDescriberJP>();
+
+// Add services to the container.
+string? connectionString = builder.Configuration.GetConnectionString("ApplicationDbContext");
+
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 
 /*
 builder.Services.AddLogging(loggingBuilder =>

@@ -1,19 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace Manga.Server.Models
+namespace Manga.Server.Models;
+
+public partial class MangaTitle
 {
-    [Table("manga_titles")]
-    public class MangaTitle
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Column("main_title")]
-        public string? MainTitle { get; set; }
+    public string? MainTitle { get; set; }
 
-        [Column("yomi_title")]
-        public string? YomiTitle { get; set; }
+    public string? YomiTitle { get; set; }
 
-        [Column("author")]
-        public string? Author { get; set; }
-    }
+    public string? Author { get; set; }
 }

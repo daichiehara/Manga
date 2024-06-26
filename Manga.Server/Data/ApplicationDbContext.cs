@@ -1,46 +1,57 @@
-﻿using Manga.Server.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using System;
+using System.Collections.Generic;
+using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Sockets;
 
-namespace Manga.Server.Data
+namespace Manga.Server.Data;
+
+public partial class ApplicationDbContext : IdentityDbContext<UserAccount>
 {
-    public class ApplicationDbContext : IdentityDbContext<UserAccount>
+    public ApplicationDbContext()
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
-
-        public DbSet<Sell>? Sell { get; set; }
-        public DbSet<OwnedList>? OwnedList { get; set; }
-        public DbSet<WishList>? WishList { get; set; }
-        public DbSet<SellImage>? SellImage { get; set; }
-        public DbSet<Reply>? Reply { get; set; }
-        public DbSet<Report>? Report { get; set; }
-        public DbSet<Request>? Request { get; set; }
-        public DbSet<MyList>? MyList { get; set; }
-        public DbSet<Notification>? Notification { get; set; }
-        public DbSet<Match>? Match { get; set; }
-        public DbSet<Contact>? Contact { get; set; }
-        public DbSet<MangaTitle>? MangaTitles { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<MangaTitle>(entity =>
-            {
-                entity.ToTable("manga_titles");
-                entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.MainTitle).HasColumnName("main_title");
-                entity.Property(e => e.YomiTitle).HasColumnName("yomi_title");
-                entity.Property(e => e.Author).HasColumnName("author");
-            });
-
-            // 他のエンティティの設定もここに追加できます
-        }
     }
+
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<Sell> Sell { get; set; }
+    public virtual DbSet<OwnedList> OwnedList { get; set; }
+    public virtual DbSet<WishList> WishList { get; set; }
+    public virtual DbSet<SellImage> SellImage { get; set; }
+    public virtual DbSet<Reply> Reply { get; set; }
+    public virtual DbSet<Report> Report { get; set; }
+    public virtual DbSet<Request> Request { get; set; }
+    public virtual DbSet<MyList> MyList { get; set; }
+    public virtual DbSet<Notification> Notification { get; set; }
+    public virtual DbSet<Match> Match { get; set; }
+    public virtual DbSet<Contact> Contact { get; set; }
+    public virtual DbSet<MangaTitle> MangaTitles { get; set; }
+
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);  // この行が重要です
+        
+        modelBuilder.Entity<MangaTitle>(entity =>
+        {
+            entity.ToTable("manga_titles", t => t.ExcludeFromMigrations());
+            entity.HasKey(e => e.Id).HasName("manga_titles_pkey");
+
+            entity.ToTable("manga_titles");
+
+            entity.HasIndex(e => e.MainTitle, "manga_titles_main_title_key").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Author).HasColumnName("author");
+            entity.Property(e => e.MainTitle).HasColumnName("main_title");
+            entity.Property(e => e.YomiTitle).HasColumnName("yomi_title");
+        });
+        
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
