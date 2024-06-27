@@ -219,7 +219,7 @@ const SellForm: React.FC = () => {
       }
     
       if (response.data.status === 1) {
-        navigate(`/item/${response.data.id}`, { state: { snackOpen: true, snackMessage: '出品に成功しました。' } });
+        navigate(`/item/${response.data.id}`, { state: { snackOpen: true, snackMessage: '出品に成功しました。', openWishlistDrawer: true } });
       } else if (response.data.status === 2 || response.data.status === 4) {
         navigate('/main-sell', { state: { snackOpen: true, snackMessage } });
       }
