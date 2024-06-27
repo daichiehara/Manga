@@ -1,39 +1,103 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Grid, Typography, Paper, Divider, Button} from '@mui/material';
-import ActionButton from './ActionButton';
+import { Box, Grid, Typography, Paper, Divider, Button, FormGroup, FormControlLabel, Checkbox} from '@mui/material';
 
-interface ExchangeRequestModalProps {
+
+interface ExchangeRequestModalProps 
+{
     isOpen: boolean;
     onClose: () => void;
 }
 
+interface ChangeAddressDto 
+{
+    sei: string;
+    mei: string;
+    postalCode: string;
+    prefecture: string;
+    address1: string;
+    address2: string;
+}
+
+interface MangaDetail 
+{
+    wishTitles: { title: string; isOwned: boolean }[];
+}  
+
+interface MpMySell 
+{
+    sellId: number;
+    message: string;
+}
+
+
 const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose }) => {
-  // BooksTabsでデータフェッチをトリガーするための状態
-  const [triggerFetch, setTriggerFetch] = useState(false);
-  // コンテンツのスクロール位置を管理するためのRef
-  const contentRef = useRef<HTMLDivElement>(null);
+    const { sellId } = useParams();
+    const [triggerFetch, setTriggerFetch] = useState(false);
+    const [address, setAddress] = useState<ChangeAddressDto | null>(null);
+    const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
+    const [mpmysell, setmpmysell] = useState<MpMySell[]>([]);
+    const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleExchangeFinalRequest = () => {
-    // Implementation of the exchange request logic
-    
-  };  
+    const fetchAddress = async () => {
+        try 
+        {
+            const response = await axios.get<ChangeAddressDto>('https://localhost:7103/api/Users/GetAddress', {
+                withCredentials: true,
+            });
+            setAddress(response.data);
+        } catch (error) {
+            console.error('Error fetching address:', error);
+        }
+    };
 
-  // スクロール位置をリセットするためのエフェクト
-  useEffect(() => {
-    if (!isOpen && contentRef.current) {
-      contentRef.current.scrollTop = 0; // モーダルが閉じたときにスクロール位置をリセット
-    }
-  }, [isOpen]);
+    const fetchMangaDetails = async () => {
+        try {
+            const response = await axios.get<MangaDetail>(`https://localhost:7103/api/Sells/${sellId}`, {
+                withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+            });
+            setMangaDetail(response.data);
+        } catch (error) {
+            console.error('漫画の詳細情報の取得に失敗:', error);
+        }
+    };
 
-  // isOpenプロップに基づいてtriggerFetch状態を制御するエフェクト
-  useEffect(() => {
-    if (isOpen) {
-      // モーダルが開いたときにデータフェッチをトリガー
-      setTriggerFetch(true);
-    }
-  }, [isOpen]);
+    const fetchmpmysell = async () => {
+        try {
+            const response = await axios.get<MpMySell[]>('https://localhost:7103/api/Sells/MySell', {
+                withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+            });
+            // 取得したデータで状態を更新
+            setmpmysell(response.data);
+        } catch (error) {
+            console.error('出品データの取得に失敗:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMangaDetails();
+    }, [sellId]);
+
+    useEffect(() => {
+        if (isOpen) {
+            setTriggerFetch(true);
+            fetchAddress(); // モーダルが開いたときに住所を取得
+            fetchmpmysell(); // モーダルが開いたときにマイセルを取得
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen && contentRef.current) {
+            contentRef.current.scrollTop = 0; // モーダルが閉じたときにスクロール位置をリセット
+        }
+    }, [isOpen]);
+
+    const handleExchangeFinalRequest = () => {
+        // Implementation of the exchange request logic
+    };
 
   return (
     <SwipeableDrawer
@@ -90,27 +154,46 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         >
             <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
             <Typography variant="body1" sx={{color: '#757575', fontWeight:'bold'}}>
-                交換に出す漫画（複数選択可）を選んでください。XXさんが欲しい漫画がYつあります。
+                交換に出す漫画を選ぶ（複数選択可）
             </Typography>
-            <Box sx={{py:2}}></Box>
-            <Typography variant="body2" sx={{color: '#757575', fontWeight:'bold'}}>
-                ※ 交換されるタイトルは1つです。複数選択すると<Box component="span" sx={{color:"red"}}>交換される可能性は上がります。</Box>
-            </Typography>
-            <Typography variant="body2" sx={{color: '#757575', fontWeight:'bold'}}>
-                交換に出すためには、出品する必要があります。
-            </Typography>
-            <Box sx={{py:2, position: 'relative', bottom: 0,right: 0, display: 'flex', justifyContent: 'center',  maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
-                <Button variant="contained" sx={{mx: 2, background:'orange',maxWidth: '640px', width: '100%', boxShadow: 'none',color: '#353535',fontWeight:'bold'}}
-                    onClick={handleExchangeFinalRequest}
-                >
-                    今すぐ出品する
-                </Button>
+
+            <Box sx={{mt:0, mb:1.5, mr:1.5}}>
+                {mpmysell.map((item, index) => (
+                    <FormGroup key={index}>
+                        <FormControlLabel control={<Checkbox defaultChecked disableRipple/>} label={item.message} />
+                    </FormGroup>
+                ))}
+            </Box>
+
+            <Box sx={{pt:2, border: '1px solid #A2A2A2A2', borderRadius: '4px', }}>
+                <Typography variant="body2" sx={{color: '#757575', fontWeight:'bold'}}>
+                    ※ 交換されるタイトルは1つです。複数選択すると<Box component="span" sx={{color:"red"}}>交換される可能性は上がります。</Box>
+                </Typography>
+                <Typography variant="body2" sx={{color: '#757575', fontWeight:'bold'}}>
+                    交換に出すためには、出品する必要があります。
+                </Typography>
+                <Box sx={{py:2, position: 'relative', bottom: 0,right: 0, display: 'flex', justifyContent: 'center',  maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
+                    <Button variant="contained" sx={{mx: 2, background:'white',maxWidth: '640px', width: '100%', color:'red',border: '1px solid red', borderRadius: '4px', boxShadow: 'none' }}
+                        onClick={handleExchangeFinalRequest}
+                    >
+                        今すぐ出品へ!!
+                    </Button>
+                </Box>
             </Box>
             <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
             <Typography variant="body1" sx={{color: '#757575', fontWeight:'bold'}}>
                 配送先
             </Typography>
-            <Box sx={{py:2}}></Box>
+            <Box sx={{ py: 2 }}>
+                {address && (
+                    <Typography variant="body2" sx={{ color: '#757575' }}>
+                        {`${address.sei} ${address.mei}`}<br />
+                        〒{address.postalCode}<br />
+                        {address.prefecture} {address.address1}<br />
+                        {address.address2}
+                    </Typography>
+                )}
+            </Box>
             
             <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
 

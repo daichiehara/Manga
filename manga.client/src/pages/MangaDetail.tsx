@@ -43,7 +43,7 @@ interface MangaDetail {
     sendDay: string;
     hasIdVerificationImage: boolean;
     replies: Reply[]; 
-  }  
+}  
 
 const MangaDetail = () => {
   const { sellId } = useParams();
