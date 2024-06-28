@@ -1,7 +1,7 @@
 // MpAdressUpadate
 
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, Grid, TextField, Button, CircularProgress, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Typography, Box, Grid, Divider, TextField, Button, CircularProgress, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import CustomToolbar from '../components/common/CustumToolbar';
 import axios from 'axios';
 import { useForm, Controller } from 'react-hook-form';
@@ -174,7 +174,7 @@ const MpAdressUpdate: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12}>
-                <hr />
+                <Divider />
             </Grid>
             <Grid container spacing={2} px={2} mt={1} alignItems="center">
               <Grid item xs={8}>
