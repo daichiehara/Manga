@@ -30,6 +30,12 @@ namespace Manga.Server.Controllers
         private readonly HttpClient _httpClient;
         private readonly ILogger<SellsController> _logger;
         private readonly S3Service _s3Service;
+        private static readonly Dictionary<string, string> TitleNormalizationMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "one piece", "ONE PIECE" },
+            { "ワンピース", "ONE PIECE" },
+            // 他の特別な変換ルールをここに追加できます
+        };
 
         public SellsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IHttpClientFactory httpClientFactory, ILogger<SellsController> logger, S3Service s3Service)
         {
@@ -968,23 +974,49 @@ namespace Manga.Server.Controllers
         {
             var mangaTitles = await _context.MangaTitles
                 .FromSqlRaw(@"
-            SELECT * FROM manga_titles 
-            WHERE main_title LIKE {0} OR yomi_title LIKE {0}
-            ORDER BY 
-                CASE 
-                    WHEN main_title =% {1} THEN main_title =% {1}
-                    ELSE yomi_title =% {1}
-                END DESC
-            LIMIT 10",
-                    $"%{query}%", query)
+                SELECT main_title FROM manga_titles 
+                WHERE main_title =% {0} OR public.kana_match(yomi_title, {0})
+                ORDER BY count DESC
+                LIMIT 20",
+                query)
                 .Select(m => m.MainTitle)
                 .ToListAsync();
-            return Ok(mangaTitles);
+
+            var normalizedTitles = NormalizeTitles(mangaTitles);
+
+            return Ok(normalizedTitles);
         }
 
-        private string NormalizeTitle(string title)
+        private static List<string> NormalizeTitles(List<string> titles)
         {
-            return title.Replace("★", "・").Replace("☆", "・");
+            var normalizedTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var title in titles)
+            {
+                var normalizedTitle = NormalizeTitle(title);
+                normalizedTitles.Add(normalizedTitle);
+            }
+
+            return normalizedTitles.ToList();
+        }
+
+        private static string NormalizeTitle(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                return title;
+
+            // 特別な変換ルールの適用
+            if (TitleNormalizationMap.TryGetValue(title, out var normalizedTitle))
+            {
+                return normalizedTitle;
+            }
+
+            // ☆と★を・に変換
+            title = title.Replace('☆', '・').Replace('★', '・');
+
+            // その他の正規化ルールをここに追加
+
+            return title;
         }
 
         private bool SellExists(int id)
