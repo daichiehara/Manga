@@ -972,13 +972,15 @@ namespace Manga.Server.Controllers
         [HttpGet("title")]
         public async Task<IActionResult> SearchManga([FromQuery] string query)
         {
+            var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
+
             var mangaTitles = await _context.MangaTitles
                 .FromSqlRaw(@"
                 SELECT main_title FROM manga_titles 
-                WHERE main_title =% {0} OR public.kana_match(yomi_title, {0})
+                WHERE main_title =% {0} OR yomi_title =% {0}
                 ORDER BY count DESC
                 LIMIT 20",
-                query)
+                katakanaQuery)
                 .Select(m => m.MainTitle)
                 .ToListAsync();
 
