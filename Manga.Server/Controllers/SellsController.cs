@@ -1014,14 +1014,19 @@ namespace Manga.Server.Controllers
             var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
             var mangaTitles = await _context.MangaTitles
                 .FromSqlRaw(@"
-                    SELECT main_title FROM (
-                        SELECT main_title, count FROM manga_titles WHERE main_title =% {0}
-                        UNION
-                        SELECT main_title, count FROM manga_titles WHERE yomi_title =% {0}
-                    ) AS combined
-                    ORDER BY count DESC
-                    LIMIT 20",
-                katakanaQuery)
+                    SELECT main_title
+                        FROM (
+                            SELECT DISTINCT ON (main_title) main_title, count
+                            FROM (
+                                (SELECT main_title, count FROM manga_titles WHERE main_title =% {0} ORDER BY count DESC LIMIT 10)
+                                UNION ALL
+                                (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1} ORDER BY count DESC LIMIT 10)
+                            ) AS combined
+                            ORDER BY main_title, count DESC
+                        ) AS distinct_titles
+                        ORDER BY count DESC
+                        LIMIT 20",
+                query, katakanaQuery)
                 .Select(m => m.MainTitle)
                 .ToListAsync();
             var normalizedTitles = NormalizeTitles(mangaTitles);
@@ -1034,16 +1039,21 @@ namespace Manga.Server.Controllers
             var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
             var mangaTitles = await _context.MangaTitles
                 .FromSqlRaw(@"
-                    SELECT main_title FROM (
-                        SELECT main_title, count FROM manga_titles WHERE main_title =% {0}
-                        UNION
-                        SELECT main_title, count FROM manga_titles WHERE yomi_title =% {0}
-                        UNION
-                        SELECT main_title, count FROM manga_titles WHERE author =% {0}
-                    ) AS combined
-                    ORDER BY count DESC
-                    LIMIT 20",
-                katakanaQuery)
+                    SELECT main_title
+                        FROM (
+                            SELECT DISTINCT ON (main_title) main_title, count
+                            FROM (
+                                (SELECT main_title, count FROM manga_titles WHERE main_title =% {0})
+                                UNION ALL
+                                (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1})
+                                UNION ALL
+                                (SELECT main_title, count FROM manga_titles WHERE author =% {0})
+                            ) AS combined
+                            ORDER BY main_title, count DESC
+                        ) AS distinct_titles
+                        ORDER BY count DESC
+                        LIMIT 20",
+                query, katakanaQuery)
                 .Select(m => m.MainTitle)
                 .ToListAsync();
             var normalizedTitles = NormalizeTitles(mangaTitles);
