@@ -968,8 +968,8 @@ namespace Manga.Server.Controllers
             }
             return sells;
         }
-
-        [HttpGet("title")]
+        /*
+        [HttpGet("Title")]
         public async Task<IActionResult> SearchManga([FromQuery] string query)
         {
             var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
@@ -979,7 +979,7 @@ namespace Manga.Server.Controllers
                 SELECT main_title FROM manga_titles 
                 WHERE main_title =% {0} OR yomi_title =% {0}
                 ORDER BY count DESC
-                LIMIT 20",
+                LIMIT 30",
                 katakanaQuery)
                 .Select(m => m.MainTitle)
                 .ToListAsync();
@@ -989,6 +989,66 @@ namespace Manga.Server.Controllers
             return Ok(normalizedTitles);
         }
 
+        [HttpGet("Any")]
+        public async Task<IActionResult> SearchMangaAndAuthor([FromQuery] string query)
+        {
+            var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
+            var mangaTitles = await _context.MangaTitles
+                .FromSqlRaw(@"
+            SELECT main_title FROM manga_titles 
+            WHERE main_title =% {0} 
+            OR yomi_title =% {0}
+            OR author =% {0}
+            ORDER BY count DESC
+            LIMIT 30",
+                katakanaQuery)
+                .Select(m => m.MainTitle)
+                .ToListAsync();
+            var normalizedTitles = NormalizeTitles(mangaTitles);
+            return Ok(normalizedTitles);
+        }
+        */
+        [HttpGet("Title")]
+        public async Task<IActionResult> SearchManga([FromQuery] string query)
+        {
+            var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
+            var mangaTitles = await _context.MangaTitles
+                .FromSqlRaw(@"
+                    SELECT main_title FROM (
+                        SELECT main_title, count FROM manga_titles WHERE main_title =% {0}
+                        UNION
+                        SELECT main_title, count FROM manga_titles WHERE yomi_title =% {0}
+                    ) AS combined
+                    ORDER BY count DESC
+                    LIMIT 20",
+                katakanaQuery)
+                .Select(m => m.MainTitle)
+                .ToListAsync();
+            var normalizedTitles = NormalizeTitles(mangaTitles);
+            return Ok(normalizedTitles);
+        }
+
+        [HttpGet("Any")]
+        public async Task<IActionResult> SearchMangaAndAuthor([FromQuery] string query)
+        {
+            var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
+            var mangaTitles = await _context.MangaTitles
+                .FromSqlRaw(@"
+                    SELECT main_title FROM (
+                        SELECT main_title, count FROM manga_titles WHERE main_title =% {0}
+                        UNION
+                        SELECT main_title, count FROM manga_titles WHERE yomi_title =% {0}
+                        UNION
+                        SELECT main_title, count FROM manga_titles WHERE author =% {0}
+                    ) AS combined
+                    ORDER BY count DESC
+                    LIMIT 20",
+                katakanaQuery)
+                .Select(m => m.MainTitle)
+                .ToListAsync();
+            var normalizedTitles = NormalizeTitles(mangaTitles);
+            return Ok(normalizedTitles);
+        }
         private static List<string> NormalizeTitles(List<string> titles)
         {
             var normalizedTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
