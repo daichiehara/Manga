@@ -24,13 +24,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
 } from '@mui/material';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingComponent from '../components/common/LoadingComponent';
-
+import WishListAccordion from '../components/common/WishListAccordion';
+import PreSellDialog from '../components/common/PreSellComfirmation';
 import { prefectures } from '../components/common/Prefectures';
+
 
 interface FormData {
   title: string;
@@ -42,6 +44,7 @@ interface FormData {
   sellStatus: number;
   sellImages: FileList | null;
 }
+
 
 const SellForm: React.FC = () => {
   const { control, handleSubmit, setError, clearErrors, setValue } = useForm<FormData>();
@@ -60,6 +63,7 @@ const SellForm: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
   const [inputValue, setInputValue] = useState('');
+  const [isPreSellDialogOpen, setIsPreSellDialogOpen] = useState(false);
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -263,6 +267,11 @@ const SellForm: React.FC = () => {
   };
 
   const handleSell = () => {
+    setIsPreSellDialogOpen(true);
+  };
+
+  const handleConfirmListing = () => {
+    setIsPreSellDialogOpen(false);
     isDraftRef.current = false;
     setIsDraft(false);
     setIsLoading(true);
@@ -342,6 +351,8 @@ const SellForm: React.FC = () => {
   const handleCancelDelete = () => {
     setIsDialogOpen(false);
   };
+
+  
 
   return (
     <>
@@ -534,6 +545,12 @@ const SellForm: React.FC = () => {
               )}
             />
           </Grid>
+          <Grid item xs={12} mb={2}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} mb={4}>
+            <WishListAccordion />
+          </Grid>
           <Grid item xs={12} mb={3}>
             <Button
               type="button"
@@ -604,6 +621,11 @@ const SellForm: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <PreSellDialog
+        open={isPreSellDialogOpen}
+        onClose={() => setIsPreSellDialogOpen(false)}
+        onConfirm={handleConfirmListing}
+      />
     </>
   );
 };
