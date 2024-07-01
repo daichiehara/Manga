@@ -7,6 +7,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import axios from 'axios';
 import { SnackbarContext } from '../context/SnackbarContext';
 import PropTypes from 'prop-types';
+import { debounce } from 'lodash';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -20,43 +21,6 @@ interface SearchModalProps {
   message2: string;
   message3: string;
   messageColor: string;
-}
-
-const titleMapping: { [key: string]: string } = {
-    'Hunter×hunter': 'HUNTER×HUNTER',
-    'ハンター×ハンター': 'HUNTER×HUNTER',
-    'Slam dunk': 'SLAM DUNK',
-    'One piece': 'ONE PIECE'
-    // 他の必要なマッピングをここに追加
-};
-
-const parseXmlResponse = (xmlString: string) => {
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, "application/xml");
-
-  const items = xmlDoc.getElementsByTagName("record");
-  const titles: string[] = [];
-
-  for (let i = 0; i < items.length; i++) {
-    const titleElement = items[i].getElementsByTagName("dc:title")[0];
-    let title = titleElement ? titleElement.textContent : "";
-    if (title && title.trim()) {
-      title = title.replace(/\.$/, ""); // 末尾のピリオドを削除
-      title = title.replace(/★/g, "・").replace(/☆/g, "・");
-      titles.push(title);
-    }
-  }
-
-  return titles;
-};
-
-const normalizeTitle = (title: string) => {
-  return title.toLowerCase();
-};
-
-interface TitleCount {
-  Title: string;
-  Count: number;
 }
 
 const famousTitles = [
@@ -78,33 +42,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
   const [isLoading, setIsLoading] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
 
-  const processTitles = (titles: string[]) => {
-    const titleCountsMap: { [key: string]: TitleCount } = titles.reduce((acc, title) => {
-      const normalized = normalizeTitle(title);
-      if (!acc[normalized]) {
-        acc[normalized] = { Title: title, Count: 0 };
-      }
-      acc[normalized].Count += 1;
-
-      if (title.toUpperCase() === title) {
-        acc[normalized].Title = title;
-      }
-      if (titleMapping[acc[normalized].Title]){
-        acc[normalized].Title = titleMapping[title];
-      }
-      return acc;
-    }, {} as { [key: string]: TitleCount });
-
-    const titleCounts = Object.values(titleCountsMap).sort((a, b) => b.Count - a.Count);
-
-    return titleCounts;
-  };
-
-  const fetchMangaTitles = async (query: string) => {
-    const dpid = "iss-ndl-opac-bib";
-    const encodedNdc = "726.1";
-    const apiUrl = `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve&recordPacking=xml&query=dpid=${dpid}%20AND%20ndc=${encodedNdc}%20AND%20anywhere=${encodeURIComponent(query)}%20AND%20sortBy=issued_date/sort.ascending`;
-
+  const fetchMangaTitles = useCallback(async (query: string) => {
     try {
       if (cancelTokenSource) {
         cancelTokenSource.cancel('Operation canceled due to new request.');
@@ -114,18 +52,11 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       setCancelTokenSource(newCancelTokenSource);
 
       setIsLoading(true);
-      const response = await axios.get(apiUrl, {
-        headers: {
-          'Accept': 'application/xml'
-        },
+      const response = await axios.get(`https://localhost:7103/api/Sells/Any?query=${encodeURIComponent(query)}`, {
         cancelToken: newCancelTokenSource.token,
       });
 
-      const titles = parseXmlResponse(response.data);
-
-      const processedTitles = processTitles(titles);
-
-      setOptions(processedTitles.map(titleCount => titleCount.Title));
+      setOptions(response.data);
       setIsLoading(false);
 
     } catch (error) {
@@ -136,6 +67,25 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
         setIsLoading(false);
         setOptions([]);
       }
+    }
+  }, []);
+
+  const debouncedFetchMangaTitles = useCallback(
+    debounce((query: string) => {
+      if (query.length > 1) {
+        fetchMangaTitles(query);
+      }
+    }, 300),
+    [fetchMangaTitles]
+  );
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    if (newQuery.length === 0) {
+      setOptions([]); // クエリが空の場合、オプションをクリア
+    } else {
+      debouncedFetchMangaTitles(newQuery);
     }
   };
 
@@ -156,7 +106,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
 
   const handleSubmit = async () => {
     if (selectedTitles.length === 0) {
-      onClose(); // 選択されたタイトルがない場合はDrawerを閉じる
+      onClose();
       showSnackbar(noSelectionMessage, 'error');
       return;
     }
@@ -164,7 +114,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
     try {
       const response = await axios.post(
         apiEndpoint,
-        selectedTitles,  // 直接配列を送信する
+        selectedTitles,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -174,14 +124,13 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       );
       console.log('Titles added:', response.data);
       showSnackbar(completeMessage);
-      onRefreshList(); // リストをリフレッシュ
+      onRefreshList();
       onClose();
     } catch (error) {
       console.error('Error adding titles:', error);
-      showSnackbar('タイトルを追加できませんでした。', 'error');
+      showSnackbar('タイトルが追加されませんでした。', 'error');
     }
   };
-
   return (
     <SwipeableDrawer
       disableScrollLock
@@ -254,7 +203,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
                 }}
                 placeholder={placeholder}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={handleQueryChange}
                 type='search'
               />
             </Paper>
