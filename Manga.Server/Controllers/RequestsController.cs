@@ -313,6 +313,7 @@ namespace Manga.Server.Controllers
                     };
 
                     _context.Match.Add(match);
+                    await _context.SaveChangesAsync();
 
                     // 通知を作成
                     string message = $"「{requesterSell.Title}」と「{responderSell.Title}」の交換が成立しました。内容を確認の上発送をお願いします。";
@@ -357,6 +358,7 @@ namespace Manga.Server.Controllers
 
                     _context.Request.Add(request);
                     updatedRequests.Add(request);
+                    await _context.SaveChangesAsync();
 
                     await NotificationsController.SendExchangeRequestNotification(_context, request, responderSell);
 
@@ -365,7 +367,7 @@ namespace Manga.Server.Controllers
                 }
             }
 
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             if (updatedRequests.Count == 0)
             {

@@ -39,6 +39,9 @@ namespace Manga.Server.Models
         [Display(Name = "本人確認画像")]
         public bool HasIdVerificationImage { get; set; }
 
+        [Display(Name = "リクエスト")]
+        public bool IsRequest { get; set; }
+
         public int ReplyCount { get; set; }
 
         public List<ReplyDto> Replies { get; set; } = new List<ReplyDto>();

@@ -420,6 +420,10 @@ namespace Manga.Server.Controllers
                 return NotFound();
             }
 
+            // 現在のユーザーがこの出品に対してリクエストを出しているかを確認
+            var isRequest = await _context.Request
+                .AnyAsync(r => r.RequesterId == userId && r.ResponderSellId == id);
+
             // 出品者のWishListを取得
             var wishLists = await _context.WishList
                 .Where(w => w.UserAccountId == sell.UserAccountId)
@@ -485,6 +489,7 @@ namespace Manga.Server.Controllers
                 WishTitles = wishTitles,
                 Replies = replies,
                 ReplyCount = replyCount,
+                IsRequest = isRequest
             };
 
             return dto;
