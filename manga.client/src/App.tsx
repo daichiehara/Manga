@@ -26,6 +26,7 @@ import IdCamera from './pages/IdCamera.tsx';
 import SellForm from './pages/MainSell.tsx';
 import DraftList from './pages/DraftList.tsx';
 import MpProfile from './pages/MpProfile.tsx';
+import EmailConfirmation from './pages/EmailConfirmation';
 
 
 const App = () => {
@@ -64,6 +65,7 @@ const App = () => {
             <Route path="/sell/:sellId" element={<SellForm />} />
             <Route path="/sell/draft" element={<DraftList />} />
             <Route path="/mypage/profile" element={<MpProfile />} />
+            <Route path="/email-confirmation" element={<EmailConfirmation />} />
             {/* 他のルートをここに追加 */}
           </Routes>
         </Router>
