@@ -34,6 +34,7 @@ namespace Manga.Server.Controllers
         {
             { "one piece", "ONE PIECE" },
             { "ワンピース", "ONE PIECE" },
+            { "遊・戯・王ゼアル", "遊・戯・王ZEXAL" },
             // 他の特別な変換ルールをここに追加できます
         };
 

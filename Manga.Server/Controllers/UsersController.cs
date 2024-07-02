@@ -16,6 +16,7 @@ using System.Text;
 using Manga.Server.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Google.Cloud.RecaptchaEnterprise.V1;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace Manga.Server.Controllers
 {
@@ -43,30 +44,58 @@ namespace Manga.Server.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterDto model)
         {
-            var user = new UserAccount()
+            var user = new UserAccount
             {
                 Email = model.Email,
                 UserName = model.Email,
                 NickName = model.NickName,
-                PasswordHash = model.Password
             };
 
-            var result = await _userManager.CreateAsync(user, user.PasswordHash!);
-
+            var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                // ユーザー登録が成功した場合、自動的にログイン
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmationLink = Url.Action("ConfirmEmail", "Users",
+                    new { userId = user.Id, token = token }, Request.Scheme);
+
+                var body = string.Format(Resources.EmailTemplates.RegisterEmailMessage, confirmationLink);
+                await _emailSender.SendEmailAsync(user.Email, "トカエルの仮登録が完了しました！", body);
+
                 await _signInManager.SignInAsync(user, isPersistent: false);
-
                 // JWTトークンを生成
-                var token = GenerateJwtToken(user);
+                GenerateJwtToken(user);
 
-                return Ok(new { Token = token });
+                return Ok(new { Message = "登録成功。確認メールを送信しました。" });
             }
             else
             {
                 var errors = result.Errors.Select(e => e.Description);
                 return BadRequest(new { Errors = errors });
+            }
+        }
+
+        [HttpGet("ConfirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (userId == null || token == null)
+            {
+                return Redirect($"{_configuration["FrontendUrl"]}/email-confirmation?status=error&message=Invalid confirmation link");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Redirect($"{_configuration["FrontendUrl"]}/email-confirmation?status=error&message=User not found");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return Redirect($"{_configuration["FrontendUrl"]}/email-confirmation?status=success");
+            }
+            else
+            {
+                return Redirect($"{_configuration["FrontendUrl"]}/email-confirmation?status=error&message=Email confirmation failed");
             }
         }
 
@@ -347,6 +376,8 @@ namespace Manga.Server.Controllers
                 await _emailSender.SendEmailAsync(model.NewEmail, "メールアドレスの変更を完了してください。",
                     $"Changeyをご利用いただきありがとうございます。<br /><br />以下のURLをクリックして、メールアドレスの変更手続きを完了してください。<br /><a href='{callbackUrl}'>{callbackUrl}</a><br /><br />Changeyサポートチーム");
                 emailChangeInitiated = true;
+                user.UserName = model.NewEmail;
+                await _userManager.UpdateAsync(user);
             }
 
             // パスワードの変更を試みる

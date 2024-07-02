@@ -101,6 +101,23 @@ namespace Manga.Server.Resources {
         }
         
         /// <summary>
+        ///   トカエルをご利用いただきありがとうございます。&lt;br /&gt;
+        ///仮登録が完了しました。&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///以下のリンクをクリックすることでアカウントの登録が完了し、
+        ///すべてのサービスをご利用いただけます。&lt;br /&gt;
+        ///
+        ///&lt;a href=&quot;{0}&quot;&gt;{0}&lt;/a&gt;
+        ///&lt;br /&gt;
+        ///トカエルサポートチーム に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string RegisterEmailMessage {
+            get {
+                return ResourceManager.GetString("RegisterEmailMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   トカエルをご利用いただきありがとうございます。
         ///
         ///{0}さんの出品「{1}」に交換申請がありました。

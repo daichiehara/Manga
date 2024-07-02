@@ -156,6 +156,17 @@
 
 トカエルサポートチーム</value>
   </data>
+  <data name="RegisterEmailMessage" xml:space="preserve">
+    <value>トカエルをご利用いただきありがとうございます。&lt;br /&gt;
+仮登録が完了しました。&lt;br /&gt;
+&lt;br /&gt;
+以下のリンクをクリックすることでアカウントの登録が完了し、
+すべてのサービスをご利用いただけます。&lt;br /&gt;
+
+&lt;a href="{0}"&gt;{0}&lt;/a&gt;
+&lt;br /&gt;
+トカエルサポートチーム</value>
+  </data>
   <data name="RequestMessage" xml:space="preserve">
     <value>トカエルをご利用いただきありがとうございます。
 

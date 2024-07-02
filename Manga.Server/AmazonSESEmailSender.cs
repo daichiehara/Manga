@@ -2,6 +2,8 @@
 using Amazon.SimpleEmail.Model;
 using Amazon.SimpleEmail;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Azure.Core;
+using System.Web;
 
 namespace Manga.Server
 {
@@ -44,7 +46,7 @@ namespace Manga.Server
                             Text = new Content
                             {
                                 Charset = "UTF-8",
-                                Data = htmlBody
+                                Data = HttpUtility.HtmlDecode(htmlBody)
                             }
                         }
                     }
