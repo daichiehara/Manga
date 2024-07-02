@@ -42,7 +42,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
 
     setIsLoading(true);
     try {
-      const response = await axios.get(`https://localhost:7103/api/Sells/title?query=${encodeURIComponent(query)}`, {
+      const response = await axios.get(`https://localhost:7103/api/Sells/Title?query=${encodeURIComponent(query)}`, {
         cancelToken: newCancelTokenSource.token,
       });
 
@@ -123,7 +123,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
         onInputChange(_, newInputValue);
         if (!newInputValue) {
           setIsLoading(false);
-          setOptions(famousTitles);
+          //setOptions(famousTitles);
         }
       }}
       onChange={(_, newValue) => {
