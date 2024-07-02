@@ -49,8 +49,8 @@ const WishListAccordion: React.FC = () => {
         <Typography sx={{ width: '33%', flexShrink: 0, fontWeight: 'bold' }}>
           追加の設定
         </Typography>
-        <Typography sx={{ color: 'text.secondary' }}>欲しい漫画登録でマッチ率</Typography>
-        <TrendingUpIcon sx={{color: 'text.secondary'}} />
+        <Typography sx={{ color: 'text.secondary' }}>欲しい漫画登録でマッチ率UP</Typography>
+        
       </AccordionSummary>
       <AccordionDetails>
         <BookListWish

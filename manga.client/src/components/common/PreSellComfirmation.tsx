@@ -12,7 +12,6 @@ interface PreSellDialogProps {
 const PreSellDialog: React.FC<PreSellDialogProps> = ({ open, onClose, onConfirm }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>出品前の確認事項</DialogTitle>
       <DialogContent>
         <Typography variant="body1" paragraph>
           以下の重要事項をご確認ください
@@ -20,7 +19,7 @@ const PreSellDialog: React.FC<PreSellDialogProps> = ({ open, onClose, onConfirm 
         <List>
           <ListItem>
             <ListItemIcon>
-              <LocalShippingIcon color="primary" />
+              <LocalShippingIcon sx={{color: '#0F9ED5'}} />
             </ListItemIcon>
             <ListItemText 
               primary="配送方法" 
@@ -37,9 +36,6 @@ const PreSellDialog: React.FC<PreSellDialogProps> = ({ open, onClose, onConfirm 
             />
           </ListItem>
         </List>
-        <Typography variant="body2" color="textSecondary" paragraph>
-          上記の内容に同意される場合は「同意して出品する」を押してください。
-        </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
