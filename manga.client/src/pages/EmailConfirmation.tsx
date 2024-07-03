@@ -59,7 +59,7 @@ const EmailConfirmation: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CustomToolbar title='メールアドレスの確認'/>
-      <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+      <Container maxWidth="sm" sx={{ pt: 10, mb: 4 }}>
         <StyledPaper elevation={3}>
           <IconWrapper>
             {status === 'success' ? (
@@ -70,10 +70,10 @@ const EmailConfirmation: React.FC = () => {
           </IconWrapper>
           {status === 'success' ? (
             <>
-              <Typography variant="h4" gutterBottom color="primary">
+              <Typography variant="h4" gutterBottom color="primary" textAlign={'center'}>
                 アカウントの登録が完了しました。
               </Typography>
-              <Typography variant="body1" paragraph align="center">
+              <Typography variant="body1" paragraph align="center" textAlign={'center'}>
                 {message}
               </Typography>
               <Button 
