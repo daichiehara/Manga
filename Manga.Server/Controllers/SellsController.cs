@@ -431,7 +431,7 @@ namespace Manga.Server.Controllers
             }
             else if (sell.SellStatus == SellStatus.Established) // 既にマッチングが成立している場合
             {
-                requestStatus = RequestButtonStatus.CannotRequest;
+                requestStatus = RequestButtonStatus.Matched;
             }
             else
             {

@@ -51,9 +51,9 @@ namespace Manga.Server.Models
     }
     public enum RequestButtonStatus
     {
-        CannotRequest = 0,
         CanRequest = 1,
-        AlreadyRequested = 2,
-        OwnSell = 3, 
+        Matched = 2,
+        AlreadyRequested = 3,
+        OwnSell = 4, 
     }
 }
