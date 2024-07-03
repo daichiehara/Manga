@@ -420,9 +420,23 @@ namespace Manga.Server.Controllers
                 return NotFound();
             }
 
-            // 現在のユーザーがこの出品に対してリクエストを出しているかを確認
-            var isRequest = await _context.Request
-                .AnyAsync(r => r.RequesterId == userId && r.ResponderSellId == id);
+            RequestButtonStatus requestStatus;
+            if (sell.UserAccountId == userId)
+            {
+                requestStatus = RequestButtonStatus.OwnSell;
+            }
+            else if (await _context.Request.AnyAsync(r => r.RequesterId == userId && r.ResponderSellId == id))
+            {
+                requestStatus = RequestButtonStatus.AlreadyRequested;
+            }
+            else if (sell.SellStatus == SellStatus.Established) // 既にマッチングが成立している場合
+            {
+                requestStatus = RequestButtonStatus.CannotRequest;
+            }
+            else
+            {
+                requestStatus = RequestButtonStatus.CanRequest;
+            }
 
             // 出品者のWishListを取得
             var wishLists = await _context.WishList
@@ -489,7 +503,7 @@ namespace Manga.Server.Controllers
                 WishTitles = wishTitles,
                 Replies = replies,
                 ReplyCount = replyCount,
-                IsRequest = isRequest
+                RequestButtonStatus = requestStatus
             };
 
             return dto;

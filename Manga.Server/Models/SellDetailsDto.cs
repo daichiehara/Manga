@@ -39,8 +39,8 @@ namespace Manga.Server.Models
         [Display(Name = "本人確認画像")]
         public bool HasIdVerificationImage { get; set; }
 
-        [Display(Name = "リクエスト")]
-        public bool IsRequest { get; set; }
+        [Display(Name = "リクエストボタン")]
+        public RequestButtonStatus RequestButtonStatus { get; set; }
 
         public int ReplyCount { get; set; }
 
@@ -48,5 +48,12 @@ namespace Manga.Server.Models
 
         public List<string> ImageUrls { get; set; } = new List<string>();
         public List<WishTitleInfo> WishTitles { get; set; } = new List<WishTitleInfo>();
+    }
+    public enum RequestButtonStatus
+    {
+        CannotRequest = 0,
+        CanRequest = 1,
+        AlreadyRequested = 2,
+        OwnSell = 3, 
     }
 }
