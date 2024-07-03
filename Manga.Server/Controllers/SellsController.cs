@@ -974,6 +974,29 @@ namespace Manga.Server.Controllers
             }
             return sells;
         }
+
+        [HttpGet("RequestedSell")]
+        public async Task<ActionResult<List<RequestedSellDto>>> GetRequestedSell()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var requestedSells = await _context.Request
+                .Where(r => r.RequesterId == userId)
+                .Select(r => new RequestedSellDto
+                {
+                    SellId = r.ResponderSellId,
+                    Title = r.ResponderSell.Title,
+                    ImageUrl = r.ResponderSell.SellImages
+                                    .OrderBy(si => si.Order)
+                                    .Select(si => si.ImageUrl)
+                                    .FirstOrDefault(),
+                    Created = r.Create,
+                    Status = r.Status
+                })
+                .ToListAsync();
+
+            return requestedSells;
+        }
         /*
         [HttpGet("Title")]
         public async Task<IActionResult> SearchManga([FromQuery] string query)
