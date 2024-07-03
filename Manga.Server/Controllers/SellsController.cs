@@ -1011,6 +1011,29 @@ namespace Manga.Server.Controllers
 
             return requestedSells;
         }
+
+        [HttpGet("RequestedSell/{sellId}")]
+        public async Task<ActionResult<RequestedSellDetailDto>> GetRequestedSellDetail(int sellId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var requesterSells = await _context.Request
+                .Where(r => r.ResponderSellId == sellId && r.RequesterId == userId)
+                .Select(r => new ItemDto { ItemId = r.RequesterSellId, Title = r.RequesterSell.Title })
+                .ToListAsync();
+
+            if (requesterSells.Count == 0)
+            {
+                return NotFound();
+            }
+
+            var detailDto = new RequestedSellDetailDto
+            {
+                RequesterSells = requesterSells
+            };
+
+            return detailDto;
+        }
+
         /*
         [HttpGet("Title")]
         public async Task<IActionResult> SearchManga([FromQuery] string query)
