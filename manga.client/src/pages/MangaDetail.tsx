@@ -1,5 +1,5 @@
 import { useEffect, useState} from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Grid, Typography, Paper, SwipeableDrawer, Divider} from '@mui/material';
 import 'swiper/swiper-bundle.css'; 
 import ImageCarousel from '../components/common/ImageCarousel';
@@ -16,7 +16,6 @@ import RecentCommentsDisplay from '../components/item/RecentCommentsDisplay';
 import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply インターフェイスのインポート
 import { useSnackbar } from '../hooks/useSnackbar';
 import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
-import WishSearchModal from '../components/common/WishSearchModal';
 import axios from 'axios';
 
 /**
@@ -44,6 +43,7 @@ interface MangaDetail {
     sendDay: string;
     hasIdVerificationImage: boolean;
     replies: Reply[]; 
+    requestButtonStatus :number;
 }  
 
 const MangaDetail = () => {
@@ -52,8 +52,6 @@ const MangaDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   useSnackbar();
 
@@ -93,21 +91,6 @@ const MangaDetail = () => {
 
     fetchMangaDetails();
   }, [sellId]);
-
-  useEffect(() => {
-    if (location.state && location.state.openWishlistDrawer) {
-      setIsWishlistDrawerOpen(true);
-    }
-  }, [location]);
-
-  const handleCloseWishlistDrawer = () => {
-    setIsWishlistDrawerOpen(false);
-  };
-
-  const handleRefreshWishList = () => {
-    // Wishlistをリフレッシュするロジックをここに実装
-    // 必要に応じて、サーバーから最新のWishlistデータを取得する
-  };
 
   // Handle errors by rendering the ErrorDisplay component
   if (error) {
@@ -201,13 +184,6 @@ const MangaDetail = () => {
       <ActionButton label="交換を希望する" onClick={handleExchangeRequest} />
       </Box>
       <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} />
-      
-      {/* WishSearchModalを追加 */}
-      <WishSearchModal
-        isOpen={isWishlistDrawerOpen}
-        onClose={handleCloseWishlistDrawer}
-        onRefreshWishList={handleRefreshWishList}
-      />
     </Box>
   );
 };
