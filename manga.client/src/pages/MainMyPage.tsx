@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Typography, Button, Avatar, Box, Stack, Grid, Snackbar, Alert } from '@mui/material';
 import MenuBar from '../components/menu/MenuBar';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../api/authService';
 import BeenhereRoundedIcon from '@mui/icons-material/BeenhereRounded';
 import BeenhereOutlinedIcon from '@mui/icons-material/BeenhereOutlined'; 
@@ -15,10 +15,11 @@ import SellSettingList from '../components/mypage/SellSettingList';
 import PolicyList from '../components/mypage/PolicyList';
 import { useContext } from 'react';
 import { AuthContext } from '../components/context/AuthContext';
-import { Link } from 'react-router-dom';
 import LogoutList from '../components/mypage/LogoutList';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import { useSnackbar } from '../hooks/useSnackbar';
+import { LEFT } from 'react-swipeable';
+import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
 
 interface MainMyPage {
   title: string; 
@@ -36,11 +37,6 @@ const MainMyPage: React.FC = () => {
 
   const location = useLocation();
   useSnackbar();
-
-  // useCallbackを使用して関数が再生成されるのを避ける
-  const handleLogin = useCallback(() => {
-    navigate('/login-page');
-  }, [navigate]);
 
   const handleLogout = useCallback(() => {
     authService.logout()
@@ -187,43 +183,7 @@ const MainMyPage: React.FC = () => {
         )
       ) : (
         // ログインしていない場合の表示
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '80vh',  // 画面全体の高さを使用
-          }}
-        >
-
-          <Typography variant='h6' sx={{mb:`2rem`,fontWeight:`bold`,color:'#707070'}}>
-            ご利用にはログイン・会員登録が必要です
-          </Typography>
-          <Button
-            variant="outlined"
-            onClick={handleLogin}
-            sx={{
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              color: (theme) => theme.palette.primary.main, // テキストカラーをテーマのプライマリー色に
-              borderColor: (theme) => theme.palette.primary.main, // 境界線をテーマのプライマリー色に
-              borderWidth:`1px`,
-              width: `95%`,
-              borderRadius: '5px',
-              '&:hover': {
-                background: 'rgba(0, 0, 0, 0.04)', // ホバー時の背景を軽く暗く
-                borderColor: (theme) => theme.palette.primary.main, // ホバー時の境界線をテーマのプライマリーの暗い色に
-                boxShadow: 'none',
-              }
-            }}
-          >
-            ログイン・会員登録
-          </Button>
-
-        </Box>
-        
-
+        <NavigateToLoginBox />
       )}
 
       
