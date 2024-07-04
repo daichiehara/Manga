@@ -1,10 +1,11 @@
 import React from 'react';
-import { Drawer, Box, Typography, List, ListItem, ListItemText, Divider, Button } from '@mui/material';
+import { Drawer, Box, Typography, List, ListItem, ListItemText, Divider, Button, SwipeableDrawer } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
   
   interface RequestedSellDrawerProps {
     open: boolean;
     onClose: () => void;
+    onOpen: () => void;
     requestedSell: {
       sellId: number;
       title: string;
@@ -12,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
     } | null;
   }
   
-  const RequestedSellDrawer: React.FC<RequestedSellDrawerProps> = ({ open, onClose, requestedSell }) => {
+  const RequestedSellDrawer: React.FC<RequestedSellDrawerProps> = ({ open, onClose, onOpen, requestedSell }) => {
     const navigate = useNavigate();
   
     if (!requestedSell) return null;
@@ -23,8 +24,24 @@ import { useNavigate } from 'react-router-dom';
     };
   
     return (
-      <Drawer anchor="right" open={open} onClose={onClose}>
-        <Box sx={{ width: 250, p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <SwipeableDrawer 
+        anchor="bottom" 
+        open={open} 
+        onClose={onClose} 
+        onOpen={onOpen}
+        disableScrollLock
+            PaperProps={{
+            style: {
+                height: 'auto',
+                width: '100%',
+                maxWidth: '640px',
+                margin: 'auto',
+                borderTopLeftRadius: 15,
+                borderTopRightRadius: 15,
+            },
+            }}
+        >
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Typography variant="h6" gutterBottom>
             交換申請詳細
           </Typography>
@@ -45,13 +62,15 @@ import { useNavigate } from 'react-router-dom';
         <Button 
           variant="contained" 
           color="primary" 
+          size='large'
+          fullWidth
           onClick={handleNavigateToDetails}
           sx={{ mt: 2 }}
         >
           商品詳細・キャンセル
         </Button>
       </Box>
-    </Drawer>
+    </SwipeableDrawer>
   );
 };
 

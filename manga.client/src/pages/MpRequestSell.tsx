@@ -96,6 +96,10 @@ const RequestedSellList: React.FC = () => {
     }
   };
 
+  const handleOpen = () => {
+    // ドロワーを開く処理
+  };
+
   if (requestedSells.length === 0) {
     return (
       <>
@@ -163,6 +167,7 @@ const RequestedSellList: React.FC = () => {
       </Box>
       <RequestedSellDrawer
         open={drawerOpen}
+        onOpen={handleOpen}
         onClose={() => setDrawerOpen(false)}
         requestedSell={selectedSell}
       />

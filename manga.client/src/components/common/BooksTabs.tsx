@@ -177,4 +177,4 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
   );
 };
 
-export default BooksTabs;
+export default React.memo(BooksTabs);

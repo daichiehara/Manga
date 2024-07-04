@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, IconButton, Button, Drawer } from '@mui/material';
+import { Box, IconButton, Button, SwipeableDrawer } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import SellCamera from './SellCamera';
 
@@ -70,11 +70,15 @@ const ImageList: React.FC<ImageListProps> = ({ capturedImages, onCapturedImagesC
           </Box>
         ))}
       </Box>
-      <Drawer
+      <SwipeableDrawer
         anchor="bottom"
         open={isCameraOpen}
         onClose={handleCameraClose}
-        disableScrollLock
+        onOpen={() => setIsCameraOpen(true)}
+        disableBackdropTransition
+        disableDiscovery
+        disableSwipeToOpen
+        swipeAreaWidth={0}
         PaperProps={{
           style: {
             height: '97%',
@@ -99,13 +103,15 @@ const ImageList: React.FC<ImageListProps> = ({ capturedImages, onCapturedImagesC
           >
             完了
           </Button>
-          <SellCamera
-            capturedImages={capturedImages}
-            onCapturedImagesChange={onCapturedImagesChange}
-            initialSelectedImageIndex={selectedImageIndex}
-          />
+          {isCameraOpen && (
+            <SellCamera
+              capturedImages={capturedImages}
+              onCapturedImagesChange={onCapturedImagesChange}
+              initialSelectedImageIndex={selectedImageIndex}
+            />
+          )}
         </Box>
-      </Drawer>
+      </SwipeableDrawer>
     </>
   );
 };
