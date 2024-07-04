@@ -1,6 +1,7 @@
 import React from 'react';
-import { Drawer, Box, Typography, List, ListItem, ListItemText, Divider, Button, SwipeableDrawer } from '@mui/material';
+import { Box, Typography, List, ListItemButton, ListItemText, Link, Button, SwipeableDrawer } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
   
   interface RequestedSellDrawerProps {
     open: boolean;
@@ -18,9 +19,9 @@ import { useNavigate } from 'react-router-dom';
   
     if (!requestedSell) return null;
   
-    const handleNavigateToDetails = () => {
-      navigate(`/item/${requestedSell.sellId}`);
-      onClose();
+    const handleNavigateToDetails = (itemId: number) => {
+        navigate(`/item/${itemId}`);
+        onClose();
     };
   
     return (
@@ -29,10 +30,14 @@ import { useNavigate } from 'react-router-dom';
         open={open} 
         onClose={onClose} 
         onOpen={onOpen}
+        disableBackdropTransition
+        disableDiscovery
+        disableSwipeToOpen
+        swipeAreaWidth={0}
         disableScrollLock
             PaperProps={{
             style: {
-                height: 'auto',
+                maxHeight: '70%',
                 width: '100%',
                 maxWidth: '640px',
                 margin: 'auto',
@@ -41,22 +46,31 @@ import { useNavigate } from 'react-router-dom';
             },
             }}
         >
-        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <Typography variant="h6" gutterBottom>
-            交換申請詳細
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', textAlign: 'center', alignItems: 'center' }}>
+          <Typography variant="h6" sx={{pb: 3, color:'#0F9ED5', fontWeight: 'bold'}}>
+            相手の漫画
           </Typography>
-          <Typography variant="subtitle1" gutterBottom>
-            相手の漫画: {requestedSell.title}
-          </Typography>
-        <Divider sx={{ my: 2 }} />
-        <Typography variant="subtitle2" gutterBottom>
-          あなたの出品:
+          <Link
+          component="button"
+          variant="body1"
+          onClick={() => handleNavigateToDetails(requestedSell.sellId)}
+          sx={{pb: 4, textDecoration: 'none', color: 'inherit'}}
+        >
+          {requestedSell.title}
+        </Link>
+        <KeyboardDoubleArrowUpIcon sx={{fontSize: '48px', pb: 4}} />
+        <Typography variant="h6" gutterBottom sx={{color: '#EB4848', fontWeight: 'bold'}}>
+          あなたの漫画
         </Typography>
-        <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        <List sx={{ overflowY: 'auto', width: '100%' }}>
           {requestedSell.requesterSells.map((sell) => (
-            <ListItem key={sell.itemId}>
+            <ListItemButton 
+              key={sell.itemId} 
+              onClick={() => handleNavigateToDetails(sell.itemId)}
+              sx={{ textAlign: 'center' }}
+            >
               <ListItemText primary={sell.title} />
-            </ListItem>
+            </ListItemButton>
           ))}
         </List>
         <Button 
@@ -64,7 +78,7 @@ import { useNavigate } from 'react-router-dom';
           color="primary" 
           size='large'
           fullWidth
-          onClick={handleNavigateToDetails}
+          onClick={() => handleNavigateToDetails(requestedSell.sellId)}
           sx={{ mt: 2 }}
         >
           商品詳細・キャンセル

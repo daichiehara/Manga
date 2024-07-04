@@ -6,6 +6,7 @@ import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import PanToolIcon from '@mui/icons-material/PanTool';
 import RequestedSellDrawer from '../components/common/RequestedSellDrawer';
+import LoadingComponent from '../components/common/LoadingComponent';
 
 interface RequestedSell {
     sellId: number;
@@ -65,18 +66,25 @@ const RequestedSellList: React.FC = () => {
     const [selectedSell, setSelectedSell] = useState<RequestedSell | null>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const { authState } = useContext(AuthContext);
+    const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!authState.isAuthenticated) return;
+    if (!authState.isAuthenticated) {
+        setIsLoading(false);
+        return;
+    }
     const fetchRequestedSells = async () => {
-      try {
-        const response = await axios.get('https://localhost:7103/api/Sells/RequestedSell', {
-          withCredentials: true
-        });
-        setRequestedSells(response.data);
-      } catch (error) {
-        console.error('リクエストした出品の取得に失敗:', error);
-      }
+        setIsLoading(true);
+        try {
+            const response = await axios.get('https://localhost:7103/api/Sells/RequestedSell', {
+            withCredentials: true
+            });
+            setRequestedSells(response.data);
+        } catch (error) {
+            console.error('リクエストした出品の取得に失敗:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
     fetchRequestedSells();
   }, [authState.isAuthenticated]);
@@ -99,6 +107,15 @@ const RequestedSellList: React.FC = () => {
   const handleOpen = () => {
     // ドロワーを開く処理
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <CustomToolbar title='交換申請した漫画' />
+        <LoadingComponent />
+      </>
+    );
+  }
 
   if (requestedSells.length === 0) {
     return (
