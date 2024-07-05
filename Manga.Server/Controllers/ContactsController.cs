@@ -14,6 +14,7 @@ using Humanizer.Localisation;
 using Microsoft.Extensions.Hosting;
 using System.Globalization;
 using System.Resources;
+using System.Text.Encodings.Web;
 
 namespace Manga.Server.Controllers
 {
@@ -24,12 +25,14 @@ namespace Manga.Server.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserAccount> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly HtmlEncoder _htmlEncoder;
 
-        public ContactsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IEmailSender emailSender)
+        public ContactsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IEmailSender emailSender, HtmlEncoder htmlEncoder)
         {
             _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
+            _htmlEncoder = htmlEncoder;
         }
 
         // GET: api/Contacts
@@ -123,47 +126,49 @@ namespace Manga.Server.Controllers
         */
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateContact([FromBody] ContactPostDto contactDto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState); // Returns error if the DTO does not meet required validation
+                return BadRequest(ModelState);
             }
 
-            var contact = new Contact
+            // 入力値のサニタイズ
+            var sanitizedContact = new Contact
             {
-                Name = contactDto.Name,
-                Email = contactDto.Email,
-                Message = contactDto.Message
+                Name = _htmlEncoder.Encode(contactDto.Name),
+                Email = _htmlEncoder.Encode(contactDto.Email),
+                Message = _htmlEncoder.Encode(contactDto.Message)
             };
 
             var user = await _userManager.GetUserAsync(User);
             if (user != null)
             {
-                contact.UserAccountId = user.Id;
+                sanitizedContact.UserAccountId = user.Id;
             }
 
             try
             {
-                _context.Contact.Add(contact);
-                await _context.SaveChangesAsync(); // Save the contact information to the database
+                _context.Contact.Add(sanitizedContact);
+                await _context.SaveChangesAsync();
 
                 // メール送信
-                // リソースファイルからメール本文を読み込む
-                string escapedName = System.Net.WebUtility.HtmlEncode(contact.Name);
-                string escapedEmail = System.Net.WebUtility.HtmlEncode(contact.Email);
-                string escapedMessage = System.Net.WebUtility.HtmlEncode(contact.Message);
+                // サニタイズ済みのデータを使用するので、再度のエスケープは不要
+                var body = string.Format(Resources.EmailTemplates.ContactMessage,
+                    sanitizedContact.Name, sanitizedContact.Email, sanitizedContact.Message);
 
-                var body = string.Format(Resources.EmailTemplates.ContactMessage, escapedName, escapedEmail, escapedMessage);
+                await _emailSender.SendEmailAsync(sanitizedContact.Email, "お問い合わせ確認", body);
 
-                await _emailSender.SendEmailAsync(contact.Email, "お問い合わせ確認", body);
-                await _emailSender.SendEmailAsync("d.ehara2019@gmail.com", "お問い合わせがありました。", $"お問い合わせがありました。<br /><br />{escapedEmail}<br />{escapedName}<br />{escapedMessage}");
+                // 管理者向けメール
+                var adminBody = $"お問い合わせがありました。<br /><br />{sanitizedContact.Email}<br />{sanitizedContact.Name}<br />{sanitizedContact.Message}";
+                await _emailSender.SendEmailAsync("d.ehara2019@gmail.com", "お問い合わせがありました。", adminBody);
 
                 return Ok(new { message = "Contact information saved and confirmation email sent successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while saving the contact information or sending the email.");
+                return StatusCode(500, "An error occurred while processing your request.");
             }
         }
 

@@ -17,6 +17,7 @@ using Manga.Server.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Google.Cloud.RecaptchaEnterprise.V1;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Net.Http;
 
 namespace Manga.Server.Controllers
 {
@@ -30,8 +31,9 @@ namespace Manga.Server.Controllers
         private readonly IConfiguration _configuration;
         private readonly IEmailSender _emailSender;
         private readonly S3Service _s3Service;
+        private readonly HttpClient _httpClient;
 
-        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender, S3Service s3Service)
+        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender, S3Service s3Service, HttpClient httpClient)
         {
             _context = context;
             _userManager = userManager;
@@ -39,6 +41,7 @@ namespace Manga.Server.Controllers
             _configuration = configuration;
             _emailSender = emailSender;
             _s3Service = s3Service;
+            _httpClient = httpClient;
         }
 
         [HttpPost("Register")]
@@ -600,7 +603,6 @@ namespace Manga.Server.Controllers
 
             return Ok();
         }
-
 
         [HttpGet("protected")]
         [Authorize]
