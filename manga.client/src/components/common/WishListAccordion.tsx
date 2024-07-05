@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import BookListWish from '../item/BookListWish';
 import { useBooks } from '../context/BookContext';
 import axios from 'axios';

@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Grid, Typography, Paper, Divider, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, Grid, Typography, Divider, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import NavigateToLoginBox from '../login/NavigateToLoginBox';
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
@@ -33,6 +35,7 @@ interface MpMySell {
 
 const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose }) => {
     const { sellId } = useParams();
+    const { authState } = useContext(AuthContext);
     const [triggerFetch, setTriggerFetch] = useState(false);
     const [address, setAddress] = useState<ChangeAddressDto | null>(null);
     const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
@@ -116,40 +119,11 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         }
     };
 
-    return (
-        <SwipeableDrawer
-            disableScrollLock // スクロールロックを無効にする
-            anchor='bottom' // モーダルを下部に配置
-            open={isOpen} // モーダルの開閉状態
-            onClose={() => {
-                onClose();
-                // モーダルが閉じたときにtriggerFetchをリセット
-                setTriggerFetch(false);
-            }}
-            onOpen={() => {}}
-            swipeAreaWidth={0}
-            disableSwipeToOpen={false}
-            ModalProps={{
-                keepMounted: true,  // 一度表示された後もコンポーネントを保持
-                BackdropProps: {
-                    style: {
-                        pointerEvents: 'none' // バックドロップをクリック不可にする
-                    }
-                }
-            }}
-            sx={{
-                '& .MuiDrawer-paper': {
-                    borderTopLeftRadius: 15,
-                    borderTopRightRadius: 15,
-                    width: '100vw', // 画面の幅にフルで広げる
-                    maxWidth: '640px',  // 最大幅を640pxに設定
-                    mx: 'auto',
-                    zIndex:30000,
-                }
-            }}
-        >
-            <Box display="flex" alignItems="center" sx={{my:2, position: 'relative' }}>
-                <Button onClick={onClose} sx={{p:0, position: 'absolute', left: 0 }}>
+    // 認証されている場合の表示
+    const renderAuthenticatedContent = () => (
+        <>
+            <Box display="flex" alignItems="center" sx={{ my: 2, position: 'relative' }}>
+                <Button onClick={onClose} sx={{ p: 0, position: 'absolute', left: 0 }}>
                     <CloseIcon sx={{ color: '#494949' }} />
                 </Button>
                 <Typography variant="subtitle1" sx={{ color: '#494949', fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
@@ -165,17 +139,17 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     overflow: 'auto', // コンテンツが溢れた場合にスクロールを有効にする
                     mb: 2,
                     px: 3,
-                    zIndex:30000,
+                    zIndex: 30000,
                 }}
                 role="presentation"
             >
-                <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
-                <Typography variant="body1" sx={{color: '#656565', fontWeight:'bold', pb:1}}>
+                <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
+                <Typography variant="body1" sx={{ color: '#656565', fontWeight: 'bold', pb: 1 }}>
                     交換に出す漫画を選ぶ（複数選択可）
                 </Typography>
-                
+
                 <Grid container>
-                    <Grid item xs sx={{ maxWidth: '70%' }}> 
+                    <Grid item xs sx={{ maxWidth: '70%' }}>
                         <Box sx={{ pl: 0.8, mt: 0, mb: 0.5, mr: 1.5 }}>
                             {mpmysell.filter(item => item.sellStatus === 1).map((item, index) => (
                                 <FormGroup key={index}>
@@ -193,77 +167,80 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                             ))}
                         </Box>
                     </Grid>
-                    <Link to="/main-sell" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                    <Link to="/sell" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                         <Grid item display="flex" justifyContent="flex-end" alignItems="center">
-                            <Typography variant='subtitle2' sx={{color: '#0F9ED5',}}>さらに出品</Typography>
-                            <ArrowForwardIosIcon sx={{color: '#0F9ED5',}}/>
-                        </Grid>    
-                    </Link>      
+                            <Typography variant='subtitle2' sx={{ color: '#0F9ED5', }}>さらに出品</Typography>
+                            <ArrowForwardIosIcon sx={{ color: '#0F9ED5', }} />
+                        </Grid>
+                    </Link>
                 </Grid>
 
-                <Grid container alignItems="center" sx={{mt:1, p: 1, mb:1, background: '#F2F2F2', color: '#444444', fontSize: '0.8rem', borderRadius: '4px', }} >
+                <Grid container alignItems="center" sx={{ mt: 1, p: 1, mb: 1, background: '#F2F2F2', color: '#444444', fontSize: '0.8rem', borderRadius: '4px', }}>
                     <Grid item>
-                        <RocketLaunchIcon sx={{ml:1 ,mr:2, display: 'flex', justifyContent: 'center', fontSize: '1.3rem', color: '#0F9ED5' }} />
+                        <RocketLaunchIcon sx={{ ml: 1, mr: 2, display: 'flex', justifyContent: 'center', fontSize: '1.3rem', color: '#0F9ED5' }} />
                     </Grid>
                     <Grid item xs>
-                    <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
-                        複数選択すると交換される可能性が上がります。
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
-                        交換されるタイトルは1つです。
-                    </Typography>
-                </Grid>
+                        <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
+                            複数選択すると交換される可能性が上がります。
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
+                            交換されるタイトルは1つです。
+                        </Typography>
+                    </Grid>
                 </Grid>
 
-                <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
-                <Typography variant="body1" sx={{color: '#757575', fontWeight:'bold'}}>
+                <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
+                <Typography variant="body1" sx={{ color: '#757575', fontWeight: 'bold' }}>
                     配送先
                 </Typography>
 
                 <Grid container>
-                    <Grid item xs sx={{ maxWidth: '70%' }}> 
-                    <Box sx={{pl: 0.8, py: 2 }}>
-                        {address && (
-                            <Typography variant="body2" sx={{ color: '#757575' }}>
-                                {`${address.sei} ${address.mei}`}<br />
-                                〒{address.postalCode}<br />
-                                {address.prefecture} {address.address1}<br />
-                                {address.address2}
-                            </Typography>
-                        )}
-                    </Box>
+                    <Grid item xs sx={{ maxWidth: '70%' }}>
+                        <Box sx={{ pl: 0.8, py: 2 }}>
+                            {address && (
+                                <Typography variant="body2" sx={{ color: '#757575' }}>
+                                    {`${address.sei} ${address.mei}`}<br />
+                                    〒{address.postalCode}<br />
+                                    {address.prefecture} {address.address1}<br />
+                                    {address.address2}
+                                </Typography>
+                            )}
+                        </Box>
                     </Grid>
-                    <Link to="/mypage/adressupdate" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                    <Link to="/mypage/addressupdate" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                         <Grid item display="flex" justifyContent="flex-end" alignItems="center">
-                            <Typography variant='subtitle2' sx={{color: '#757575',}}>さらに出品</Typography>
-                            <ArrowForwardIosIcon sx={{color: '#757575',}}/>
-                        </Grid>    
-                    </Link>      
+                            <Typography variant='subtitle2' sx={{ color: '#757575', }}></Typography>
+                            <ArrowForwardIosIcon sx={{ color: '#757575', }} />
+                        </Grid>
+                    </Link>
                 </Grid>
-                
-                <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
 
-                <Typography  sx={{py:1.5, color: '#454545', fontSize:'0.8rem'}}>
-                    この選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{color:"red"}}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
+                <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
+
+                <Typography sx={{ py: 1.5, color: '#454545', fontSize: '0.8rem' }}>
+                    この選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{ color: "red" }}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
                 </Typography>
-                <Typography  sx={{py:1.5, color: '#454545', fontSize:'0.8rem'}}>
-                    利用規約に同意の上、ボタンを押してください。
+                <Typography sx={{ py: 1.5, color: '#454545', fontSize: '0.8rem' }}>
+                    <Link to="/terms-of-service" style={{ color: '#0F9ED5', textDecoration: 'underline'  }}>
+                        利用規約
+                    </Link>
+                    に同意の上、ボタンを押してください。
                 </Typography>
 
-                <Box sx={{py:2, position: 'relative', bottom: 0,right: 0, display: 'flex', justifyContent: 'center',  maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
-                    <Button variant="contained" sx={{ background:'orange',maxWidth: '640px', width: '100%', boxShadow: 'none',color: '#353535',fontWeight:'bold'}}
+                <Box sx={{ py: 2, position: 'relative', bottom: 0, right: 0, display: 'flex', justifyContent: 'center', maxWidth: '640px', width: '100%', left: '50%', transform: 'translateX(-50%)', }}>
+                    <Button variant="contained" disableElevation sx={{ background: 'white', maxWidth: '640px', width: '100%', color: 'red', border: '1px solid red', borderRadius: '4px', boxShadow: 'none' }}
                         onClick={handleExchangeFinalRequest}
                     >
                         交換を希望する
                     </Button>
                 </Box>
-                <Box sx={{border: '0.5px solid #A2A2A2A2', borderRadius: '4px', padding: '16px', }}>
-                    <Typography variant="body2" sx={{mb:1.5, color: '#454545',}}>
+                <Box sx={{ border: '0.5px solid #A2A2A2A2', borderRadius: '4px', padding: '16px', }}>
+                    <Typography variant="body2" sx={{ mb: 1.5, color: '#454545', }}>
                         交換に出すためには、出品する必要があります。
                     </Typography>
-                    
-                    <Box sx={{py:2, position: 'relative', bottom: 0, right: 0, display: 'flex', justifyContent: 'center', maxWidth: '640px', width: '100%', left: '50%', transform: 'translateX(-50%)', }}>
-                        <Button variant="contained" disableElevation sx={{ background:'white', maxWidth: '640px', width: '100%', color:'red', border: '1px solid red', borderRadius: '4px', boxShadow: 'none' }}
+
+                    <Box sx={{ py: 2, position: 'relative', bottom: 0, right: 0, display: 'flex', justifyContent: 'center', maxWidth: '640px', width: '100%', left: '50%', transform: 'translateX(-50%)', }}>
+                        <Button variant="contained" disableElevation sx={{ background: 'white', maxWidth: '640px', width: '100%', color: 'red', border: '1px solid red', borderRadius: '4px', boxShadow: 'none' }}
                             onClick={handleExchangeFinalRequest}
                         >
                             今すぐ出品する
@@ -271,6 +248,58 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     </Box>
                 </Box>
             </Box>
+        </>
+    );
+
+    // 未認証時の表示
+    const renderUnauthenticatedContent = () => (
+        <>
+        <Box display="flex" alignItems="center" sx={{ my: 2, position: 'relative' }}>
+            <Button onClick={onClose} sx={{ p: 0, position: 'absolute', left: 0 }}>
+                <CloseIcon sx={{ color: '#494949' }} />
+            </Button>
+            <Typography variant="subtitle1" sx={{ color: '#494949', fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
+                交換を希望する
+            </Typography>
+        </Box>
+            <NavigateToLoginBox height='70vh'/>
+        </>
+    );
+
+    return (
+        <SwipeableDrawer
+            disableScrollLock // スクロールロックを無効にする
+            anchor='bottom' // モーダルを下部に配置
+            open={isOpen} // モーダルの開閉状態
+            onClose={() => {
+                onClose();
+                // モーダルが閉じたときにtriggerFetchをリセット
+                setTriggerFetch(false);
+            }}
+            onOpen={() => { }}
+            swipeAreaWidth={0}
+            disableSwipeToOpen={false}
+            ModalProps={{
+                keepMounted: true,  // 一度表示された後もコンポーネントを保持
+                BackdropProps: {
+                    style: {
+                        pointerEvents: 'none' // バックドロップをクリック不可にする
+                    }
+                }
+            }}
+            sx={{
+                '& .MuiDrawer-paper': {
+                    borderTopLeftRadius: 15,
+                    borderTopRightRadius: 15,
+                    height: '90vh',
+                    width: '100vw', // 画面の幅にフルで広げる
+                    maxWidth: '640px',  // 最大幅を640pxに設定
+                    mx: 'auto',
+                    zIndex: 30000,
+                }
+            }}
+        >
+            {authState.isAuthenticated ? renderAuthenticatedContent() : renderUnauthenticatedContent()}
         </SwipeableDrawer>
     );
 });

@@ -13,6 +13,7 @@ const SellSettingList: React.FC = () => {
     { name: 'いいね一覧', path: '/mypage/favolist' },
     { name: '出品した漫画', path: '/mypage/mysell' },
     { name: '交換した漫画', path: '/mypage/matchedsell' },
+    { name: '交換申請した漫画', path: '/mypage/requestedsell' },
   ];
 
   return (

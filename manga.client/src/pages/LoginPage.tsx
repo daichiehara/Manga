@@ -47,7 +47,7 @@ const Login: React.FC = () => {
     .then(response => {
     setIsLoginSuccessful(true);
     updateGlobalAuthState({ isAuthenticated: true }); 
-    navigate('/');
+    navigate(-1);
     })
     .catch(error => {
         setIsLoginSuccessful(false);
