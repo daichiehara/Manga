@@ -8,6 +8,8 @@ import { Box, Grid, Typography, Divider, Button, FormGroup, FormControlLabel, Ch
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import NavigateToLoginBox from '../login/NavigateToLoginBox';
+import AddIcon from '@mui/icons-material/Add';
+
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
@@ -119,14 +121,26 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         }
     };
 
+    const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.checked) {
+            const allSellIds = mpmysell.filter(item => item.sellStatus === 1).map(item => item.sellId);
+            setSelectedSellIds(allSellIds);
+        } else {
+            setSelectedSellIds([]);
+        }
+    };
+
+    const allChecked = selectedSellIds.length === mpmysell.filter(item => item.sellStatus === 1).length;
+
+
     // 認証されている場合の表示
     const renderAuthenticatedContent = () => (
         <>
             <Box display="flex" alignItems="center" sx={{ my: 2, position: 'relative' }}>
                 <Button onClick={onClose} sx={{ p: 0, position: 'absolute', left: 0 }}>
-                    <CloseIcon sx={{ color: '#494949' }} />
+                    <CloseIcon sx={{fontSize:'1.9rem', color: '#494949' }} />
                 </Button>
-                <Typography variant="subtitle1" sx={{ color: '#494949', fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
+                <Typography variant="h6" sx={{ color: '#494949', fontWeight: 'bold', width: '100%', textAlign: 'center', fontSize:'1.1rem' }}>
                     交換を希望する
                 </Typography>
             </Box>
@@ -148,32 +162,60 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     交換に出す漫画を選ぶ（複数選択可）
                 </Typography>
 
-                <Grid container>
-                    <Grid item xs sx={{ maxWidth: '70%' }}>
-                        <Box sx={{ pl: 0.8, mt: 0, mb: 0.5, mr: 1.5 }}>
-                            {mpmysell.filter(item => item.sellStatus === 1).map((item, index) => (
-                                <FormGroup key={index}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={selectedSellIds.includes(item.sellId)}
-                                                onChange={() => handleCheckboxChange(item.sellId)}
-                                                disableRipple
-                                            />
-                                        }
-                                        label={item.message}
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', py:0.5}}>
+                    <Box sx={{ flexGrow: 1 }}>
+                        <Link to="/sell" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                            <AddIcon sx={{ color: '#0F9ED5' }} />
+                            <Typography variant='subtitle1' sx={{ color: '#0F9ED5' }}>
+                                さらに出品
+                            </Typography>
+                        </Link>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <FormControlLabel
+                            sx={{ mr: 2 }}
+                            control={
+                                <Checkbox
+                                    checked={allChecked}
+                                    onChange={handleSelectAllChange}
+                                    disableRipple
+                                    sx={{
+                                        '& .MuiSvgIcon-root': { fontSize: '1.0rem' }  // ここでチェックボックスのサイズを変更
+                                    }}
+                                />
+                            }
+                            label={
+                                <Typography variant='body2' sx={{fontSize:'0.85rem'}}>
+                                    すべて選択
+                                </Typography>
+                            }
+                        />
+                    </Box>
+                </Box>
+
+
+                
+                
+                
+                    
+                <Box sx={{ pl: 0.8, mt: 0, mb: 0.5, mr: 1.5 }}>
+                    {mpmysell.filter(item => item.sellStatus === 1).map((item, index) => (
+                        <FormGroup key={index}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={selectedSellIds.includes(item.sellId)}
+                                        onChange={() => handleCheckboxChange(item.sellId)}
+                                        disableRipple
                                     />
-                                </FormGroup>
-                            ))}
-                        </Box>
-                    </Grid>
-                    <Link to="/sell" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-                        <Grid item display="flex" justifyContent="flex-end" alignItems="center">
-                            <Typography variant='subtitle2' sx={{ color: '#0F9ED5', }}>さらに出品</Typography>
-                            <ArrowForwardIosIcon sx={{ color: '#0F9ED5', }} />
-                        </Grid>
-                    </Link>
-                </Grid>
+                                }
+                                label={item.message}
+                            />
+                        </FormGroup>
+                    ))}
+                </Box>
+                    
+               
 
                 <Grid container alignItems="center" sx={{ mt: 1, p: 1, mb: 1, background: '#F2F2F2', color: '#444444', fontSize: '0.8rem', borderRadius: '4px', }}>
                     <Grid item>
@@ -181,10 +223,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     </Grid>
                     <Grid item xs>
                         <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
-                            複数選択すると交換される可能性が上がります。
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
-                            交換されるタイトルは1つです。
+                            複数選択すると交換される可能性が上がります。交換されるタイトルは1つです。
                         </Typography>
                     </Grid>
                 </Grid>
@@ -195,7 +234,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 </Typography>
 
                 <Grid container>
-                    <Grid item xs sx={{ maxWidth: '70%' }}>
+                    <Grid item xs sx={{ maxWidth: '100%' }}>
                         <Box sx={{ pl: 0.8, py: 2 }}>
                             {address && (
                                 <Typography variant="body2" sx={{ color: '#757575' }}>
@@ -234,6 +273,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                         交換を希望する
                     </Button>
                 </Box>
+                {/* Add the Recent Comments s
                 <Box sx={{ border: '0.5px solid #A2A2A2A2', borderRadius: '4px', padding: '16px', }}>
                     <Typography variant="body2" sx={{ mb: 1.5, color: '#454545', }}>
                         交換に出すためには、出品する必要があります。
@@ -247,6 +287,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                         </Button>
                     </Box>
                 </Box>
+                ection */}
             </Box>
         </>
     );
@@ -268,7 +309,11 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
 
     return (
         <SwipeableDrawer
+            swipeAreaWidth={0}
+            disableSwipeToOpen={false}
             disableScrollLock // スクロールロックを無効にする
+            disableDiscovery // 
+            disableBackdropTransition //
             anchor='bottom' // モーダルを下部に配置
             open={isOpen} // モーダルの開閉状態
             onClose={() => {
@@ -277,8 +322,6 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 setTriggerFetch(false);
             }}
             onOpen={() => { }}
-            swipeAreaWidth={0}
-            disableSwipeToOpen={false}
             ModalProps={{
                 keepMounted: true,  // 一度表示された後もコンポーネントを保持
                 BackdropProps: {

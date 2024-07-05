@@ -56,7 +56,7 @@ const App = () => {
             <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
             <Route path="/mypage/favolist" element={<MpFavoList />} /> {/* test */}
             <Route path="/mypage/changeemailpassword" element={<MpChangeEmailPassword />} />
-            <Route path="/mypage/adressupdate" element={<MpAdressUpadate />} />
+            <Route path="/mypage/addressupdate" element={<MpAdressUpadate />} />
             <Route path="/mypage/mysell" element={<MpMySell />} />
             <Route path="/mypage/matchedsell" element={<MpMatchedSell />} />
             <Route path="/mypage/verification" element={<MpIdVerification />} />

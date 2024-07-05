@@ -183,7 +183,7 @@ const MainMyPage: React.FC = () => {
         )
       ) : (
         // ログインしていない場合の表示
-        <NavigateToLoginBox />
+        <NavigateToLoginBox height='80vh'/>
       )}
 
       
