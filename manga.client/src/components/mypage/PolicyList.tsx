@@ -10,7 +10,7 @@ import { ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 
 const PolicyList: React.FC = () => {
   const menuItems = [
-    { name: 'ヘルプ・お問い合わせ', path: '/mypage/favolist' },
+    { name: 'ヘルプ・お問い合わせ', path: '/mypage/contact' },
     { name: '利用規約等', path: '/mypage/favolist' },
     { name: 'プライバシーポリシー等', path: '/mangahistory' },
   ];

@@ -28,6 +28,7 @@ import DraftList from './pages/DraftList.tsx';
 import MpProfile from './pages/MpProfile.tsx';
 import EmailConfirmation from './pages/EmailConfirmation';
 import MpRequestSell from './pages/MpRequestSell.tsx';
+import MpContact from './pages/MpContact.tsx';
 
 const App = () => {
   useEffect(() => {
@@ -62,6 +63,7 @@ const App = () => {
             <Route path="/mypage/verification" element={<MpIdVerification />} />
             <Route path="/mypage/verification/camera" element={<IdCamera />} />
             <Route path="/mypage/requestedsell" element={<MpRequestSell />} />
+            <Route path='/mypage/contact' element={<MpContact />} />
             <Route path="/sell" element={<SellForm />} />
             <Route path="/sell/:sellId" element={<SellForm />} />
             <Route path="/sell/draft" element={<DraftList />} />
