@@ -1,6 +1,6 @@
 import { useEffect, useState} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Grid, Typography, Paper, SwipeableDrawer, Divider} from '@mui/material';
+import { Box, Grid, Typography, Paper, Button, Divider} from '@mui/material';
 import 'swiper/swiper-bundle.css'; 
 import ImageCarousel from '../components/common/ImageCarousel';
 import BackButton from '../components/common/BackButton';
@@ -72,6 +72,10 @@ const MangaDetail = () => {
     // Implementation of the exchange request logic
     setDrawerOpen(!drawerOpen);
   };  
+
+  const handleCancelRequest = () => {
+    // Implementation of the cancel request logic
+  }; 
   
 
   const [error, setError] = useState<string | null>(null); 
@@ -101,6 +105,21 @@ const MangaDetail = () => {
   if (!mangaDetail) {
     return <LoadingComponent />;
   }
+
+  const renderActionButton = () => {
+    switch(mangaDetail.requestButtonStatus) {
+      case 1:
+        return <ActionButton label="交換を希望する" onClick={handleExchangeRequest} />;
+      case 2:
+        return <Button variant="contained" disabled>交換済み</Button>;
+      case 3:
+        return <Button variant="contained" color="error" onClick={handleCancelRequest}>交換申請をキャンセルする</Button>;
+      case 4:
+        return <Button variant="contained" disabled>自分の出品</Button>;
+      default:
+        return null;
+    }
+  };
 
   return  (
     <Box sx={{ p: 0, margin:0 }}>
@@ -181,7 +200,7 @@ const MangaDetail = () => {
         
       </Box>
       <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: '0px 8px 12px 10px rgba(0, 0, 0, 0.25)' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
-      <ActionButton label="交換を希望する" onClick={handleExchangeRequest} />
+        {renderActionButton()}
       </Box>
       <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} />
     </Box>
