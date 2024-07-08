@@ -191,7 +191,6 @@ const MainMyPage: React.FC = () => {
       
       {/* 以降の部分は変わらず共通のコンポーネントやUI要素を表示 */}
       <MenuBar />
-
     </>
   );
 };

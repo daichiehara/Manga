@@ -52,9 +52,9 @@ const App = () => {
             <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
             <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
             <Route path="/main-sell" element={<MSell />} />
-            <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
             <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
             <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
+            <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
             <Route path="/mypage/favolist" element={<MpFavoList />} /> {/* test */}
             <Route path="/mypage/changeemailpassword" element={<MpChangeEmailPassword />} />
             <Route path="/mypage/addressupdate" element={<MpAdressUpadate />} />

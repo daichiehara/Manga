@@ -5,12 +5,12 @@ import {
   TextField, 
   Button, 
   Container, 
-  Typography, 
   Box, 
   CircularProgress
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { SnackbarContext } from '../components/context/SnackbarContext';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import CustomToolbar from '../components/common/CustumToolbar';
 
 interface ContactFormData {
   name: string;
@@ -19,10 +19,11 @@ interface ContactFormData {
 }
 
 const ContactForm: React.FC = () => {
-  const { control, handleSubmit, reset } = useForm<ContactFormData>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-  const { showSnackbar } = useContext(SnackbarContext);
+    window.scrollTo({top:0, behavior: "instant"});
+    const { control, handleSubmit, reset } = useForm<ContactFormData>();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { showSnackbar } = useContext(SnackbarContext);
+    const customNavigate = useCustomNavigate();
 
   // Axiosインスタンスの作成
   const api = axios.create({
@@ -34,7 +35,7 @@ const ContactForm: React.FC = () => {
     try {
       await api.post('https://localhost:7103/api/Contacts', data);
       reset(); // フォームをリセット
-      navigate(-1);
+      customNavigate();
       showSnackbar('お問い合わせが正常に送信されました。', 'success');
     } catch (error) {
       console.error('Error:', error);
@@ -47,10 +48,8 @@ const ContactForm: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <Box my={4}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          お問い合わせ
-        </Typography>
+      <CustomToolbar title='お問い合わせ' />
+      <Box pt={4} my={4}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
             name="name"
@@ -115,9 +114,10 @@ const ContactForm: React.FC = () => {
               variant="contained" 
               color="primary"
               disabled={isSubmitting}
-              startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+              fullWidth
+              size='large'
             >
-              {isSubmitting ? '送信中...' : '送信'}
+                {isSubmitting ? <CircularProgress size={24} /> : '送信'}
             </Button>
           </Box>
         </form>
