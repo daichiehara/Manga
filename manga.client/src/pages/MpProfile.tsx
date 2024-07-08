@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { TextField, Button, Avatar, IconButton, Box, Typography, CircularProgress } from '@mui/material';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import CustomToolbar from '../components/common/CustumToolbar';
 import LoadingComponent from '../components/common/LoadingComponent';
-import { useNavigate } from 'react-router-dom';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { SnackbarContext } from '../components/context/SnackbarContext';
 import axios from 'axios';
 
 interface ProfileFormData {
@@ -12,9 +13,10 @@ interface ProfileFormData {
 }
 
 const MpProfile: React.FC = () => {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const customNavigate = useCustomNavigate();
+  const { showSnackbar } = useContext(SnackbarContext);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     nickName: '',
@@ -79,10 +81,12 @@ const MpProfile: React.FC = () => {
       if (response.status === 200) {
         // Profile updated successfully
         console.log('Profile updated');
-        navigate('/mypage', { state: { snackOpen: true, snackMessage: 'プロフィールを更新しました。' } });
+        customNavigate();
+        showSnackbar('正常に更新されました。', 'success');
       } else {
         // Handle error
         console.error('Failed to update profile');
+        showSnackbar('更新に失敗しました。', 'error');
       }
     } catch (error) {
       console.error('Error updating profile:', error);

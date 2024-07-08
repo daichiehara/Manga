@@ -61,20 +61,35 @@ function handleError(error: unknown) {
   }
 }
 
+let isRefreshing = false;
+let refreshPromise: Promise<any> | null = null;
 
 export const authService = {
   refreshToken: async () => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/Users/RefreshToken`, {}, { withCredentials: true });
-      console.log('Refresh token received:', response.data);
-      updateGlobalAuthState({ isAuthenticated: true });
-      return response.data;
-    } catch (error) {
-      handleError(error);
-      updateGlobalAuthState({ isAuthenticated: false });
-      throw error;
+    if (isRefreshing) {
+      return refreshPromise;
     }
+
+    isRefreshing = true;
+    refreshPromise = axios.post(`${API_BASE_URL}/Users/RefreshToken`, {}, { withCredentials: true })
+      .then(response => {
+        console.log('Refresh token received:', response.data);
+        updateGlobalAuthState({ isAuthenticated: true });
+        return response.data;
+      })
+      .catch(error => {
+        console.error('Failed to refresh token:', error);
+        updateGlobalAuthState({ isAuthenticated: false });
+        throw error;
+      })
+      .finally(() => {
+        isRefreshing = false;
+        refreshPromise = null;
+      });
+
+    return refreshPromise;
   },
+  
   logout: async () => {
     try {
       await axios.post(`${API_BASE_URL}/Users/Logout`, {}, { withCredentials: true });

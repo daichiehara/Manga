@@ -6,6 +6,7 @@ import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import CustomToolbar from '../components/common/CustumToolbar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import LoadingComponent from '../components/common/LoadingComponent';
 
 
 interface Notification {
@@ -50,11 +51,13 @@ function timeSince(date: string): string {
 const MainNotification: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { authState } = useContext(AuthContext); // 認証状態にアクセス
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!authState.isAuthenticated) return; // ログインしていない場合はAPIコールをスキップ
     // APIから通知データを取得する関数
     const fetchNotifications = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get('https://localhost:7103/api/Notifications',{
           withCredentials: true  // クロスオリジンリクエストにクッキーを含める
@@ -63,17 +66,29 @@ const MainNotification: React.FC = () => {
         setNotifications(response.data);
       } catch (error) {
         console.error('通知データの取得に失敗:', error);
+      } finally{
+        setIsLoading(false);
       }
     };
     fetchNotifications();
   }, [authState.isAuthenticated]); // isAuthenticatedに依存しているため、この値が変わるとエフェクトが再実行されます
+
+  if (isLoading) {
+    return (
+      <>
+        <CustomToolbar title='お知らせ' showBackButton={false} />
+        <LoadingComponent />
+        <MenuBar />
+      </>
+    );
+  }
 
   // ログインしていない場合の表示
   if (!authState.isAuthenticated) {
     return (
       <>
         {/* 見出しのToolbar */}
-        <CustomToolbar title='お知らせ'/>
+        <CustomToolbar title='お知らせ' showBackButton={false} />
         {/* ログイン促進メッセージ */}
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', paddingTop: '64px' /* Toolbarの高さを考慮 */ }}>
           <Typography variant="h5">
@@ -90,7 +105,7 @@ const MainNotification: React.FC = () => {
     return (
       <>
         {/* 見出しのToolbar */}
-        <CustomToolbar title='お知らせ'/>
+        <CustomToolbar title='お知らせ' showBackButton={false} />
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pt: 9 }}>
           <NotificationsNoneIcon sx={{ fontSize: 60, color: 'action.active', padding:9}} />  {/* アイコンのサイズと色、下のマージンを調整 */}
           <Typography variant="subtitle1">
@@ -110,7 +125,7 @@ const MainNotification: React.FC = () => {
     <>
       {/* メインコンテンツエリア */}
       {/* 見出しのToolbar */}
-      <CustomToolbar title='お知らせ'/>
+      <CustomToolbar title='お知らせ' showBackButton={false} />
       
       {/* 通知カードのリスト */}
       <Box sx={{mt: 8, mb: 8}}>

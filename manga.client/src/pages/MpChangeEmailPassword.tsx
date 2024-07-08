@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Typography, TextField, Button, Grid, CircularProgress, Box } from '@mui/material';
 import axios from 'axios';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import CustomToolbar from '../components/common/CustumToolbar';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { SnackbarContext } from '../components/context/SnackbarContext';
+
 
 type FormData = {
   email: string;
@@ -29,7 +31,9 @@ const MpChangeEmailPassword: React.FC = () => {
   const [passwordMismatchError, setPasswordMismatchError] = useState('');
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [serverError, setServerError] = useState('');
-  const navigate = useNavigate();
+  const customNavigate = useCustomNavigate();
+  const { showSnackbar } = useContext(SnackbarContext);
+
 
   useEffect(() => {
     const fetchCurrentEmail = async () => {
@@ -96,10 +100,12 @@ const MpChangeEmailPassword: React.FC = () => {
       if (response.status === 200) {
         // Handle success
         console.log('更新されました。');
-        navigate('/mypage', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
+        customNavigate();
+        showSnackbar('正常に更新されました。', 'success');
       } else {
         // Handle error
         console.error('Failed to update account');
+        showSnackbar('更新に失敗しました。', 'error');
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

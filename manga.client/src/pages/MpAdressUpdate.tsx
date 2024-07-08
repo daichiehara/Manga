@@ -1,11 +1,12 @@
 // MpAdressUpadate
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Typography, Box, Grid, Divider, TextField, Button, CircularProgress, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import CustomToolbar from '../components/common/CustumToolbar';
 import axios from 'axios';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { SnackbarContext } from '../components/context/SnackbarContext';
 
 interface ChangeAddressDto {
   sei: string;
@@ -46,7 +47,8 @@ const MpAdressUpdate: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAutoFilling, setIsAutoFilling] = useState(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-  const navigate = useNavigate();
+  const customNavigate = useCustomNavigate();
+  const { showSnackbar } = useContext(SnackbarContext);
 
   useEffect(() => {
     const fetchAddress = async () => {
@@ -133,9 +135,11 @@ const MpAdressUpdate: React.FC = () => {
         withCredentials: true,
       });
       console.log('更新されました。');
-      navigate('/mypage', { state: { snackOpen: true, snackMessage: '正常に更新できました。' } });
+      customNavigate();
+      showSnackbar('正常に更新されました。', 'success');
     } catch (error) {
       console.error('Error updating address:', error);
+      showSnackbar('更新に失敗しました。', 'error');
     }
 
     setIsLoading(false);

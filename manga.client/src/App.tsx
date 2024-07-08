@@ -31,10 +31,19 @@ import MpRequestSell from './pages/MpRequestSell.tsx';
 import MpContact from './pages/MpContact.tsx';
 
 const App = () => {
+  
   useEffect(() => {
-    // アプリケーションの起動時に一度だけリフレッシュトークンのロジックを実行する
-    authService.refreshToken();
+    const initializeAuth = async () => {
+      try {
+        await authService.refreshToken();
+      } catch (error) {
+        console.error('Failed to initialize authentication:', error);
+      }
+    };
+
+    initializeAuth();
   }, []);
+  
   return (
     <ThemeProvider theme={theme}>
       {/* 全体を囲むBoxコンポーネント */}

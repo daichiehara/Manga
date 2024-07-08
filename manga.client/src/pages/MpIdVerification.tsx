@@ -84,7 +84,7 @@ const MpIdVerification: React.FC = () => {
             </Box>
             </Box>
             <Box position="fixed" bottom={10} left={0} right={0} p={2} maxWidth={'600px'} mx={'auto'}>
-                <Link to="/user/verification/camera">
+                <Link to="/mypage/verification/camera">
                 <Button
                     variant="contained"
                     color="primary"
