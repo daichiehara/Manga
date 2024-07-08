@@ -253,52 +253,43 @@ namespace Manga.Server.Controllers
         [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken()
         {
-            // HTTPリクエストのCookieからリフレッシュトークンを取得
             var refreshToken = Request.Cookies["RefreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
             {
                 return BadRequest("Refresh token is required.");
             }
 
-            // データベースからリフレッシュトークンを持つユーザーを検索
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return BadRequest("Invalid refresh token.");
+                var user = await _userManager.Users
+                    .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+
+                if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+                {
+                    return BadRequest("Invalid refresh token.");
+                }
+
+                var newAccessToken = GenerateJwtToken(user);
+                var newRefreshToken = GenerateRefreshToken();
+
+                user.RefreshToken = newRefreshToken;
+                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(180);
+                await _userManager.UpdateAsync(user);
+
+                SetTokenCookie("accessToken", newAccessToken, 30);
+                SetTokenCookie("RefreshToken", newRefreshToken, 259200);
+
+                await transaction.CommitAsync();
+
+                return Ok(new { message = "トークンが正常に更新されました。" });
             }
-            // 新しいアクセストークンとリフレッシュトークンを生成
-            var newAccessToken = GenerateJwtToken(user);
-            var newRefreshToken = GenerateRefreshToken();
-
-            // トークン更新処理
-            user.RefreshToken = newRefreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(180);
-            await _userManager.UpdateAsync(user);
-
-            // アクセストークンをHTTP Only Cookieに設定
-            var accessTokenCookieOptions = new CookieOptions
+            catch (Exception ex)
             {
-                HttpOnly = true,
-                Secure = true,
-                //SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddMinutes(30) // アクセストークンの有効期限
-            };
-            HttpContext.Response.Cookies.Append("accessToken", newAccessToken, accessTokenCookieOptions);
-
-            // リフレッシュトークンを別のHTTP Only Cookieに設定
-            var refreshTokenCookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                //SameSite = SameSiteMode.Strict, // 必要に応じて None に設定
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(180) // リフレッシュトークンの有効期限
-            };
-            HttpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, refreshTokenCookieOptions);
-
-            // トークンが正常に更新されたことをクライアントに通知
-            return Ok(new { message = "トークンが正常に更新されました。" });
+                await transaction.RollbackAsync();
+                // ログ出力やエラー処理
+                return StatusCode(500, "An error occurred while refreshing the token.");
+            }
         }
 
         [HttpPost("Logout")]

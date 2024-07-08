@@ -134,19 +134,16 @@ namespace Manga.Server.Controllers
                 return BadRequest(ModelState);
             }
 
+            var user = await _userManager.GetUserAsync(User);
+
             // 入力値のサニタイズ
             var sanitizedContact = new Contact
             {
                 Name = _htmlEncoder.Encode(contactDto.Name),
                 Email = _htmlEncoder.Encode(contactDto.Email),
-                Message = _htmlEncoder.Encode(contactDto.Message)
+                Message = _htmlEncoder.Encode(contactDto.Message),
+                UserAccountId = user?.Id
             };
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user != null)
-            {
-                sanitizedContact.UserAccountId = user.Id;
-            }
 
             try
             {
