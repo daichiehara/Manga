@@ -1,6 +1,6 @@
 // index.tsx
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import theme from './theme/theme';
@@ -10,20 +10,27 @@ import { SnackbarProvider } from './components/context/SnackbarContext';
 import './utils/http'
 
 
-ReactDOM.render(
-  <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <BooksProvider>
-          <SnackbarProvider>
-            <App />
-          </SnackbarProvider>
-        </BooksProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const container = document.getElementById('root');
 
+// containerがnullでないことを確認
+if (container) {
+  const root = createRoot(container);
+  
+  root.render(
+    <React.StrictMode>
+      <ThemeProvider theme={theme}>
+        <AuthProvider>
+          <BooksProvider>
+            <SnackbarProvider>
+              <App />
+            </SnackbarProvider>
+          </BooksProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </React.StrictMode>
+  );
+} else {
+  console.error('Failed to find the root element');
+}
 
 

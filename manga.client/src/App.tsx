@@ -28,6 +28,7 @@ import DraftList from './pages/DraftList.tsx';
 import MpProfile from './pages/MpProfile.tsx';
 import EmailConfirmation from './pages/EmailConfirmation';
 import MpRequestSell from './pages/MpRequestSell.tsx';
+import MpContact from './pages/MpContact.tsx';
 
 const App = () => {
   useEffect(() => {
@@ -51,17 +52,18 @@ const App = () => {
             <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
             <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
             <Route path="/main-sell" element={<MSell />} />
-            <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
             <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
             <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
+            <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
             <Route path="/mypage/favolist" element={<MpFavoList />} /> {/* test */}
             <Route path="/mypage/changeemailpassword" element={<MpChangeEmailPassword />} />
-            <Route path="/mypage/adressupdate" element={<MpAdressUpadate />} />
+            <Route path="/mypage/addressupdate" element={<MpAdressUpadate />} />
             <Route path="/mypage/mysell" element={<MpMySell />} />
             <Route path="/mypage/matchedsell" element={<MpMatchedSell />} />
             <Route path="/mypage/verification" element={<MpIdVerification />} />
             <Route path="/mypage/verification/camera" element={<IdCamera />} />
             <Route path="/mypage/requestedsell" element={<MpRequestSell />} />
+            <Route path='/mypage/contact' element={<MpContact />} />
             <Route path="/sell" element={<SellForm />} />
             <Route path="/sell/:sellId" element={<SellForm />} />
             <Route path="/sell/draft" element={<DraftList />} />

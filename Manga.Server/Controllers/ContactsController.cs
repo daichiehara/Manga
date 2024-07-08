@@ -126,7 +126,6 @@ namespace Manga.Server.Controllers
         */
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateContact([FromBody] ContactPostDto contactDto)
         {
             if (!ModelState.IsValid)
