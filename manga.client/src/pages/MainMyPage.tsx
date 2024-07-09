@@ -78,7 +78,7 @@ const MainMyPage: React.FC = () => {
 
   return (
     <>
-      <CustomToolbar title='マイページ'/>
+      <CustomToolbar title='マイページ' showBackButton={false} />
       {/* ログイン状態に応じて表示を切り替える */}
       {authState.isAuthenticated ? (
         // ログインしている場合の表示

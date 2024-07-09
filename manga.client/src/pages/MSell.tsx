@@ -47,7 +47,7 @@ const MSell: React.FC= () => {
 
       {/* メインコンテンツエリア */}
       {/* 見出し */}
-      <CustomToolbar title='出品'/>
+      <CustomToolbar title='出品' showBackButton={false} />
         {/* 出品ボタン */}
       <Box sx={{ml:4, mr:4, mb: 6,}}>
       <Typography 
