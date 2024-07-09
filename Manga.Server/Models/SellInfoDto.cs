@@ -1,6 +1,6 @@
 ﻿namespace Manga.Server.Models
 {
-    public class SellDraftDto
+    public class SellInfoDto
     {
         public int SellId { get; set; }
         public string Title { get; set; }

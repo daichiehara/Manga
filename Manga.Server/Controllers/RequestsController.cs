@@ -38,6 +38,7 @@ namespace Manga.Server.Controllers
         }
 
         // GET: api/Requests/5
+        /*
         [HttpGet("{id}")]
         public async Task<ActionResult<Request>> GetRequest(int id)
         {
@@ -50,6 +51,7 @@ namespace Manga.Server.Controllers
 
             return request;
         }
+        */
 
         // PUT: api/Requests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -391,6 +393,45 @@ namespace Manga.Server.Controllers
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<RequestedGetDto>> GetExchangeRequests(int id)
+        {
+            var responderSell = await _context.Sell
+                .Where(s => s.SellId == id)
+                .Select(s => new { s.SellId, s.Title })
+                .FirstOrDefaultAsync();
+
+            if (responderSell == null)
+            {
+                return NotFound("No sell found with the given SellId.");
+            }
+
+            var requestedGetDto = new RequestedGetDto
+            {
+                ResponderSellId = responderSell.SellId,
+                ResponderSellTitle = responderSell.Title,
+                RequesterSells = await _context.Request
+                    .Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending)
+                    .Select(r => new SellInfoDto
+                    {
+                        SellId = r.RequesterSellId,
+                        Title = r.RequesterSell.Title,
+                        ImageUrl = r.RequesterSell.SellImages
+                            .OrderBy(i => i.Order)
+                            .Select(i => i.ImageUrl)
+                            .FirstOrDefault()
+                    })
+                    .ToListAsync()
+            };
+
+            if (!requestedGetDto.RequesterSells.Any())
+            {
+                return NotFound("No exchange requests found for the given SellId.");
+            }
+
+            return Ok(requestedGetDto);
         }
 
         // GET: api/Matches/User

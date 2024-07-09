@@ -615,7 +615,7 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("Drafts")]
-        public async Task<ActionResult<IEnumerable<SellDraftDto>>> GetDrafts()
+        public async Task<ActionResult<IEnumerable<SellInfoDto>>> GetDrafts()
         {
             // 現在のユーザーIDを取得
             var userId = _userManager.GetUserId(User);
@@ -623,7 +623,7 @@ namespace Manga.Server.Controllers
             // 自分の下書きのみをフィルタリング
             var drafts = await _context.Sell
                 .Where(s => s.SellStatus == SellStatus.Draft && s.UserAccountId == userId)
-                .Select(s => new SellDraftDto
+                .Select(s => new SellInfoDto
                 {
                     SellId = s.SellId,
                     Title = s.Title,
