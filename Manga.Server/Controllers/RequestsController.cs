@@ -400,7 +400,14 @@ namespace Manga.Server.Controllers
         {
             var responderSell = await _context.Sell
                 .Where(s => s.SellId == id)
-                .Select(s => new { s.SellId, s.Title })
+                .Select(s => new {
+                    s.SellId,
+                    s.Title,
+                    ImageUrl = s.SellImages
+                        .OrderBy(i => i.Order)
+                        .Select(i => i.ImageUrl)
+                        .FirstOrDefault()
+                })
                 .FirstOrDefaultAsync();
 
             if (responderSell == null)
@@ -412,6 +419,7 @@ namespace Manga.Server.Controllers
             {
                 ResponderSellId = responderSell.SellId,
                 ResponderSellTitle = responderSell.Title,
+                ResponderSellImageUrl = responderSell.ImageUrl,
                 RequesterSells = await _context.Request
                     .Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending)
                     .Select(r => new SellInfoDto
