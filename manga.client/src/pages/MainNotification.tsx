@@ -5,6 +5,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import CustomToolbar from '../components/common/CustumToolbar';
+import ExchangeAcceptDrawer from '../components/common/ExchangeAcceptDrawer';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import LoadingComponent from '../components/common/LoadingComponent';
 
@@ -52,26 +53,36 @@ const MainNotification: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { authState } = useContext(AuthContext); // 認証状態にアクセス
   const [isLoading, setIsLoading] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedSellId, setSelectedSellId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!authState.isAuthenticated) return; // ログインしていない場合はAPIコールをスキップ
-    // APIから通知データを取得する関数
+    if (!authState.isAuthenticated) return;
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get('https://localhost:7103/api/Notifications',{
-          withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+        const response = await axios.get('https://localhost:7103/api/Notifications', {
+          withCredentials: true
         });
-        // 取得したデータで状態を更新
         setNotifications(response.data);
       } catch (error) {
         console.error('通知データの取得に失敗:', error);
-      } finally{
+      } finally {
         setIsLoading(false);
       }
     };
     fetchNotifications();
-  }, [authState.isAuthenticated]); // isAuthenticatedに依存しているため、この値が変わるとエフェクトが再実行されます
+  }, [authState.isAuthenticated]);
+
+  const handleNotificationClick = (sellId: number) => {
+    setSelectedSellId(sellId);
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setSelectedSellId(null); // Drawerを閉じる際にsellIdもリセット
+  };
 
   if (isLoading) {
     return (
@@ -135,7 +146,7 @@ const MainNotification: React.FC = () => {
               borderBottom: index !== notifications.length - 1 ? '1px solid #e0e0e0' : '' 
             }}>
               <Card elevation={0} sx={{ display: 'flex', alignItems: 'center'}}>
-                <CardActionArea onClick={() => window.location.href = `/products/${notification.sellId}`}>
+                <CardActionArea onClick={() => handleNotificationClick(notification.sellId)}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <CardMedia
                       component="img"
@@ -159,6 +170,12 @@ const MainNotification: React.FC = () => {
           
         </Grid>
       </Box>
+
+      <ExchangeAcceptDrawer 
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        sellId={selectedSellId}
+      />
 
       <MenuBar /> {/* 画像のボトムのナビゲーションバーに対応するコンポーネント */}
     </>

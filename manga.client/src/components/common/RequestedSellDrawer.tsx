@@ -32,7 +32,7 @@ import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp
         onOpen={onOpen}
         disableBackdropTransition
         disableDiscovery
-        disableSwipeToOpen
+        disableSwipeToOpen={false}
         swipeAreaWidth={0}
         disableScrollLock
             PaperProps={{
