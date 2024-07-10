@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardActionArea, CardContent, CardMedia} from '@mui/material';
 import MenuBar from '../components/menu/MenuBar';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -19,7 +20,11 @@ interface Notification {
   title: string; 
 }
 
-
+interface SellInfoDto {
+  sellId: number;
+  title: string;
+  imageUrl: string;
+}
 
 function timeSince(date: string): string {
   const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
@@ -51,10 +56,29 @@ function timeSince(date: string): string {
 
 const MainNotification: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const { authState } = useContext(AuthContext); // 認証状態にアクセス
+  const [drawerOpen, setDrawerOpen] = useState(() => {
+    const savedState = sessionStorage.getItem('notificationState');
+    return savedState ? JSON.parse(savedState).drawerOpen : false;
+  });
+  const [selectedSellId, setSelectedSellId] = useState<number | null>(() => {
+    const savedState = sessionStorage.getItem('notificationState');
+    return savedState ? JSON.parse(savedState).selectedSellId : null;
+  });
+  const [selectedRequesterSells, setSelectedRequesterSells] = useState<{[key: number]: SellInfoDto | null}>(() => {
+    const savedState = sessionStorage.getItem('notificationState');
+    return savedState ? JSON.parse(savedState).selectedRequesterSells : {};
+  });
+  const { authState } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedSellId, setSelectedSellId] = useState<number | null>(null);
+
+  const saveState = useCallback(() => {
+    const stateToSave = { selectedRequesterSells, drawerOpen, selectedSellId };
+    sessionStorage.setItem('notificationState', JSON.stringify(stateToSave));
+  }, [selectedRequesterSells, drawerOpen, selectedSellId]);
+
+  useEffect(() => {
+    saveState();
+  }, [saveState]);
 
   useEffect(() => {
     if (!authState.isAuthenticated) return;
@@ -74,15 +98,23 @@ const MainNotification: React.FC = () => {
     fetchNotifications();
   }, [authState.isAuthenticated]);
 
-  const handleNotificationClick = (sellId: number) => {
+  const handleNotificationClick = useCallback((sellId: number) => {
     setSelectedSellId(sellId);
     setDrawerOpen(true);
-  };
+  }, []);
 
-  const handleDrawerClose = () => {
+  const handleDrawerClose = useCallback(() => {
     setDrawerOpen(false);
-    setSelectedSellId(null); // Drawerを閉じる際にsellIdもリセット
-  };
+  }, []);
+
+  const handleRequesterSellSelect = useCallback((sell: SellInfoDto | null) => {
+    if (selectedSellId) {
+      setSelectedRequesterSells(prev => ({
+        ...prev,
+        [selectedSellId]: sell
+      }));
+    }
+  }, [selectedSellId]);
 
   if (isLoading) {
     return (
@@ -175,6 +207,8 @@ const MainNotification: React.FC = () => {
         open={drawerOpen}
         onClose={handleDrawerClose}
         sellId={selectedSellId}
+        selectedRequesterSell={selectedSellId ? selectedRequesterSells[selectedSellId] : null}
+        onRequesterSellSelect={handleRequesterSellSelect}
       />
 
       <MenuBar /> {/* 画像のボトムのナビゲーションバーに対応するコンポーネント */}
