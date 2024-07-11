@@ -1,11 +1,12 @@
 import React, { useState, useEffect, MouseEvent, useCallback } from 'react';
 import { SwipeableDrawer, Box, Typography, Button, CircularProgress, Card, CardContent, CardMedia, CardActionArea, Chip, IconButton } from '@mui/material';
 import axios from 'axios';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import CloseIcon from '@mui/icons-material/Close';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 
 interface RequestedGetDto {
   responderSellId: number;
@@ -38,6 +39,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
   const [selectedExchange, setSelectedExchange] = useState<RequestedGetDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   useEffect(() => {
     if (open && sellId !== null) {
@@ -100,10 +102,15 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
         },
       }}
     >
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom sx={{ mb: 3, fontWeight: 'bold' }}>
-          交換を受け入れる
-        </Typography>
+      <Box display="flex" alignItems="center" sx={{ my: 2, position: 'relative' }}>
+          <Button onClick={onClose} sx={{ p: 0, position: 'absolute', left: 0 }}>
+              <CloseIcon sx={{fontSize:'1.9rem', color: theme.palette.info.main }} />
+          </Button>
+          <Typography variant="h6" sx={{ color: theme.palette.info.main, fontWeight: 'bold', width: '100%', textAlign: 'center', fontSize:'1.1rem' }}>
+              交換を受け入れる
+          </Typography>
+      </Box>
+      <Box sx={{ px: 3 }}>
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
             <CircularProgress />
@@ -164,6 +171,23 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                 pb: 4,
                 pr: 3, // 右側のパディングを削除
                 mr: '-24px', // Drawerの右側のパディングを相殺
+                '&::-webkit-scrollbar': {
+                  display: 'none',
+                },
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                [theme.breakpoints.up('md')]: {
+                  '&::-webkit-scrollbar': {
+                    width: '8px',
+                    height: '8px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: 'rgba(0,0,0,.2)',
+                    borderRadius: '4px',
+                  },
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(0,0,0,.2) transparent',
+                }
               }}
             >
               <Box sx={{ display: 'flex', gap: 2 }}>
@@ -263,7 +287,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
               onClick={handleExchangeConfirm}
               disabled={selectedRequesterSell === null}
               fullWidth
-              sx={{ mt: 2, py: 1.5, borderRadius: 2 }}
+              sx={{ mt: 2, mb: 3, py: 1.5, borderRadius: 2 }}
             >
               交換を確定
             </Button>

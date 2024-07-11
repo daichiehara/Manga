@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, IconButton, Button, SwipeableDrawer } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import SellCamera from './SellCamera';
+import { useTheme } from '@mui/material/styles';
 
 interface ImageListProps {
   capturedImages: string[];
@@ -11,6 +12,7 @@ interface ImageListProps {
 const ImageList: React.FC<ImageListProps> = ({ capturedImages, onCapturedImagesChange }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const theme = useTheme();
 
   const handleCameraClick = () => {
     setIsCameraOpen(true);
@@ -28,7 +30,31 @@ const ImageList: React.FC<ImageListProps> = ({ capturedImages, onCapturedImagesC
 
   return (
     <>
-      <Box sx={{ display: 'flex', overflowX: 'auto', whiteSpace: 'nowrap', py: 2, px: 2 }}>
+      <Box 
+      sx={{ 
+        display: 'flex', 
+        overflowX: 'auto', 
+        whiteSpace: 'nowrap', 
+        py: 2, 
+        px: 2,
+        '&::-webkit-scrollbar': {
+          display: 'none',
+        },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        [theme.breakpoints.up('md')]: {
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0,0,0,.2)',
+            borderRadius: '4px',
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(0,0,0,.2) transparent',
+        }
+       }}>
         {Array.from({ length: 10 }).map((_, index) => (
           <Box
             key={index}
