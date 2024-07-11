@@ -230,10 +230,10 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     </Grid>
                 </Grid>
 
-                <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
+                
                 <ShippingLink />
 
-                <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
+                
 
                 <Typography sx={{ py: 1.5, color: '#454545', fontSize: '0.8rem' }}>
                     この選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{ color: "red" }}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
