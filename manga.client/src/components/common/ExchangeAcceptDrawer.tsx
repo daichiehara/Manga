@@ -117,7 +117,8 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
           </Box>
         ) : selectedExchange ? (
           <>
-            <Card sx={{ mb: 3, position: 'relative', display: 'flex', alignItems: 'center' }}>
+            
+            <Card variant='outlined' sx={{ mb: 3, position: 'relative', display: 'flex', alignItems: 'center' }} elevation={0}>
               <CardActionArea onClick={() => navigateToItemDetail(selectedExchange.responderSellId)}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <CardMedia
@@ -150,7 +151,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                 <InfoOutlinedIcon fontSize="small" />
               </IconButton>
             </Card>
-
+            
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
               <CompareArrowsIcon sx={{ fontSize: 40, color: 'primary.main' }} />
             </Box>
@@ -170,6 +171,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                 overflow: 'auto',
                 pb: 4,
                 pr: 3, // 右側のパディングを削除
+                pt: 1,
                 mr: '-24px', // Drawerの右側のパディングを相殺
                 '&::-webkit-scrollbar': {
                   display: 'none',
@@ -206,6 +208,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                       backgroundColor: selectedRequesterSell?.sellId === sell.sellId 
                         ? '#e3f2fd'
                         : 'white',
+                        borderRadius: 2,
                     }}
                   >
                           <CardActionArea 

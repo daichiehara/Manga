@@ -21,7 +21,7 @@ function determineActiveIndex(pathname: string): number {
     case '/item/new':
     case '/item/favorite':
       return 0;
-    case '/main-notification':
+    case '/notification':
       return 1;
     case '/main-mybook':
       return 2;
@@ -59,7 +59,7 @@ const MenuBar = memo(() => {
           navigate('/');
           break;
         case 1:
-          navigate('/main-notification');
+          navigate('/notification');
           break;
         case 2:
           handleModalToggle();
