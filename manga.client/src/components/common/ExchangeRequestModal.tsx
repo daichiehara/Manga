@@ -9,7 +9,9 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import NavigateToLoginBox from '../login/NavigateToLoginBox';
 import AddIcon from '@mui/icons-material/Add';
-
+import ShippingLink from './AddressLink';
+import {useTheme} from '@mui/material/styles';
+import theme from '../../theme/theme';
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
@@ -44,6 +46,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     const [mpmysell, setmpmysell] = useState<MpMySell[]>([]);
     const [selectedSellIds, setSelectedSellIds] = useState<number[]>([]); // 選択されたsellIdを管理
     const contentRef = useRef<HTMLDivElement>(null);
+    const theme = useTheme();
 
     const fetchAddress = async () => {
         try {
@@ -138,9 +141,9 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         <>
             <Box display="flex" alignItems="center" sx={{ my: 2, position: 'relative' }}>
                 <Button onClick={onClose} sx={{ p: 0, position: 'absolute', left: 0 }}>
-                    <CloseIcon sx={{fontSize:'1.9rem', color: '#494949' }} />
+                    <CloseIcon sx={{fontSize:'1.9rem', color: theme.palette.info.main }} />
                 </Button>
-                <Typography variant="h6" sx={{ color: '#494949', fontWeight: 'bold', width: '100%', textAlign: 'center', fontSize:'1.1rem' }}>
+                <Typography variant="h6" sx={{ color: theme.palette.info.main, fontWeight: 'bold', width: '100%', textAlign: 'center', fontSize:'1.1rem' }}>
                     交換を希望する
                 </Typography>
             </Box>
@@ -228,30 +231,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 </Grid>
 
                 <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
-                <Typography variant="body1" sx={{ color: '#757575', fontWeight: 'bold' }}>
-                    配送先
-                </Typography>
-
-                <Grid container>
-                    <Grid item xs sx={{ maxWidth: '100%' }}>
-                        <Box sx={{ pl: 0.8, py: 2 }}>
-                            {address && (
-                                <Typography variant="body2" sx={{ color: '#757575' }}>
-                                    {`${address.sei} ${address.mei}`}<br />
-                                    〒{address.postalCode}<br />
-                                    {address.prefecture} {address.address1}<br />
-                                    {address.address2}
-                                </Typography>
-                            )}
-                        </Box>
-                    </Grid>
-                    <Link to="/mypage/addressupdate" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-                        <Grid item display="flex" justifyContent="flex-end" alignItems="center">
-                            <Typography variant='subtitle2' sx={{ color: '#757575', }}></Typography>
-                            <ArrowForwardIosIcon sx={{ color: '#757575', }} />
-                        </Grid>
-                    </Link>
-                </Grid>
+                <ShippingLink />
 
                 <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
 
