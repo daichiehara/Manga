@@ -161,7 +161,6 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 <Typography variant="body1" sx={{ color: '#656565', fontWeight: 'bold', pb: 1 }}>
                     交換に出す漫画を選ぶ（複数選択可）
                 </Typography>
-
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', py:0.5}}>
                     <Box sx={{ flexGrow: 1 }}>
                         <Link to="/sell" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
