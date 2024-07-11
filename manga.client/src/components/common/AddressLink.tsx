@@ -5,7 +5,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 
 
-interface ShippingLinkProps {
+interface AddressLinkProps {
   address: {
     sei: string;
     mei: string;
@@ -16,7 +16,7 @@ interface ShippingLinkProps {
 } | null;
 }
 
-const ShippingLink: React.FC<ShippingLinkProps> = ({ address }) => (
+const AddressLink: React.FC<AddressLinkProps> = ({ address }) => (
   <>
     <Typography variant="body1" sx={{ color: '#757575', fontWeight: 'bold' }}>
                 配送先
@@ -44,4 +44,4 @@ const ShippingLink: React.FC<ShippingLinkProps> = ({ address }) => (
   </>
 );
 
-export default ShippingLink;
+export default AddressLink;

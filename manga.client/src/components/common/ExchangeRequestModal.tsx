@@ -9,7 +9,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import NavigateToLoginBox from '../login/NavigateToLoginBox';
 import AddIcon from '@mui/icons-material/Add';
-import ShippingLink from './ShippingLink';
+import ShippingLink from './AddressLink';
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
