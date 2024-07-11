@@ -9,7 +9,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import NavigateToLoginBox from '../login/NavigateToLoginBox';
 import AddIcon from '@mui/icons-material/Add';
-
+import ShippingLink from './ShippingLink';
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
@@ -228,30 +228,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 </Grid>
 
                 <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
-                <Typography variant="body1" sx={{ color: '#757575', fontWeight: 'bold' }}>
-                    配送先
-                </Typography>
-
-                <Grid container>
-                    <Grid item xs sx={{ maxWidth: '100%' }}>
-                        <Box sx={{ pl: 0.8, py: 2 }}>
-                            {address && (
-                                <Typography variant="body2" sx={{ color: '#757575' }}>
-                                    {`${address.sei} ${address.mei}`}<br />
-                                    〒{address.postalCode}<br />
-                                    {address.prefecture} {address.address1}<br />
-                                    {address.address2}
-                                </Typography>
-                            )}
-                        </Box>
-                    </Grid>
-                    <Link to="/mypage/addressupdate" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-                        <Grid item display="flex" justifyContent="flex-end" alignItems="center">
-                            <Typography variant='subtitle2' sx={{ color: '#757575', }}></Typography>
-                            <ArrowForwardIosIcon sx={{ color: '#757575', }} />
-                        </Grid>
-                    </Link>
-                </Grid>
+                <ShippingLink address={address} />
 
                 <Box sx={{ pb: 1.3 }}><Divider sx={{ pt: 1.3 }} /></Box>
 
