@@ -286,6 +286,10 @@ namespace Manga.Server.Controllers
                 var requesterSell = await _context.Sell
                     .Include(s => s.UserAccount)
                     .FirstOrDefaultAsync(s => s.SellId == requesterSellId);
+                if (requesterSell.SellStatus == SellStatus.Established)
+                {
+                    return NotFound("あなたの出品はすでに交換成立済みです。");
+                }
                 if (requesterSell == null || requesterSell.UserAccountId != userId)
                 {
                     continue;
@@ -412,23 +416,23 @@ namespace Manga.Server.Controllers
                 .Select(s => new {
                     s.SellId,
                     s.Title,
+                    s.SellStatus,
                     ImageUrl = s.SellImages
                         .OrderBy(i => i.Order)
                         .Select(i => i.ImageUrl)
                         .FirstOrDefault()
                 })
                 .FirstOrDefaultAsync();
-
             if (responderSell == null)
             {
                 return NotFound("No sell found with the given SellId.");
             }
-
             var requestedGetDto = new RequestedGetDto
             {
                 ResponderSellId = responderSell.SellId,
                 ResponderSellTitle = responderSell.Title,
                 ResponderSellImageUrl = responderSell.ImageUrl,
+                ResponderSellStatus = responderSell.SellStatus,
                 RequesterSells = await _context.Request
                     .Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending)
                     .Select(r => new SellInfoDto
@@ -442,12 +446,10 @@ namespace Manga.Server.Controllers
                     })
                     .ToListAsync()
             };
-
             if (!requestedGetDto.RequesterSells.Any())
             {
                 return NotFound("No exchange requests found for the given SellId.");
             }
-
             return Ok(requestedGetDto);
         }
 
