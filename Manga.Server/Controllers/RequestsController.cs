@@ -423,33 +423,50 @@ namespace Manga.Server.Controllers
                         .FirstOrDefault()
                 })
                 .FirstOrDefaultAsync();
+
             if (responderSell == null)
             {
                 return NotFound("No sell found with the given SellId.");
             }
+
+            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id);
+
+            if (responderSell.SellStatus == SellStatus.Established)
+            {
+                requestQuery = requestQuery.Where(r => r.Status == RequestStatus.Approved);
+            }
+            else
+            {
+                requestQuery = requestQuery.Where(r => r.Status == RequestStatus.Pending || r.Status == RequestStatus.Approved);
+            }
+
+            var requesterSells = await requestQuery
+                .Select(r => new SellInfoDto
+                {
+                    SellId = r.RequesterSellId,
+                    Title = r.RequesterSell.Title,
+                    ImageUrl = r.RequesterSell.SellImages
+                        .OrderBy(i => i.Order)
+                        .Select(i => i.ImageUrl)
+                        .FirstOrDefault(),
+                    RequestStatus = r.Status
+                })
+                .ToListAsync();
+
             var requestedGetDto = new RequestedGetDto
             {
                 ResponderSellId = responderSell.SellId,
                 ResponderSellTitle = responderSell.Title,
                 ResponderSellImageUrl = responderSell.ImageUrl,
                 ResponderSellStatus = responderSell.SellStatus,
-                RequesterSells = await _context.Request
-                    .Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending)
-                    .Select(r => new SellInfoDto
-                    {
-                        SellId = r.RequesterSellId,
-                        Title = r.RequesterSell.Title,
-                        ImageUrl = r.RequesterSell.SellImages
-                            .OrderBy(i => i.Order)
-                            .Select(i => i.ImageUrl)
-                            .FirstOrDefault()
-                    })
-                    .ToListAsync()
+                RequesterSells = requesterSells
             };
+
             if (!requestedGetDto.RequesterSells.Any())
             {
                 return NotFound("No exchange requests found for the given SellId.");
             }
+
             return Ok(requestedGetDto);
         }
 
