@@ -12,6 +12,7 @@ using Amazon.SimpleEmail.Model;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Web;
 
 namespace Manga.Server.Controllers
 {
@@ -252,15 +253,14 @@ namespace Manga.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateExchangeRequest([FromBody] RequestPostDto exchangeRequestDto)
         {
-            var userId = _userManager.GetUserId(User); // 交換申請者のユーザーIDを取得
+            var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
             }
 
-            // 交換対象のSellが存在するか確認
             var responderSell = await _context.Sell
-                .Include(s => s.UserAccount) // UserAccount を含めてデータをロード
+                .Include(s => s.UserAccount)
                 .Include(s => s.UserAccount.WishLists)
                 .FirstOrDefaultAsync(s => s.SellId == exchangeRequestDto.ResponderSellId);
             if (responderSell == null)
@@ -268,7 +268,18 @@ namespace Manga.Server.Controllers
                 return NotFound("交換対象の出品が見つかりません。");
             }
 
-            var updatedRequests = new List<Request>();
+            if (responderSell.SellStatus == SellStatus.Established)
+            {
+                return NotFound("相手の出品はすでに交換成立済みです。");
+            }
+
+            if (responderSell.SellStatus == SellStatus.Suspended || responderSell.SellStatus == SellStatus.Draft)
+            {
+                return NotFound("相手の出品は現在非公開です。");
+            }
+
+            var createdRequests = new List<(Request Request, Sell RequesterSell)>();
+            var matchCreated = false;
 
             foreach (var requesterSellId in exchangeRequestDto.RequesterSellIds)
             {
@@ -277,19 +288,9 @@ namespace Manga.Server.Controllers
                     .FirstOrDefaultAsync(s => s.SellId == requesterSellId);
                 if (requesterSell == null || requesterSell.UserAccountId != userId)
                 {
-                    continue; // 出品が見つからない、または出品者が申請者自身でない場合はスキップ
+                    continue;
                 }
 
-                //削除検討
-                /*
-                // WishListにrequesterSellのTitleが含まれているか確認
-                if (!responderSell.UserAccount.WishLists.Any(wl => wl.Title == requesterSell.Title))
-                {
-                    continue; // WishListに含まれない場合はスキップ
-                }
-                */
-
-                // 相手からの交換申請を検索
                 var reciprocalRequest = await _context.Request
                     .FirstOrDefaultAsync(r => r.RequesterId == responderSell.UserAccountId
                         && r.ResponderId == userId
@@ -299,15 +300,10 @@ namespace Manga.Server.Controllers
 
                 if (reciprocalRequest != null)
                 {
-                    // 相手からの交換申請が存在する場合、両方の交換申請のステータスを更新
                     reciprocalRequest.Status = RequestStatus.Approved;
-                    updatedRequests.Add(reciprocalRequest);
-
-                    // Sellの状態を更新
                     requesterSell.SellStatus = SellStatus.Established;
                     responderSell.SellStatus = SellStatus.Established;
 
-                    // Matchを作成
                     var match = new Match
                     {
                         RequestId = reciprocalRequest.RequestId,
@@ -317,37 +313,14 @@ namespace Manga.Server.Controllers
                     _context.Match.Add(match);
                     await _context.SaveChangesAsync();
 
-                    // 通知を作成
-                    string message = $"「{requesterSell.Title}」と「{responderSell.Title}」の交換が成立しました。内容を確認の上発送をお願いします。";
-
-                    await NotificationsController.CreateNotificationAsync(
-                        _context,
-                        message,
-                        Models.Type.Match,
-                        userId,
-                        requesterSellId
-                    );
-
-                    await NotificationsController.CreateNotificationAsync(
-                        _context,
-                        message,
-                        Models.Type.Match,
-                        responderSell.UserAccountId,
-                        exchangeRequestDto.ResponderSellId
-                    );
-
-                    var responderbody = string.Format(Resources.EmailTemplates.MatchMessage, responderSell.Title, requesterSell.Title);
-                    await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "あなたの出品で交換が成立しました。", responderbody);
-
-                    var requesterbody = string.Format(Resources.EmailTemplates.MatchMessage, requesterSell.Title, responderSell.Title);
-                    await _emailSender.SendEmailAsync(requesterSell.UserAccount.Email, "あなたの出品で交換が成立しました。", requesterbody);
-
-                    // matchしたrequesterSellとresponderSellに対してPendingのRequestをすべてRejectedに変更
+                    await SendNotificationsAndEmails(requesterSell, responderSell);
                     await UpdatePendingRequests(requesterSellId, exchangeRequestDto.ResponderSellId);
+
+                    matchCreated = true;
+                    break;
                 }
                 else
                 {
-                    // 相手からの交換申請が存在しない場合、新しい交換申請を作成
                     var request = new Request
                     {
                         RequesterId = userId,
@@ -359,24 +332,46 @@ namespace Manga.Server.Controllers
                     };
 
                     _context.Request.Add(request);
-                    updatedRequests.Add(request);
-                    await _context.SaveChangesAsync();
-
-                    await NotificationsController.SendExchangeRequestNotification(_context, request, responderSell);
-
-                    var body = string.Format(Resources.EmailTemplates.RequestMessage, responderSell.UserAccount.NickName, responderSell.Title, requesterSell.Title);
-                    await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "あなたの出品に交換申請がありました。", body);
+                    createdRequests.Add((request, requesterSell));
                 }
             }
 
-            //await _context.SaveChangesAsync();
-
-            if (updatedRequests.Count == 0)
+            if (matchCreated)
             {
-                return BadRequest("交換申請に失敗しました。条件に一致する出品が存在しないか、既に申請済みの可能性があります。");
+                return Ok("交換が成立しました。");
             }
 
-            return Ok("交換申請が正常に作成されました。");
+            if (createdRequests.Count > 0)
+            {
+                await _context.SaveChangesAsync();
+                await SendConsolidatedExchangeRequestNotification(responderSell, createdRequests);
+                return Ok("交換申請が正常に作成されました。");
+            }
+
+            return BadRequest("交換申請に失敗しました。条件に一致する出品が存在しないか、既に申請済みの可能性があります。");
+        }
+
+        private async Task SendConsolidatedExchangeRequestNotification(Sell responderSell, List<(Request Request, Sell RequesterSell)> createdRequests)
+        {
+            var requestDetails = createdRequests.Select(r => $"<li>「{HttpUtility.HtmlEncode(r.RequesterSell.Title)}」</li>").ToList();
+            var consolidatedMessage = $"{responderSell.UserAccount.NickName}さんの出品「{responderSell.Title}」に対して、交換申請がありました。";
+
+            // 通知の作成（アプリ内）
+            await NotificationsController.CreateNotificationAsync(
+                _context,
+                consolidatedMessage,
+                Models.Type.Request,
+                responderSell.UserAccountId,
+                responderSell.SellId
+            );
+
+            // メールの送信
+            var emailBody = string.Format(Resources.EmailTemplates.ConsolidatedRequestMessage,
+                HttpUtility.HtmlEncode(responderSell.UserAccount.NickName),
+                HttpUtility.HtmlEncode(responderSell.Title),
+                string.Join("\n", requestDetails)
+            );
+            await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "あなたの出品に交換申請がありました。", emailBody);
         }
 
         private async Task UpdatePendingRequests(int requesterSellId, int responderSellId)
@@ -393,6 +388,20 @@ namespace Manga.Server.Controllers
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        private async Task SendNotificationsAndEmails(Sell requesterSell, Sell responderSell)
+        {
+            string message = $"「{requesterSell.Title}」と「{responderSell.Title}」の交換が成立しました。内容を確認の上、発送をお願いします。";
+
+            await NotificationsController.CreateNotificationAsync(_context, message, Models.Type.Match, requesterSell.UserAccountId, requesterSell.SellId);
+            await NotificationsController.CreateNotificationAsync(_context, message, Models.Type.Match, responderSell.UserAccountId, responderSell.SellId);
+
+            var responderbody = string.Format(Resources.EmailTemplates.MatchMessage, responderSell.Title, requesterSell.Title);
+            await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "あなたの出品の交換が成立しました。", responderbody);
+
+            var requesterbody = string.Format(Resources.EmailTemplates.MatchMessage, requesterSell.Title, responderSell.Title);
+            await _emailSender.SendEmailAsync(requesterSell.UserAccount.Email, "あなたの出品の交換が成立しました。", requesterbody);
         }
 
         [HttpGet("{id}")]
