@@ -35,7 +35,7 @@ namespace Manga.Server.Controllers
         */
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<NotificationsDto>>> GetNotifications()
+        public async Task<ActionResult<IEnumerable<NotificationsDto>>> GetNotifications(int limit = 50)
         {
             var userId = _userManager.GetUserId(User);
             if (userId == null)
@@ -45,6 +45,8 @@ namespace Manga.Server.Controllers
 
             var notifications = await _context.Notification
                 .Where(n => n.UserAccountId == userId)
+                .OrderByDescending(n => n.UpdatedDateTime)
+                .Take(limit) // 結果の数を制限
                 .Select(n => new NotificationsDto
                 {
                     SellId = n.SellId ?? 0,
