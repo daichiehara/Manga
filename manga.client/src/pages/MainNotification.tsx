@@ -9,6 +9,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import ExchangeAcceptDrawer from '../components/common/ExchangeAcceptDrawer';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import LoadingComponent from '../components/common/LoadingComponent';
+import { useNavigate } from 'react-router-dom';
 
 
 interface Notification {
@@ -24,6 +25,13 @@ interface SellInfoDto {
   sellId: number;
   title: string;
   imageUrl: string;
+  requestStatus: RequestStatus;
+}
+
+enum RequestStatus {
+  Pending = 1,
+  Approved = 2,
+  Rejected = 3,
 }
 
 function timeSince(date: string): string {
@@ -66,7 +74,8 @@ const MainNotification: React.FC = () => {
   });
   const [selectedRequesterSells, setSelectedRequesterSells] = useState<{[key: number]: SellInfoDto | null}>(() => {
     const savedState = sessionStorage.getItem('notificationState');
-    return savedState ? JSON.parse(savedState).selectedRequesterSells : {};
+    const parsedState = savedState ? JSON.parse(savedState).selectedRequesterSells : {};
+    return Object.keys(parsedState).length > 0 ? parsedState : {};
   });
   const { authState } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -76,32 +85,47 @@ const MainNotification: React.FC = () => {
     sessionStorage.setItem('notificationState', JSON.stringify(stateToSave));
   }, [selectedRequesterSells, drawerOpen, selectedSellId]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     saveState();
   }, [saveState]);
 
-  useEffect(() => {
+  const fetchNotifications = useCallback(async () => {
     if (!authState.isAuthenticated) return;
-    const fetchNotifications = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get('https://localhost:7103/api/Notifications', {
-          withCredentials: true
-        });
-        setNotifications(response.data);
-      } catch (error) {
-        console.error('通知データの取得に失敗:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchNotifications();
+    setIsLoading(true);
+    try {
+      const response = await axios.get('https://localhost:7103/api/Notifications', {
+        withCredentials: true
+      });
+      setNotifications(response.data);
+    } catch (error) {
+      console.error('通知データの取得に失敗:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [authState.isAuthenticated]);
 
-  const handleNotificationClick = useCallback((sellId: number) => {
-    setSelectedSellId(sellId);
-    setDrawerOpen(true);
+  const fetchExchangeRequest = useCallback(async (id: number) => {
+    try {
+      const response = await axios.get(`https://localhost:7103/api/Requests/${id}`, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('交換リクエストデータの取得に失敗:', error);
+      throw error;
+    }
   }, []);
+
+  const handleNotificationClick = useCallback((notification: Notification) => {
+    if (notification.type === 3) {
+      navigate('/mypage/matchedsell');
+    } else {
+      setSelectedSellId(notification.sellId);
+      setDrawerOpen(true);
+    }
+  }, [navigate, setSelectedSellId, setDrawerOpen]);
 
   const handleDrawerClose = useCallback(() => {
     setDrawerOpen(false);
@@ -115,6 +139,15 @@ const MainNotification: React.FC = () => {
       }));
     }
   }, [selectedSellId]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  const handleExchangeConfirmed = useCallback(() => {
+    fetchNotifications(); // 通知リストを再取得
+    setDrawerOpen(false); // Drawerを閉じる
+  }, [fetchNotifications]);
 
   if (isLoading) {
     return (
@@ -174,11 +207,11 @@ const MainNotification: React.FC = () => {
       <Box sx={{mt: 8, mb: 8}}>
         <Grid container spacing={0.5}>
           {notifications.map((notification, index) => (
-            <Grid item xs={12} key={notification.sellId}style={{ 
+            <Grid item xs={12} key={index} style={{ 
               borderBottom: index !== notifications.length - 1 ? '1px solid #e0e0e0' : '' 
             }}>
               <Card elevation={0} sx={{ display: 'flex', alignItems: 'center'}}>
-                <CardActionArea onClick={() => handleNotificationClick(notification.sellId)}>
+                <CardActionArea onClick={() => handleNotificationClick(notification)}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <CardMedia
                       component="img"
@@ -209,6 +242,8 @@ const MainNotification: React.FC = () => {
         sellId={selectedSellId}
         selectedRequesterSell={selectedSellId ? selectedRequesterSells[selectedSellId] : null}
         onRequesterSellSelect={handleRequesterSellSelect}
+        onFetchExchangeRequest={fetchExchangeRequest}
+        onExchangeConfirmed={handleExchangeConfirmed}
       />
 
       <MenuBar /> {/* 画像のボトムのナビゲーションバーに対応するコンポーネント */}
