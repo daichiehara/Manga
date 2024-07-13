@@ -43,7 +43,7 @@ const App = () => {
 
     initializeAuth();
   }, []);
-  
+
   return (
     <ThemeProvider theme={theme}>
       {/* 全体を囲むBoxコンポーネント */}
@@ -58,7 +58,7 @@ const App = () => {
             <Route path="/" element={<MainSearch initialTab={1} />} />
             <Route path="/item/new" element={<MainSearch initialTab={2} />} />
             <Route path="/item/:sellId" element={<MangaDetail />} />
-            <Route path="/main-notification" element={<MainNotification />} /> {/* 通知ページのルート */}
+            <Route path="/notification" element={<MainNotification />} /> {/* 通知ページのルート */}
             <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
             <Route path="/main-sell" element={<MSell />} />
             <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
