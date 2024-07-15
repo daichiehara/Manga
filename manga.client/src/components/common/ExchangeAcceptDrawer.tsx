@@ -1,24 +1,41 @@
-import React, { useState, useEffect, MouseEvent, useCallback } from 'react';
-import { SwipeableDrawer, Box, Typography, Button, CircularProgress, Card, CardContent, CardMedia, CardActionArea, Chip, IconButton } from '@mui/material';
+import React, { useState, useEffect, MouseEvent, useCallback, useContext } from 'react';
+import { SwipeableDrawer, Box, Typography, Button, CircularProgress, Card, CardContent, CardMedia, CardActionArea, Chip, IconButton, Alert } from '@mui/material';
 import axios from 'axios';
 import CloseIcon from '@mui/icons-material/Close';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
+import AddressLink from './AddressLink';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
+import { SnackbarContext } from '../context/SnackbarContext';
 
 interface RequestedGetDto {
   responderSellId: number;
   responderSellTitle: string;
   responderSellImageUrl: string;
+  responderSellStatus: SellStatus;
   requesterSells: SellInfoDto[];
+}
+
+enum SellStatus {
+  Recruiting = 1,
+  Suspended = 2,
+  Established = 3,
+  Draft = 4,
 }
 
 interface SellInfoDto {
   sellId: number;
   title: string;
   imageUrl: string;
+  requestStatus: RequestStatus;
+}
+
+enum RequestStatus {
+  Pending = 1,
+  Approved = 2,
+  Rejected = 3,
 }
 
 interface ExchangeAcceptDrawerProps {
@@ -27,6 +44,8 @@ interface ExchangeAcceptDrawerProps {
   sellId: number | null;
   selectedRequesterSell: SellInfoDto | null;
   onRequesterSellSelect: (sell: SellInfoDto | null) => void;
+  onFetchExchangeRequest: (id: number) => Promise<RequestedGetDto>;
+  onExchangeConfirmed: () => void;
 }
 
 const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({ 
@@ -34,12 +53,51 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
   onClose, 
   sellId, 
   selectedRequesterSell, 
-  onRequesterSellSelect 
+  onRequesterSellSelect,
+  onFetchExchangeRequest,
+  onExchangeConfirmed
 }) => {
   const [selectedExchange, setSelectedExchange] = useState<RequestedGetDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [localSelectedRequesterSell, setLocalSelectedRequesterSell] = useState<SellInfoDto | null>(null);
   const navigate = useNavigate();
   const theme = useTheme();
+  const [isConfirming, setIsConfirming] = useState(false);
+  const { showSnackbar } = useContext(SnackbarContext);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const getButtonText = (
+    sellStatus: SellStatus | undefined,
+    requesterSell: SellInfoDto | null | undefined
+  ): string => {
+    if (sellStatus === undefined) return '読み込み中...';
+    if (sellStatus === SellStatus.Established) return '交換成立済み';
+    
+    if (requesterSell == null) return '交換する出品を選択してください';
+    
+    switch (sellStatus) {
+      case SellStatus.Recruiting:
+        return requesterSell.requestStatus === RequestStatus.Approved ? '交換成立済み' : '交換を確定';
+      case SellStatus.Suspended:
+      case SellStatus.Draft:
+        return 'あなたの出品が公開停止中';
+      default:
+        return '交換を確定';
+    }
+  };
+
+  const isButtonDisabled = (
+    sellStatus: SellStatus | undefined,
+    requesterSell: SellInfoDto | null | undefined
+  ): boolean => {
+    if (sellStatus === undefined) return true;
+    if (sellStatus === SellStatus.Established) return true;
+    
+    if (requesterSell == null) return true;
+    
+    return sellStatus !== SellStatus.Recruiting || 
+           requesterSell.requestStatus === RequestStatus.Approved || 
+           isConfirming;
+  };  
 
   useEffect(() => {
     if (open && sellId !== null) {
@@ -47,13 +105,16 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
     }
   }, [open, sellId]);
 
+  useEffect(() => {
+    setLocalSelectedRequesterSell(selectedRequesterSell);
+  }, [selectedRequesterSell]);
+
   const fetchExchangeRequest = async (id: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`https://localhost:7103/api/Requests/${id}`, {
-        withCredentials: true
-      });
-      setSelectedExchange(response.data);
+      const data = await onFetchExchangeRequest(id);
+      setSelectedExchange(data);
+      console.log('fetch requested id')
     } catch (error) {
       console.error('交換リクエストデータの取得に失敗:', error);
     } finally {
@@ -61,10 +122,54 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
     }
   };
 
+  // エラーメッセージをクリアする関数
+  const clearError = useCallback(() => {
+    setErrorMessage(null);
+  }, []);
+
+  // コンポーネントが開かれたときにエラーをクリア
+  useEffect(() => {
+    if (open) {
+      clearError();
+    }
+  }, [open, clearError]);
+
+  const confirmExchange = async (responderSellId: number, requesterSellId: number) => {
+    try {
+      const response = await axios.post('https://localhost:7103/api/Requests', {
+        ResponderSellId: responderSellId,
+        RequesterSellIds: [requesterSellId]
+      }, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data);
+      }
+      throw error;
+    }
+  };
+
   const handleExchangeConfirm = async () => {
-    if (selectedRequesterSell === null) return;
-    console.log(`交換確認: ResponderSellId=${selectedExchange?.responderSellId}, RequesterSellId=${selectedRequesterSell.sellId}`);
-    onClose();
+    if (selectedExchange === null || localSelectedRequesterSell === null) return;
+    
+    setIsConfirming(true);
+    clearError();
+    try {
+      await confirmExchange(localSelectedRequesterSell.sellId, selectedExchange.responderSellId,);
+      showSnackbar('交換が成立しました！', 'success');
+      onExchangeConfirmed();
+      onClose();
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('交換の確定に失敗しました。もう一度お試しください。');
+      }
+    } finally {
+      setIsConfirming(false);
+    }
   };
 
   const navigateToItemDetail = useCallback((itemId: number, event?: MouseEvent<HTMLButtonElement>) => {
@@ -93,7 +198,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
       disableScrollLock
       sx={{
         '& .MuiDrawer-paper': {
-          maxHeight: '90%',
+          maxHeight: '97%',
           width: '100%',
           maxWidth: '640px',
           margin: 'auto',
@@ -107,7 +212,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
               <CloseIcon sx={{fontSize:'1.9rem', color: theme.palette.info.main }} />
           </Button>
           <Typography variant="h6" sx={{ color: theme.palette.info.main, fontWeight: 'bold', width: '100%', textAlign: 'center', fontSize:'1.1rem' }}>
-              交換を受け入れる
+              交換申請を受け入れる
           </Typography>
       </Box>
       <Box sx={{ px: 3 }}>
@@ -124,11 +229,11 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                   <CardMedia
                     component="img"
                     sx={{
-                      width: 120,
-                      height: 120,
+                      width: 100,
+                      height: 100,
                       objectFit: 'cover',
                       borderRadius: 2,
-                      m: 2,
+                      m: 1,
                     }}
                     image={selectedExchange.responderSellImageUrl}
                     alt={selectedExchange.responderSellTitle}
@@ -153,7 +258,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
             </Card>
             
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-              <CompareArrowsIcon sx={{ fontSize: 40, color: 'primary.main' }} />
+              <SwapVertIcon sx={{ fontSize: 40, color: 'primary.main' }} />
             </Box>
 
             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
@@ -208,11 +313,13 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                       backgroundColor: selectedRequesterSell?.sellId === sell.sellId 
                         ? '#e3f2fd'
                         : 'white',
-                        borderRadius: 2,
+                      borderRadius: 2,
+                      opacity: sell.requestStatus === RequestStatus.Approved ? 0.7 : 1,
                     }}
                   >
                           <CardActionArea 
-                            onClick={() => onRequesterSellSelect(sell)}
+                            onClick={() => sell.requestStatus !== RequestStatus.Approved && onRequesterSellSelect(sell)}
+                            disabled={sell.requestStatus === RequestStatus.Approved}
                             sx={{
                               height: '100%',
                               display: 'flex',
@@ -238,6 +345,11 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                                 {sell.title}
                               </Typography>
                             </CardContent>
+                            {sell.requestStatus === RequestStatus.Approved && (
+                              <Typography variant="caption" color="success.main" fontWeight={'bold'}>
+                                交換成立済み
+                              </Typography>
+                            )}
                           </CardActionArea>
                           <IconButton
                             size="small"
@@ -269,9 +381,11 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                       </Box>
                     </Box>
           </Box>
+          <AddressLink />
         <Box 
           sx={{ 
             mb: 3, 
+            mt: 2,
             height: 32, // Chipの高さ分のスペースを確保
             visibility: selectedRequesterSell ? 'visible' : 'hidden', // 選択されていない時は非表示にするが、スペースは確保
             opacity: selectedRequesterSell ? 1 : 0, // フェードエフェクトのため
@@ -284,15 +398,22 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
             onDelete={() => onRequesterSellSelect(null)}
           />
         </Box>
+        <Typography sx={{fontSize: '0.8rem'}} color='secondary'>この申請を受け入れることで交換が決定します。<br />交換したい漫画の詳細情報をよく確認の上、選択してください。</Typography>
+        {errorMessage && (
+          <Alert severity="error" onClose={clearError} sx={{ mt: 2, mb: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
             <Button
               variant="contained"
               color="primary"
               onClick={handleExchangeConfirm}
-              disabled={selectedRequesterSell === null}
+              disabled={isButtonDisabled(selectedExchange?.responderSellStatus, localSelectedRequesterSell)}
               fullWidth
+              size='large'
               sx={{ mt: 2, mb: 3, py: 1.5, borderRadius: 2 }}
             >
-              交換を確定
+              {isConfirming ? <CircularProgress size={24} /> : getButtonText(selectedExchange?.responderSellStatus, localSelectedRequesterSell)}
             </Button>
           </>
         ) : (
