@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Web;
+using Google.Api;
 
 namespace Manga.Server.Controllers
 {
@@ -358,12 +359,18 @@ namespace Manga.Server.Controllers
         private async Task SendConsolidatedExchangeRequestNotification(Sell responderSell, List<(Request Request, Sell RequesterSell)> createdRequests)
         {
             var requestDetails = createdRequests.Select(r => $"<li>「{HttpUtility.HtmlEncode(r.RequesterSell.Title)}」</li>").ToList();
-            var consolidatedMessage = $"{responderSell.UserAccount.NickName}さんの出品「{responderSell.Title}」に対して、交換申請がありました。";
+
+            // 交換申請の件数を取得
+            var exchangeRequestCount = await _context.Request
+                .CountAsync(r => r.ResponderSellId == responderSell.SellId && r.Status == RequestStatus.Pending);
+
+            // 通知のメッセージを作成
+            var message = $"あなたの出品「{responderSell.Title}」に {exchangeRequestCount} 件の交換申請があります。";
 
             // 通知の作成（アプリ内）
             await NotificationsController.CreateNotificationAsync(
                 _context,
-                consolidatedMessage,
+                message,
                 Models.Type.Request,
                 responderSell.UserAccountId,
                 responderSell.SellId
