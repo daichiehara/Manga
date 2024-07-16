@@ -36,5 +36,6 @@ namespace Manga.Server.Models
         Pending = 1,    // 申請中
         Approved = 2,   // 承認された
         Rejected = 3,   // 拒否された
+        Withdrawn = 4,  // 取り下げられた
     }
 }

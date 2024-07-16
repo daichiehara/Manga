@@ -421,17 +421,17 @@ namespace Manga.Server.Controllers
             }
 
             RequestButtonStatus requestStatus;
-            if (sell.UserAccountId == userId)
+            if (sell.SellStatus == SellStatus.Established) // 既にマッチングが成立している場合
             {
-                requestStatus = RequestButtonStatus.OwnSell;
+                requestStatus = RequestButtonStatus.Matched;
             }
-            else if (await _context.Request.AnyAsync(r => r.RequesterId == userId && r.ResponderSellId == id))
+            else if (await _context.Request.AnyAsync(r => r.RequesterId == userId && r.ResponderSellId == id && (r.Status == RequestStatus.Pending || r.Status == RequestStatus.Rejected)))
             {
                 requestStatus = RequestButtonStatus.AlreadyRequested;
             }
-            else if (sell.SellStatus == SellStatus.Established) // 既にマッチングが成立している場合
+            else if (sell.SellStatus != SellStatus.Established && sell.UserAccountId == userId)
             {
-                requestStatus = RequestButtonStatus.Matched;
+                requestStatus = RequestButtonStatus.OwnSell;
             }
             else
             {

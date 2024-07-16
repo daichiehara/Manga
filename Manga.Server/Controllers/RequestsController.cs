@@ -260,100 +260,129 @@ namespace Manga.Server.Controllers
                 return Unauthorized();
             }
 
-            var responderSell = await _context.Sell
-                .Include(s => s.UserAccount)
-                .Include(s => s.UserAccount.WishLists)
-                .FirstOrDefaultAsync(s => s.SellId == exchangeRequestDto.ResponderSellId);
-            if (responderSell == null)
-            {
-                return NotFound("交換対象の出品が見つかりません。");
-            }
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            if (responderSell.SellStatus == SellStatus.Established)
+            try
             {
-                return NotFound("相手の出品はすでに交換成立済みです。");
-            }
-
-            if (responderSell.SellStatus == SellStatus.Suspended || responderSell.SellStatus == SellStatus.Draft)
-            {
-                return NotFound("相手の出品は現在非公開です。");
-            }
-
-            var createdRequests = new List<(Request Request, Sell RequesterSell)>();
-            var matchCreated = false;
-
-            foreach (var requesterSellId in exchangeRequestDto.RequesterSellIds)
-            {
-                var requesterSell = await _context.Sell
+                var responderSell = await _context.Sell
                     .Include(s => s.UserAccount)
-                    .FirstOrDefaultAsync(s => s.SellId == requesterSellId);
-                if (requesterSell.SellStatus == SellStatus.Established)
+                    .Include(s => s.UserAccount.WishLists)
+                    .FirstOrDefaultAsync(s => s.SellId == exchangeRequestDto.ResponderSellId);
+                if (responderSell == null)
                 {
-                    return NotFound("あなたの出品はすでに交換成立済みです。");
-                }
-                if (requesterSell == null || requesterSell.UserAccountId != userId)
-                {
-                    continue;
+                    return NotFound("交換対象の出品が見つかりません。");
                 }
 
-                var reciprocalRequest = await _context.Request
-                    .FirstOrDefaultAsync(r => r.RequesterId == responderSell.UserAccountId
-                        && r.ResponderId == userId
-                        && r.RequesterSellId == exchangeRequestDto.ResponderSellId
-                        && r.ResponderSellId == requesterSellId
-                        && r.Status == RequestStatus.Pending);
-
-                if (reciprocalRequest != null)
+                if (responderSell.SellStatus == SellStatus.Established)
                 {
-                    reciprocalRequest.Status = RequestStatus.Approved;
-                    requesterSell.SellStatus = SellStatus.Established;
-                    responderSell.SellStatus = SellStatus.Established;
-
-                    var match = new Match
-                    {
-                        RequestId = reciprocalRequest.RequestId,
-                        Created = DateTime.UtcNow
-                    };
-
-                    _context.Match.Add(match);
-                    await _context.SaveChangesAsync();
-
-                    await SendNotificationsAndEmails(requesterSell, responderSell);
-                    await UpdatePendingRequests(requesterSellId, exchangeRequestDto.ResponderSellId);
-
-                    matchCreated = true;
-                    break;
+                    return NotFound("相手の出品はすでに交換成立済みです。");
                 }
-                else
+
+                if (responderSell.SellStatus == SellStatus.Suspended || responderSell.SellStatus == SellStatus.Draft)
                 {
-                    var request = new Request
-                    {
-                        RequesterId = userId,
-                        RequesterSellId = requesterSellId,
-                        ResponderId = responderSell.UserAccountId,
-                        ResponderSellId = exchangeRequestDto.ResponderSellId,
-                        Status = RequestStatus.Pending,
-                        Create = DateTime.UtcNow
-                    };
-
-                    _context.Request.Add(request);
-                    createdRequests.Add((request, requesterSell));
+                    return NotFound("相手の出品は現在非公開です。");
                 }
-            }
 
-            if (matchCreated)
-            {
-                return Ok("交換が成立しました。");
-            }
+                // 既存のリクエストを確認
+                var existingRequests = await _context.Request
+                    .Where(r => r.RequesterId == userId && r.ResponderSellId == exchangeRequestDto.ResponderSellId)
+                    .ToListAsync();
 
-            if (createdRequests.Count > 0)
-            {
+                // Withdrawn以外のステータスがある場合はエラー
+                if (existingRequests.Any(r => r.Status != RequestStatus.Withdrawn))
+                {
+                    return BadRequest("この出品に対して既に有効な交換申請が存在します。");
+                }
+
+                // 既存のWithdrawnリクエストを削除
+                _context.Request.RemoveRange(existingRequests);
                 await _context.SaveChangesAsync();
-                await SendConsolidatedExchangeRequestNotification(responderSell, createdRequests);
-                return Ok("交換申請が正常に作成されました。");
-            }
 
-            return BadRequest("交換申請に失敗しました。条件に一致する出品が存在しないか、既に申請済みの可能性があります。");
+                var createdRequests = new List<(Request Request, Sell RequesterSell)>();
+                var matchCreated = false;
+
+                foreach (var requesterSellId in exchangeRequestDto.RequesterSellIds)
+                {
+                    var requesterSell = await _context.Sell
+                        .Include(s => s.UserAccount)
+                        .FirstOrDefaultAsync(s => s.SellId == requesterSellId);
+                    if (requesterSell.SellStatus == SellStatus.Established)
+                    {
+                        return NotFound("あなたの出品はすでに交換成立済みです。");
+                    }
+                    if (requesterSell == null || requesterSell.UserAccountId != userId)
+                    {
+                        continue;
+                    }
+
+                    var reciprocalRequest = await _context.Request
+                        .FirstOrDefaultAsync(r => r.RequesterId == responderSell.UserAccountId
+                            && r.ResponderId == userId
+                            && r.RequesterSellId == exchangeRequestDto.ResponderSellId
+                            && r.ResponderSellId == requesterSellId
+                            && r.Status == RequestStatus.Pending);
+
+                    if (reciprocalRequest != null)
+                    {
+                        reciprocalRequest.Status = RequestStatus.Approved;
+                        requesterSell.SellStatus = SellStatus.Established;
+                        responderSell.SellStatus = SellStatus.Established;
+
+                        var match = new Match
+                        {
+                            RequestId = reciprocalRequest.RequestId,
+                            Created = DateTime.UtcNow
+                        };
+
+                        _context.Match.Add(match);
+                        await _context.SaveChangesAsync();
+
+                        await SendNotificationsAndEmails(requesterSell, responderSell);
+                        await UpdatePendingRequests(requesterSellId, exchangeRequestDto.ResponderSellId);
+
+                        matchCreated = true;
+                        break;
+                    }
+                    else
+                    {
+                        var request = new Request
+                        {
+                            RequesterId = userId,
+                            RequesterSellId = requesterSellId,
+                            ResponderId = responderSell.UserAccountId,
+                            ResponderSellId = exchangeRequestDto.ResponderSellId,
+                            Status = RequestStatus.Pending,
+                            Create = DateTime.UtcNow
+                        };
+
+                        _context.Request.Add(request);
+                        createdRequests.Add((request, requesterSell));
+                    }
+                }
+
+                if (matchCreated)
+                {
+                    await transaction.CommitAsync();  // トランザクションをコミット
+                    return Ok("交換が成立しました。");
+                }
+
+                if (createdRequests.Count > 0)
+                {
+                    await _context.SaveChangesAsync();
+                    await SendConsolidatedExchangeRequestNotification(responderSell, createdRequests);
+                    await transaction.CommitAsync();
+                    return Ok("交換申請が正常に作成されました。");
+                }
+
+                await transaction.RollbackAsync();
+                return BadRequest("交換申請に失敗しました。条件に一致する出品が存在しないか、既に申請済みの可能性があります。");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // エラーログを記録
+                return StatusCode(500, "交換申請の処理中にエラーが発生しました。");
+            }
         }
 
         private async Task SendConsolidatedExchangeRequestNotification(Sell responderSell, List<(Request Request, Sell RequesterSell)> createdRequests)
@@ -362,7 +391,7 @@ namespace Manga.Server.Controllers
 
             // 交換申請の件数を取得
             var exchangeRequestCount = await _context.Request
-                .CountAsync(r => r.ResponderSellId == responderSell.SellId && r.Status == RequestStatus.Pending);
+                .CountAsync(r => r.ResponderSellId == responderSell.SellId && r.Status == RequestStatus.Pending || r.Status == RequestStatus.Withdrawn);
 
             // 通知のメッセージを作成
             var message = $"あなたの出品「{responderSell.Title}」に {exchangeRequestCount} 件の交換申請があります。";
@@ -444,7 +473,7 @@ namespace Manga.Server.Controllers
             }
             else
             {
-                requestQuery = requestQuery.Where(r => r.Status == RequestStatus.Pending || r.Status == RequestStatus.Approved);
+                requestQuery = requestQuery.Where(r => r.Status == RequestStatus.Pending || r.Status == RequestStatus.Approved || r.Status == RequestStatus.Withdrawn);
             }
 
             var requesterSells = await requestQuery
@@ -555,6 +584,46 @@ namespace Manga.Server.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpPut("WithdrawRequests/{Id}")]
+        public async Task<IActionResult> WithdrawRequests(int Id)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var requestsToWithdraw = await _context.Request
+                    .Where(r => r.RequesterId == userId && r.ResponderSellId == Id && r.Status == RequestStatus.Pending)
+                    .ToListAsync();
+
+                if (!requestsToWithdraw.Any())
+                {
+                    return NotFound("取り下げ可能なリクエストが見つかりません。");
+                }
+
+                foreach (var request in requestsToWithdraw)
+                {
+                    request.Status = RequestStatus.Withdrawn;
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok($"{requestsToWithdraw.Count}件のリクエストが取り下げられました。");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // ログにエラーを記録
+                return StatusCode(500, "リクエストの取り下げ中にエラーが発生しました。");
+            }
         }
 
         private bool RequestExists(int id)
