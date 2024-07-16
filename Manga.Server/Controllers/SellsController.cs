@@ -751,16 +751,37 @@ namespace Manga.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSell(int id)
         {
-            var sell = await _context.Sell.FindAsync(id);
-            if (sell == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                return NotFound();
+                var sell = await _context.Sell.FindAsync(id);
+                if (sell == null)
+                {
+                    return NotFound();
+                }
+
+                // この Sell に関連する Request を更新
+                var relatedRequests = await _context.Request
+                    .Where(r => r.RequesterSellId == id)
+                    .ToListAsync();
+
+                foreach (var request in relatedRequests)
+                {
+                    request.DeletedRequesterSellCount++;
+                }
+
+                _context.Sell.Remove(sell);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return NoContent();
             }
-
-            _context.Sell.Remove(sell);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, "Sellの削除中にエラーが発生しました。");
+            }
         }
 
         /*

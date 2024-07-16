@@ -495,7 +495,10 @@ namespace Manga.Server.Controllers
                 ResponderSellTitle = responderSell.Title,
                 ResponderSellImageUrl = responderSell.ImageUrl,
                 ResponderSellStatus = responderSell.SellStatus,
-                RequesterSells = requesterSells
+                RequesterSells = requesterSells,
+                DeletedRequesterSellCount = await _context.Request
+                    .Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending)
+                    .SumAsync(r => r.DeletedRequesterSellCount)
             };
 
             if (!requestedGetDto.RequesterSells.Any())

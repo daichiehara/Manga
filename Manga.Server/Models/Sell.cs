@@ -73,6 +73,8 @@ namespace Manga.Server.Models
         Established = 3,
         [Display(Name = "下書き")]
         Draft = 4,
+        [Display(Name = "削除済み")]
+        Deleted = 5
     }
 
     public enum SendPrefecture
