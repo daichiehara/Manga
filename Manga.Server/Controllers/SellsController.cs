@@ -761,14 +761,21 @@ namespace Manga.Server.Controllers
                     return NotFound();
                 }
 
-                // この Sell に関連する Request を更新
-                var relatedRequests = await _context.Request
-                    .Where(r => r.RequesterSellId == id)
+                // この Sell に関連する保留中のRequest数をカウント
+                var relatedRequestCount = await _context.Request
+                    .CountAsync(r => r.RequesterSellId == id && r.Status == RequestStatus.Pending);
+
+                // ResponderSellIdがこのSellIdであるSellを探し、DeletedRequestCountを更新
+                var relatedResponderSells = await _context.Sell
+                    .Where(s => s.SellId == _context.Request
+                        .Where(r => r.RequesterSellId == id && r.Status == RequestStatus.Pending)
+                        .Select(r => r.ResponderSellId)
+                        .FirstOrDefault())
                     .ToListAsync();
 
-                foreach (var request in relatedRequests)
+                foreach (var responderSell in relatedResponderSells)
                 {
-                    request.DeletedRequesterSellCount++;
+                    responderSell.DeletedRequestCount += relatedRequestCount;
                 }
 
                 _context.Sell.Remove(sell);

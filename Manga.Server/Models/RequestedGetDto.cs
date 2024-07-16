@@ -7,6 +7,6 @@
         public string ResponderSellImageUrl { get; set; }
         public SellStatus ResponderSellStatus { get; set; }
         public List<SellInfoDto> RequesterSells { get; set; }
-        public int DeletedRequesterSellCount { get; set; } = 0;
+        public int DeletedRequestCount { get; set; } = 0;
     }
 }

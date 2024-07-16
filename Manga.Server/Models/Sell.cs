@@ -31,6 +31,9 @@ namespace Manga.Server.Models
         [Display(Name = "出品状態")]
         public SellStatus SellStatus { get; set; }
 
+        [Display(Name = "削除済みリクエスト数")]
+        public int DeletedRequestCount { get; set; }
+
         public string UserAccountId { get; set; }
         public virtual UserAccount UserAccount { get; set; }
 

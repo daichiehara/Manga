@@ -30,8 +30,6 @@ namespace Manga.Server.Models
         public RequestStatus Status { get; set; } // 交換の状態
 
         public DateTime Create { get; set; }
-
-        public int DeletedRequesterSellCount { get; set; } = 0;
     }
     public enum RequestStatus
     {

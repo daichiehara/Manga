@@ -453,6 +453,7 @@ namespace Manga.Server.Controllers
                     s.SellId,
                     s.Title,
                     s.SellStatus,
+                    s.DeletedRequestCount,
                     ImageUrl = s.SellImages
                         .OrderBy(i => i.Order)
                         .Select(i => i.ImageUrl)
@@ -496,9 +497,7 @@ namespace Manga.Server.Controllers
                 ResponderSellImageUrl = responderSell.ImageUrl,
                 ResponderSellStatus = responderSell.SellStatus,
                 RequesterSells = requesterSells,
-                DeletedRequesterSellCount = await _context.Request
-                    .Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending)
-                    .SumAsync(r => r.DeletedRequesterSellCount)
+                DeletedRequestCount = responderSell.DeletedRequestCount,
             };
 
             if (!requestedGetDto.RequesterSells.Any())
