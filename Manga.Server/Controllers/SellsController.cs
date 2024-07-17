@@ -752,7 +752,6 @@ namespace Manga.Server.Controllers
         public async Task<IActionResult> DeleteSell(int id)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
-
             try
             {
                 var sell = await _context.Sell.FindAsync(id);
@@ -761,32 +760,42 @@ namespace Manga.Server.Controllers
                     return NotFound();
                 }
 
-                // この Sell に関連する保留中のRequest数をカウント
-                var relatedRequestCount = await _context.Request
-                    .CountAsync(r => r.RequesterSellId == id && r.Status == RequestStatus.Pending);
-
-                // ResponderSellIdがこのSellIdであるSellを探し、DeletedRequestCountを更新
-                var relatedResponderSells = await _context.Sell
-                    .Where(s => s.SellId == _context.Request
-                        .Where(r => r.RequesterSellId == id && r.Status == RequestStatus.Pending)
-                        .Select(r => r.ResponderSellId)
-                        .FirstOrDefault())
+                // この Sell に関連する保留中のRequestを取得
+                var relatedRequests = await _context.Request
+                    .Where(r => r.RequesterSellId == id && r.Status == RequestStatus.Pending)
                     .ToListAsync();
 
-                foreach (var responderSell in relatedResponderSells)
+                // ResponderSellIdをグループ化して、各ResponderSellのDeletedRequestCountを更新
+                var responderSellUpdates = relatedRequests
+                    .GroupBy(r => r.ResponderSellId)
+                    .Select(g => new
+                    {
+                        ResponderSellId = g.Key,
+                        DeletedRequestCount = g.Count()
+                    })
+                    .ToList();
+
+                foreach (var update in responderSellUpdates)
                 {
-                    responderSell.DeletedRequestCount += relatedRequestCount;
+                    var responderSell = await _context.Sell.FindAsync(update.ResponderSellId);
+                    if (responderSell != null)
+                    {
+                        responderSell.DeletedRequestCount += update.DeletedRequestCount;
+                    }
                 }
 
+                // Sellを削除
                 _context.Sell.Remove(sell);
-                await _context.SaveChangesAsync();
 
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return NoContent();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                // ログにエラー詳細を記録
+                _logger.LogError(ex, "Sellの削除中にエラーが発生しました。SellId: {SellId}", id);
                 return StatusCode(500, "Sellの削除中にエラーが発生しました。");
             }
         }
