@@ -12,6 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AddressLink from './AddressLink';
 import {useTheme} from '@mui/material/styles';
 import theme from '../../theme/theme';
+import { SnackbarContext } from '../context/SnackbarContext';
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
@@ -56,6 +57,8 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     const [isSubmitting, setIsSubmitting] = useState(false); // 送信中状態を管理
     const handleFinalCheckModalOpen = () => setFinalCheckModalOpen(true);
     const handleFinalCheckModalClose = () => setFinalCheckModalOpen(false);
+    const { showSnackbar } = useContext(SnackbarContext);
+
 
     const fetchAddress = async () => {
         try {
@@ -142,13 +145,11 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
             onClose(); // モーダルを閉じる
             handleFinalCheckModalClose();
             setToMainDetailMessage("交換申請が送られました");
-            setTimeout(() => {
-                window.location.reload(); // 画面を再読み込み
-            }, 2000); // 2秒待機// 成功メッセージをセット
-            setMessage("交換申請が成功しました", 'success'); // 成功メッセージをセット
+            
+            showSnackbar("交換申請が成功しました", 'success'); // 成功メッセージをセット
 
         } catch (error) {
-            setMessage("交換申請に失敗しました", 'error'); // 失敗メッセージをセット
+            showSnackbar("交換申請に失敗しました", 'error'); // 失敗メッセージをセット
             console.error('Error sending exchange request:', error);
         } finally {
             setIsSubmitting(false);
