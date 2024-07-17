@@ -56,6 +56,8 @@ function getStatusStyle(status: number): StatusStyle {
       return { text: "承認済み", color: "blue" };
     case 3:
       return { text: "拒否されました", color: "red" };
+    case 4:
+      return { text: "申請取り下げ", color: "secondary" };
     default:
       return { text: "", color: "inherit" };
   }
@@ -137,7 +139,7 @@ const RequestedSellList: React.FC = () => {
       <Box sx={{ mt: '3.5rem', mb: 10 }}>
         <Grid container>
           {requestedSells.map((item, index) => (
-            <Grid item xs={12} key={item.sellId} style={{
+            <Grid item xs={12} key={index} style={{
               borderBottom: index !== requestedSells.length - 1 ? '1px solid #e0e0e0' : ''
             }}>
               <Card elevation={0} sx={{ display: 'flex', alignItems: 'center' }}>
