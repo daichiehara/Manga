@@ -8,5 +8,6 @@
         public SellStatus ResponderSellStatus { get; set; }
         public List<SellInfoDto> RequesterSells { get; set; }
         public int DeletedRequestCount { get; set; } = 0;
+        public int SuspendedCount { get; set; } = 0;
     }
 }

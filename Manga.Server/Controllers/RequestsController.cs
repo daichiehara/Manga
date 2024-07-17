@@ -466,19 +466,10 @@ namespace Manga.Server.Controllers
                 return NotFound("No sell found with the given SellId.");
             }
 
-            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id);
+            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending);
 
-            if (responderSell.SellStatus == SellStatus.Established)
-            {
-                requestQuery = requestQuery.Where(r => r.Status == RequestStatus.Approved);
-            }
-            else
-            {
-                requestQuery = requestQuery.Where(r => r.Status == RequestStatus.Pending || r.Status == RequestStatus.Approved || r.Status == RequestStatus.Withdrawn);
-            }
-
-            var requesterSells = await requestQuery
-                .Select(r => new SellInfoDto
+            var requesterSellsInfo = await requestQuery
+                .Select(r => new
                 {
                     SellId = r.RequesterSellId,
                     Title = r.RequesterSell.Title,
@@ -486,9 +477,23 @@ namespace Manga.Server.Controllers
                         .OrderBy(i => i.Order)
                         .Select(i => i.ImageUrl)
                         .FirstOrDefault(),
-                    RequestStatus = r.Status
+                    RequestStatus = r.Status,
+                    SellStatus = r.RequesterSell.SellStatus
                 })
                 .ToListAsync();
+
+            int suspendedCount = requesterSellsInfo.Count(r => r.SellStatus == SellStatus.Suspended);
+
+            var requesterSells = requesterSellsInfo
+                .Where(r => r.SellStatus != SellStatus.Suspended)
+                .Select(r => new SellInfoDto
+                {
+                    SellId = r.SellId,
+                    Title = r.Title,
+                    ImageUrl = r.ImageUrl,
+                    RequestStatus = r.RequestStatus
+                })
+                .ToList();
 
             var requestedGetDto = new RequestedGetDto
             {
@@ -498,9 +503,10 @@ namespace Manga.Server.Controllers
                 ResponderSellStatus = responderSell.SellStatus,
                 RequesterSells = requesterSells,
                 DeletedRequestCount = responderSell.DeletedRequestCount,
+                SuspendedCount = suspendedCount
             };
 
-            if (!requestedGetDto.RequesterSells.Any())
+            if (!requestedGetDto.RequesterSells.Any() && suspendedCount == 0)
             {
                 return NotFound("No exchange requests found for the given SellId.");
             }
