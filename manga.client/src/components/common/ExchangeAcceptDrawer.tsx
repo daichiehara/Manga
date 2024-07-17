@@ -16,6 +16,7 @@ interface RequestedGetDto {
   responderSellImageUrl: string;
   responderSellStatus: SellStatus;
   requesterSells: SellInfoDto[];
+  deletedRequestCount: number;
 }
 
 enum SellStatus {
@@ -36,6 +37,7 @@ enum RequestStatus {
   Pending = 1,
   Approved = 2,
   Rejected = 3,
+  Withdrawn = 4,
 }
 
 interface ExchangeAcceptDrawerProps {
@@ -47,6 +49,13 @@ interface ExchangeAcceptDrawerProps {
   onFetchExchangeRequest: (id: number) => Promise<RequestedGetDto>;
   onExchangeConfirmed: () => void;
 }
+
+const truncateString = (str: string, num: number) => {
+  if (str.length <= num) {
+    return str;
+  }
+  return str.slice(0, num) + '...';
+};
 
 const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({ 
   open, 
@@ -65,6 +74,9 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
   const [isConfirming, setIsConfirming] = useState(false);
   const { showSnackbar } = useContext(SnackbarContext);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const deletedRequestCount = selectedExchange?.deletedRequestCount || 0;
+  const totalSellCount = (selectedExchange?.requesterSells.length || 0) + deletedRequestCount;
+  const [isAddressValid, setIsAddressValid] = useState(false); // 住所の有効性を管理
   const getButtonText = (
     sellStatus: SellStatus | undefined,
     requesterSell: SellInfoDto | null | undefined
@@ -153,13 +165,19 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
 
   const handleExchangeConfirm = async () => {
     if (selectedExchange === null || localSelectedRequesterSell === null) return;
-    
+    if (!isAddressValid) {
+      setErrorMessage("住所を登録してください。");
+      return;
+    }
     setIsConfirming(true);
     clearError();
     try {
       await confirmExchange(localSelectedRequesterSell.sellId, selectedExchange.responderSellId,);
       showSnackbar('交換が成立しました！', 'success');
+      sessionStorage.removeItem('notificationState');
       onExchangeConfirmed();
+      setLocalSelectedRequesterSell(null);  // ローカル状態をリセット
+      onRequesterSellSelect(null);  // 親コンポーネントの状態をリセット
       onClose();
     } catch (error) {
       if (error instanceof Error) {
@@ -184,6 +202,10 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
     sessionStorage.setItem('notificationState', JSON.stringify(currentState));
     navigate(`/item/${itemId}`);
   }, [navigate, sellId, selectedRequesterSell]);
+
+  const handleAddressFetch = (isValid: boolean) => {
+      setIsAddressValid(isValid);
+  };
 
   return (
     <SwipeableDrawer
@@ -318,8 +340,8 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                     }}
                   >
                           <CardActionArea 
-                            onClick={() => sell.requestStatus !== RequestStatus.Approved && onRequesterSellSelect(sell)}
-                            disabled={sell.requestStatus === RequestStatus.Approved}
+                            onClick={() => sell.requestStatus === RequestStatus.Pending && onRequesterSellSelect(sell)}
+                            disabled={sell.requestStatus !== RequestStatus.Pending}
                             sx={{
                               height: '100%',
                               display: 'flex',
@@ -342,12 +364,17 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                                   color: selectedRequesterSell?.sellId === sell.sellId ? '#1976d2' : 'inherit',
                                 }}
                               >
-                                {sell.title}
+                                {truncateString(sell.title, 10)}
                               </Typography>
                             </CardContent>
                             {sell.requestStatus === RequestStatus.Approved && (
                               <Typography variant="caption" color="success.main" fontWeight={'bold'}>
                                 交換成立済み
+                              </Typography>
+                            )}
+                            {sell.requestStatus === RequestStatus.Withdrawn && (
+                              <Typography variant="caption" color="text.secondary" fontWeight={'bold'}>
+                                リクエスト取り下げ済み
                               </Typography>
                             )}
                           </CardActionArea>
@@ -378,10 +405,22 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                           )}
                         </Card>
                       ))}
+                      {Array.from({ length: deletedRequestCount }).map((_, index) => (
+                        <Card 
+                          key={`deleted-${index}`}
+                          sx={{ width: 150, flexShrink: 0, opacity: 0.5 }}
+                        >
+                          <CardContent>
+                            <Typography variant="body2" component="div">
+                              削除済み
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      ))}
                       </Box>
                     </Box>
           </Box>
-          <AddressLink />
+          {open && <AddressLink onAddressFetch={handleAddressFetch} />}
         <Box 
           sx={{ 
             mb: 3, 

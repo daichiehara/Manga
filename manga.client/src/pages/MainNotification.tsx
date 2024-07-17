@@ -32,6 +32,7 @@ enum RequestStatus {
   Pending = 1,
   Approved = 2,
   Rejected = 3,
+  Withdrawn = 4,
 }
 
 function timeSince(date: string): string {
@@ -78,7 +79,7 @@ const MainNotification: React.FC = () => {
     return Object.keys(parsedState).length > 0 ? parsedState : {};
   });
   const { authState } = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const saveState = useCallback(() => {
     const stateToSave = { selectedRequesterSells, drawerOpen, selectedSellId };
