@@ -416,12 +416,14 @@ namespace Manga.Server.Controllers
 
         private async Task UpdatePendingRequests(int requesterSellId, int responderSellId)
         {
+            // 両者の保留中のリクエストを取得
             var pendingRequests = await _context.Request
-                .Where(r =>
-                    (r.RequesterSellId == requesterSellId || r.ResponderSellId == responderSellId) &&
-                    r.Status == RequestStatus.Pending)
+                .Where(r => (r.RequesterSellId == requesterSellId || r.ResponderSellId == requesterSellId ||
+                             r.RequesterSellId == responderSellId || r.ResponderSellId == responderSellId) &&
+                             r.Status == RequestStatus.Pending)
                 .ToListAsync();
 
+            // すべての保留中リクエストのステータスを Rejected に更新
             foreach (var request in pendingRequests)
             {
                 request.Status = RequestStatus.Rejected;
@@ -466,7 +468,7 @@ namespace Manga.Server.Controllers
                 return NotFound("No sell found with the given SellId.");
             }
 
-            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id && r.Status == RequestStatus.Pending || r.Status == RequestStatus.Approved);
+            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id && r.Status != RequestStatus.Withdrawn);
 
             var requesterSellsInfo = await requestQuery
                 .Select(r => new
@@ -478,8 +480,12 @@ namespace Manga.Server.Controllers
                         .Select(i => i.ImageUrl)
                         .FirstOrDefault(),
                     RequestStatus = r.Status,
-                    SellStatus = r.RequesterSell.SellStatus
+                    SellStatus = r.RequesterSell.SellStatus,
+                    CreateTime = r.Create
                 })
+                .OrderBy(r => r.RequestStatus == RequestStatus.Approved ? 0 : 1)
+                .ThenBy(r => r.RequestStatus == RequestStatus.Pending ? 0 : 1)
+                .ThenByDescending(r => r.CreateTime)
                 .ToListAsync();
 
             int suspendedCount = requesterSellsInfo.Count(r => r.SellStatus == SellStatus.Suspended);

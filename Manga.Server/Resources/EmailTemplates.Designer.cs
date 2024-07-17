@@ -70,7 +70,7 @@ namespace Manga.Server.Resources {
         ///&lt;/head&gt;
         ///&lt;body style=&quot;font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px;&quot;&gt;
         ///    &lt;div style=&quot;background-color: #f4f4f4; padding: 20px; border-radius: 5px; margin-bottom: 20px;&quot;&gt;
-        ///        &lt;h1 style=&quot;color: #4a4a4a; margin-top: 0;&quot;&gt;交換申請のお知らせ&lt;/h1&gt;
+        ///        &lt;h2 style=&quot;color: #4a4a4a; margin-top: 0;&quot;&gt;交換申請のお知らせ&lt;/h2&gt;
         ///        &lt;p style=&quot;margin-b [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ConsolidatedRequestMessage {

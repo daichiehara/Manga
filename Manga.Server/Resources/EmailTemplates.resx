@@ -127,8 +127,8 @@
 &lt;/head&gt;
 &lt;body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px;"&gt;
     &lt;div style="background-color: #f4f4f4; padding: 20px; border-radius: 5px; margin-bottom: 20px;"&gt;
-        &lt;h1 style="color: #4a4a4a; margin-top: 0;"&gt;交換申請のお知らせ&lt;/h1&gt;
-        &lt;p style="margin-bottom: 0;"&gt;{0}さん、&lt;/p&gt;
+        &lt;h2 style="color: #4a4a4a; margin-top: 0;"&gt;交換申請のお知らせ&lt;/h2&gt;
+        &lt;p style="margin-bottom: 0;"&gt;{0}さん&lt;/p&gt;
     &lt;/div&gt;
 
     &lt;p&gt;あなたの出品「&lt;strong style="color: #3498db;"&gt;{1}&lt;/strong&gt;」に対して、以下の交換申請がありました：&lt;/p&gt;
