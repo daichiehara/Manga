@@ -497,6 +497,7 @@ namespace Manga.Server.Controllers
                     SellId = r.SellId,
                     Title = r.Title,
                     ImageUrl = r.ImageUrl,
+                    SellStatus = r.SellStatus,
                     RequestStatus = r.RequestStatus
                 })
                 .ToList();
