@@ -1,6 +1,6 @@
 import { useEffect, useState} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Grid, Typography, Paper, Button, Divider} from '@mui/material';
+import { Box, Grid, Modal, Alert, Typography, Paper, Button, Divider} from '@mui/material';
 import 'swiper/swiper-bundle.css'; 
 import ImageCarousel from '../components/common/ImageCarousel';
 import BackButton from '../components/common/BackButton';
@@ -52,7 +52,11 @@ const MangaDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [cancelDrawerOpen, setCancelDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const [message, setMessage] = useState<string | null>(null);
+  const [severity, setSeverity] = useState<'success' | 'error'>('success');
+
   useSnackbar();
 
   const handleBack = () => {
@@ -75,8 +79,8 @@ const MangaDetail = () => {
 
   const handleCancelRequest = () => {
     // Implementation of the cancel request logic
+    setCancelDrawerOpen(!cancelDrawerOpen);
   }; 
-  
 
   const [error, setError] = useState<string | null>(null); 
 
@@ -96,6 +100,20 @@ const MangaDetail = () => {
     fetchMangaDetails();
   }, [sellId]);
 
+  const withdrawRequests = async () => {
+    try {
+        await axios.put(`https://localhost:7103/api/Requests/withdrawRequests/${sellId}`, null, {
+            withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+        });
+        showMessage("交換申請が取り消されました", 'success'); // 成功メッセージをセット
+        // 必要に応じて他の状態を更新
+    } catch (error) {
+        showMessage("交換申請の取り消しに失敗しました", 'error'); // 失敗メッセージをセット
+        console.error('交換申請の取り消しに失敗:', error);
+    }
+  };
+
+
   // Handle errors by rendering the ErrorDisplay component
   if (error) {
     return <ErrorDisplay message={error} />;
@@ -111,20 +129,50 @@ const MangaDetail = () => {
       case 1:
         return <ActionButton label="交換を希望する" onClick={handleExchangeRequest} />;
       case 2:
-        return <Button variant="contained" disabled>交換済み</Button>;
+        return <Button variant="contained" disabled
+                  sx={{ mx: 2, maxWidth: '640px', width: '100%', background: '#D83022',
+                  boxShadow: 'none',
+                  color: '#f5f5f5',
+                  fontWeight:'bold'
+                  }}
+              >
+                  交換済み
+              </Button>
       case 3:
-        return <Button variant="contained" color="error" onClick={handleCancelRequest}>交換申請をキャンセルする</Button>;
+        return <Button variant="contained" color='error' onClick={handleCancelRequest}
+                  sx={{ mx: 2, maxWidth: '640px', width: '100%', background: '#D83022',
+                  boxShadow: 'none',
+                  fontWeight:'bold'
+                  }}
+              >
+                  交換申請をキャンセルする
+              </Button>
       case 4:
-        return <Button variant="contained" disabled>自分の出品</Button>;
+        return <Button variant="contained" disabled
+                  sx={{ mx: 2, maxWidth: '640px', width: '100%', background: '#D83022',
+                  boxShadow: 'none',
+                  color: '#f5f5f5',
+                  fontWeight:'bold'
+                  }}
+              >
+                  自分の出品
+              </Button>
       default:
-        return null;
+        return null
     }
   };
+
+  const showMessage = (message: string | null, severity: 'success' | 'error') => {
+    setMessage(message);
+    setSeverity(severity);
+    setTimeout(() => {
+        setMessage(null);
+    }, 8000); // 3秒後にメッセージを消す
+};
 
   return  (
     <Box sx={{ p: 0, margin:0 }}>
       {/* 戻るボタン */}
-      {!drawerOpen && <BackButton handleBack={handleBack} />}
       <Box sx={{ flexGrow: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', minHeight: '100vh', pb: 10 }}>
         
             {/* Image Carousel Integration */}
@@ -141,7 +189,7 @@ const MangaDetail = () => {
             />
 
           <Grid item xs={12} md={6}style={{ padding: 0, margin:0 }}>
-
+          
             <MangaDetailInfo
               title={mangaDetail.title}
               numberOfBooks={mangaDetail.numberOfBooks}
@@ -199,10 +247,39 @@ const MangaDetail = () => {
           </Grid>
         
       </Box>
-      <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: '0px 8px 12px 10px rgba(0, 0, 0, 0.25)' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
+      <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
         {renderActionButton()}
       </Box>
-      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} />
+      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} setMessage={showMessage}/>
+      {message && (
+          <Alert severity={severity} sx={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', zIndex: 9999 }}>
+              {message}
+          </Alert>
+      )}
+      {/* 
+      <Modal
+        open={finalCheckModalOpen}
+        onClose={handleFinalCheckModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{zIndex:100000, position: 'absolute' as 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90vw', // 画面の幅を90%に設定
+            maxWidth: '640px',  // 最大幅を640pxに設定
+            borderRadius: 1,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 0,}}
+        >
+            <Typography sx={{px:2, pt:3, pb: 1.5, color: '#454545', fontSize: '0.8rem' }}>
+                選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{ color: "red" }}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
+            </Typography>
+            
+        </Box>
+      </Modal>*/}
     </Box>
   );
 };

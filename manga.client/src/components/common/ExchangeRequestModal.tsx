@@ -4,18 +4,19 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Grid, Typography, Divider, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, Alert, Modal, Grid, Typography, Divider, Button, FormGroup, FormControlLabel, Checkbox, CircularProgress } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import NavigateToLoginBox from '../login/NavigateToLoginBox';
 import AddIcon from '@mui/icons-material/Add';
-import ShippingLink from './AddressLink';
+import AddressLink from './AddressLink';
 import {useTheme} from '@mui/material/styles';
 import theme from '../../theme/theme';
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
     onClose: () => void;
+    setMessage: (message: string | null, severity: 'success' | 'error') => void; // メッセージ表示用の関数を受け取る
 }
 
 interface ChangeAddressDto {
@@ -37,16 +38,24 @@ interface MpMySell {
     sellStatus: number;
 }
 
-const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose }) => {
+const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose, setMessage }) => {
     const { sellId } = useParams();
     const { authState } = useContext(AuthContext);
     const [triggerFetch, setTriggerFetch] = useState(false);
+    const [isAddressValid, setIsAddressValid] = useState(false); // 住所の有効性を管理
     const [address, setAddress] = useState<ChangeAddressDto | null>(null);
+    const [addressWarningMessage, setAddressWarningMessage] = useState<string | null>(null);
+    const [sellWarningMessage, setSellWarningMessage] = useState<string | null>(null);
+    const [toMainDetailMessage, setToMainDetailMessage] = useState<string | null>(null);
     const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
     const [mpmysell, setmpmysell] = useState<MpMySell[]>([]);
     const [selectedSellIds, setSelectedSellIds] = useState<number[]>([]); // 選択されたsellIdを管理
     const contentRef = useRef<HTMLDivElement>(null);
     const theme = useTheme();
+    const [finalCheckModalOpen, setFinalCheckModalOpen] = React.useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false); // 送信中状態を管理
+    const handleFinalCheckModalOpen = () => setFinalCheckModalOpen(true);
+    const handleFinalCheckModalClose = () => setFinalCheckModalOpen(false);
 
     const fetchAddress = async () => {
         try {
@@ -109,7 +118,19 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         );
     };
 
+    const handleFinalCheckModal = async () => {
+        if (!isAddressValid) {
+            setAddressWarningMessage("住所を登録してください。");
+            return;
+        } else if (mpmysell.filter(item => item.sellStatus === 1).length === 0) {
+            setSellWarningMessage("最低1つ出品してください。");
+        } else {
+            handleFinalCheckModalOpen();
+        }
+    };
+
     const handleExchangeFinalRequest = async () => {
+        setIsSubmitting(true);
         try {
             const response = await axios.post('https://localhost:7103/api/Requests', {
                 responderSellId: sellId,
@@ -119,8 +140,18 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
             });
             console.log('Exchange request sent:', response.data);
             onClose(); // モーダルを閉じる
+            handleFinalCheckModalClose();
+            setToMainDetailMessage("交換申請が送られました");
+            setTimeout(() => {
+                window.location.reload(); // 画面を再読み込み
+            }, 2000); // 2秒待機// 成功メッセージをセット
+            setMessage("交換申請が成功しました", 'success'); // 成功メッセージをセット
+
         } catch (error) {
+            setMessage("交換申請に失敗しました", 'error'); // 失敗メッセージをセット
             console.error('Error sending exchange request:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -135,6 +166,9 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
 
     const allChecked = selectedSellIds.length === mpmysell.filter(item => item.sellStatus === 1).length;
 
+    const handleAddressFetch = (isValid: boolean) => {
+        setIsAddressValid(isValid);
+    };
 
     // 認証されている場合の表示
     const renderAuthenticatedContent = () => (
@@ -169,7 +203,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                         <Link to="/sell" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                             <AddIcon sx={{ color: '#0F9ED5' }} />
                             <Typography variant='subtitle1' sx={{ color: '#0F9ED5' }}>
-                                さらに出品
+                                出品する
                             </Typography>
                         </Link>
                     </Box>
@@ -194,11 +228,6 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                         />
                     </Box>
                 </Box>
-
-
-                
-                
-                
                     
                 <Box sx={{ pl: 0.8, mt: 0, mb: 0.5, mr: 1.5 }}>
                     {mpmysell.filter(item => item.sellStatus === 1).map((item, index) => (
@@ -217,8 +246,6 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     ))}
                 </Box>
                     
-               
-
                 <Grid container alignItems="center" sx={{ mt: 1, p: 1, mb: 1, background: '#F2F2F2', color: '#444444', fontSize: '0.8rem', borderRadius: '4px', }}>
                     <Grid item>
                         <RocketLaunchIcon sx={{ ml: 1, mr: 2, display: 'flex', justifyContent: 'center', fontSize: '1.3rem', color: '#0F9ED5' }} />
@@ -230,28 +257,71 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     </Grid>
                 </Grid>
 
+                {isOpen && <AddressLink onAddressFetch={handleAddressFetch} />}
                 
-                <ShippingLink />
+                {sellWarningMessage && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        {sellWarningMessage}
+                    </Alert>
+                )}
+                {addressWarningMessage && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        {addressWarningMessage}
+                    </Alert>
+                )}
 
-                
-
-                <Typography sx={{ py: 1.5, color: '#454545', fontSize: '0.8rem' }}>
-                    この選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{ color: "red" }}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
-                </Typography>
-                <Typography sx={{ py: 1.5, color: '#454545', fontSize: '0.8rem' }}>
-                    <Link to="/terms-of-service" style={{ color: '#0F9ED5', textDecoration: 'underline'  }}>
-                        利用規約
-                    </Link>
-                    に同意の上、ボタンを押してください。
-                </Typography>
 
                 <Box sx={{ py: 2, position: 'relative', bottom: 0, right: 0, display: 'flex', justifyContent: 'center', maxWidth: '640px', width: '100%', left: '50%', transform: 'translateX(-50%)', }}>
-                    <Button variant="contained" disableElevation sx={{ background: 'white', maxWidth: '640px', width: '100%', color: 'red', border: '1px solid red', borderRadius: '4px', boxShadow: 'none' }}
-                        onClick={handleExchangeFinalRequest}
+                    <Button variant="contained" disableElevation sx={{ background: 'red', maxWidth: '640px', width: '100%', color: 'white', border: '1px solid red', borderRadius: '4px', boxShadow: 'none' ,'&:hover': {
+                        background: 'red', // ホバー時の背景色
+                        boxShadow: 'none', // ホバー時の影
+                    },}}
+                        onClick={handleFinalCheckModal}
                     >
                         交換を希望する
                     </Button>
                 </Box>
+
+                <Modal
+                    open={finalCheckModalOpen}
+                    onClose={handleFinalCheckModalClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={{zIndex:100000, position: 'absolute' as 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '90vw', // 画面の幅を90%に設定
+                        maxWidth: '640px',  // 最大幅を640pxに設定
+                        borderRadius: 1,
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 0,}}
+                    >
+                        <Typography sx={{px:2, pt:3, pb: 1.5, color: '#454545', fontSize: '0.8rem' }}>
+                            選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{ color: "red" }}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
+                        </Typography>
+                        <Typography sx={{px:2, py: 1.5, color: '#454545', fontSize: '0.8rem' }}>
+                            <Link to="/terms-of-service" style={{ color: '#0F9ED5', textDecoration: 'underline'  }}>
+                                利用規約
+                            </Link>
+                            に同意の上、ボタンを押してください。
+                        </Typography>
+                        <Box sx={{px:1,}}>
+                            <Box sx={{ pt: 2, pb:3, position: 'relative', bottom: 0, right: 0, display: 'flex', justifyContent: 'center', maxWidth: '640px', width: '100%', left: '50%', transform: 'translateX(-50%)', }}>
+                                <Button variant="contained" disableElevation sx={{ background: 'red', maxWidth: '640px', width: '100%', color: 'white', border: '1px solid red', borderRadius: '4px', boxShadow: 'none' ,'&:hover': {
+                                    background: 'red', // ホバー時の背景色
+                                    boxShadow: 'none', // ホバー時の影
+                                },}}
+                                    onClick={handleExchangeFinalRequest}
+                                >
+                                    {isSubmitting ? <CircularProgress size={24} sx={{ color: 'white' }} /> : '交換を希望する'}
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Box>
+                </Modal>
                 {/* Add the Recent Comments s
                 <Box sx={{ border: '0.5px solid #A2A2A2A2', borderRadius: '4px', padding: '16px', }}>
                     <Typography variant="body2" sx={{ mb: 1.5, color: '#454545', }}>
