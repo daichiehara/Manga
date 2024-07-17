@@ -1,6 +1,6 @@
-import { useEffect, useState} from 'react';
+import { useEffect, useState, useContext} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Grid, Modal, Alert, Typography, Paper, Button, Divider} from '@mui/material';
+import { Box, Grid, CircularProgress, Alert, Typography, Paper, Button, IconButton, Divider, Drawer} from '@mui/material';
 import 'swiper/swiper-bundle.css'; 
 import ImageCarousel from '../components/common/ImageCarousel';
 import BackButton from '../components/common/BackButton';
@@ -17,6 +17,8 @@ import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply イ�
 import { useSnackbar } from '../hooks/useSnackbar';
 import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
 import axios from 'axios';
+import { SnackbarContext } from '../components/context/SnackbarContext';
+import CloseIcon from '@mui/icons-material/Close';
 
 /**
  * MangaDetail コンポーネント
@@ -56,7 +58,9 @@ const MangaDetail = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState<string | null>(null);
   const [severity, setSeverity] = useState<'success' | 'error'>('success');
-
+  const [isCancelDrawerOpen, setIsCancelDrawerOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // 送信中状態を管理
+  const { showSnackbar } = useContext(SnackbarContext);
   useSnackbar();
 
   const handleBack = () => {
@@ -84,6 +88,12 @@ const MangaDetail = () => {
 
   const [error, setError] = useState<string | null>(null); 
 
+  const handlCancelClickSuccess = () => {
+    showSnackbar('交換申請がキャンセルされました', 'success');
+  };
+
+  
+
   useEffect(() => {
     const fetchMangaDetails = async () => {
       try {
@@ -100,16 +110,42 @@ const MangaDetail = () => {
     fetchMangaDetails();
   }, [sellId]);
 
+  useEffect(() => {
+    if (!drawerOpen) {
+        const fetchMangaDetails = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
+                    withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+                });
+                setMangaDetail(response.data);
+            } catch (error) {
+                console.error('漫画の詳細情報の取得に失敗:', error);
+            }
+        };
+
+        fetchMangaDetails();
+    }
+}, [drawerOpen, sellId]);
+
+
   const withdrawRequests = async () => {
+    setIsSubmitting(true);
     try {
         await axios.put(`https://localhost:7103/api/Requests/withdrawRequests/${sellId}`, null, {
             withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
-        showMessage("交換申請が取り消されました", 'success'); // 成功メッセージをセット
+        const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
+                withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+            }); // sell情報を再読み込み
+        setMangaDetail(response.data); // データの再取得
+        setCancelDrawerOpen(false); // ドロワー下げる。
+        showSnackbar("交換申請が取り消されました", 'success'); // 成功メッセージをセット
         // 必要に応じて他の状態を更新
     } catch (error) {
-        showMessage("交換申請の取り消しに失敗しました", 'error'); // 失敗メッセージをセット
+        showSnackbar("交換申請の取り消しに失敗しました", 'error'); // 失敗メッセージをセット
         console.error('交換申請の取り消しに失敗:', error);
+      } finally {
+        setIsSubmitting(false);
     }
   };
 
@@ -255,31 +291,63 @@ const MangaDetail = () => {
           <Alert severity={severity} sx={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', zIndex: 9999 }}>
               {message}
           </Alert>
-      )}
-      {/* 
-      <Modal
-        open={finalCheckModalOpen}
-        onClose={handleFinalCheckModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={{zIndex:100000, position: 'absolute' as 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '90vw', // 画面の幅を90%に設定
+      )} 
+      <Drawer
+        anchor='bottom'
+        open={cancelDrawerOpen}
+        onClose={() => {
+          setCancelDrawerOpen(false);
+        }}
+        ModalProps={{
+          keepMounted: true,  // Keep the component mounted after it's been displayed once
+          BackdropProps: {
+            invisible: true
+          }
+        }}
+        sx={{
+          '& .MuiDrawer-paper': {
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            height: '30vh',
+            width: '100vw', // 画面の幅にフルで広げる
             maxWidth: '640px',  // 最大幅を640pxに設定
-            borderRadius: 1,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 0,}}
+            mx: 'auto',
+            zIndex: 30000,
+            display: 'flex', // Flexboxレイアウトを使用
+            alignItems: 'center', // 垂直方向の中央に配置
+            justifyContent: 'center', // 水平方向の中央に配置
+          }
+        }}
+      >
+        <IconButton 
+          onClick={() => setCancelDrawerOpen(false)} 
+          sx={{ 
+            position: 'absolute', 
+            top: 8, 
+            left: 8 
+          }}
         >
-            <Typography sx={{px:2, pt:3, pb: 1.5, color: '#454545', fontSize: '0.8rem' }}>
-                選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{ color: "red" }}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
-            </Typography>
-            
+          <CloseIcon />
+        </IconButton>
+
+        <Typography sx={{px:2, pt:3, pb: 1.5, color: '#454545', fontSize: '0.9rem', fontWeight:'bold' }}>
+          この漫画への交換申請がキャンセルされます
+        </Typography>
+        <Typography sx={{px:2, pb: 5, color: '#454545', fontSize: '0.9rem' }}>
+          ※ キャンセル後も、この出品に交換申請することができます
+        </Typography>
+
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', boxShadow: 'none' }}>
+          <Button variant="contained" color='error' onClick={withdrawRequests}
+              sx={{ mx: 2, maxWidth: '640px', width: '100%', background: '#D83022',
+              boxShadow: 'none',
+              fontWeight:'bold'
+              }}
+          >
+              {isSubmitting ? <CircularProgress size={24} sx={{ color: 'white' }} /> : '交換申請をキャンセルする'}
+          </Button>
         </Box>
-      </Modal>*/}
+      </Drawer>
     </Box>
   );
 };
