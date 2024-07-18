@@ -2,6 +2,6 @@
 {
     public class RequestedSellDetailDto
     {
-        public List<ItemDto> RequesterSells { get; set; }
+        public List<RequestedSellDto> RequesterSells { get; set; }
     }
 }

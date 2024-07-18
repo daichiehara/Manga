@@ -4,6 +4,7 @@
     {
         public int ItemId { get; set; }
         public string Title { get; set; }
+        public SellStatus? SellStatus { get; set; }
     }
 
     public class OwnedListDto
