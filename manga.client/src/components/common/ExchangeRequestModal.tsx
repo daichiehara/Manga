@@ -7,6 +7,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Box, Alert, Modal, Grid, Typography, Divider, Button, FormGroup, FormControlLabel, Checkbox, CircularProgress } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import EmojiObjectsOutlinedIcon from '@mui/icons-material/EmojiObjectsOutlined';
 import NavigateToLoginBox from '../login/NavigateToLoginBox';
 import AddIcon from '@mui/icons-material/Add';
 import AddressLink from './AddressLink';
@@ -18,6 +20,7 @@ interface ExchangeRequestModalProps {
     isOpen: boolean;
     onClose: () => void;
     setMessage: (message: string | null, severity: 'success' | 'error') => void; // メッセージ表示用の関数を受け取る
+    wishTitles: { title: string; isOwned: boolean }[];
 }
 
 interface ChangeAddressDto {
@@ -39,7 +42,7 @@ interface MpMySell {
     sellStatus: number;
 }
 
-const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose, setMessage }) => {
+const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose, setMessage , wishTitles }) => {
     const { sellId } = useParams();
     const { authState } = useContext(AuthContext);
     const [triggerFetch, setTriggerFetch] = useState(false);
@@ -217,7 +220,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                                     onChange={handleSelectAllChange}
                                     disableRipple
                                     sx={{
-                                        '& .MuiSvgIcon-root': { fontSize: '1.0rem' }  // ここでチェックボックスのサイズを変更
+                                        '& .MuiSvgIcon-root': { fontSize: '1.0rem', color:'red' }  // ここでチェックボックスのサイズを変更
                                     }}
                                 />
                             }
@@ -231,29 +234,66 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 </Box>
                     
                 <Box sx={{ pl: 0.8, mt: 0, mb: 0.5, mr: 1.5 }}>
-                    {mpmysell.filter(item => item.sellStatus === 1).map((item, index) => (
-                        <FormGroup key={index}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={selectedSellIds.includes(item.sellId)}
-                                        onChange={() => handleCheckboxChange(item.sellId)}
-                                        disableRipple
-                                    />
-                                }
-                                label={item.message}
-                            />
-                        </FormGroup>
-                    ))}
+                {mpmysell.filter(item => item.sellStatus === 1).map((item, index) => {
+                        const isWishTitle = wishTitles.some(wish => wish.isOwned && wish.title === item.message);
+                        return (
+                            <FormGroup key={index}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={selectedSellIds.includes(item.sellId)}
+                                            onChange={() => handleCheckboxChange(item.sellId)}
+                                            disableRipple
+                                            sx={{
+                                                '& .MuiSvgIcon-root': { fontSize: '1.2rem', color:'red' }  // ここでチェックボックスのサイズを変更
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <Typography sx={{ fontWeight: isWishTitle ? 'bold' : 'normal' }} >
+                                                {item.message}
+                                            </Typography>
+                                            {isWishTitle && (
+                                                <Box display="flex" alignItems="center">
+                                                    {/* <RocketLaunchIcon sx={{ fontSize: '1.4rem', color: '#0F9ED5', ml: 1 }} /> */}
+                                                    <Typography sx={{ ml: 1.5, fontWeight: 'bold', fontStyle: 'italic', fontSize: '0.9rem', color: '#0F9ED5' }}>
+                                                        want
+                                                        <Box component="span" sx={{ color: 'orange' }}>!!</Box>
+                                                    </Typography>
+                                                </Box>
+                                            )}
+                                            
+                                        </Box>
+                                    }
+                                />
+                            </FormGroup>
+                        );
+                    })}
                 </Box>
-                    
+
                 <Grid container alignItems="center" sx={{ mt: 1, p: 1, mb: 1, background: '#F2F2F2', color: '#444444', fontSize: '0.8rem', borderRadius: '4px', }}>
                     <Grid item>
-                        <RocketLaunchIcon sx={{ ml: 1, mr: 2, display: 'flex', justifyContent: 'center', fontSize: '1.3rem', color: '#0F9ED5' }} />
+                    <Box sx={{ display: 'flex', alignItems: 'center', py: 0.1 }}>
+                        <Typography variant="subtitle2" sx={{mr:1, mb:0.2, color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic'}}>
+                            want<Box component="span" sx={{ color: 'orange' }}>!!</Box>
+                        </Typography>
+                    </Box>
                     </Grid>
                     <Grid item xs>
                         <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
-                            複数選択すると交換される可能性が上がります。交換されるタイトルは1つです。
+                            出品者の欲しい漫画です。選択で交換成功率アップ!!
+                        </Typography>
+                    </Grid>
+                </Grid>
+                    
+                <Grid container alignItems="center" sx={{ mt: 1, p: 1, mb: 1, background: '#F2F2F2', color: '#444444', fontSize: '0.8rem', borderRadius: '4px', }}>
+                    <Grid item>
+                        <EmojiObjectsOutlinedIcon sx={{ ml: 1, mr: 2, display: 'flex', justifyContent: 'center', fontSize: '1.7rem', color: 'orange' }} />
+                    </Grid>
+                    <Grid item xs>
+                        <Typography variant="body2" sx={{ color: '#444444', fontSize: '0.8rem' }}>
+                            交換されるタイトルは1つです。複数選択して成功率アップ!!
                         </Typography>
                     </Grid>
                 </Grid>

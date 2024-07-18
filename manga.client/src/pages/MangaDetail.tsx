@@ -286,7 +286,7 @@ const MangaDetail = () => {
       <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
         {renderActionButton()}
       </Box>
-      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} setMessage={showMessage}/>
+      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} setMessage={showMessage} wishTitles={mangaDetail.wishTitles}/>
       {message && (
           <Alert severity={severity} sx={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', zIndex: 9999 }}>
               {message}
