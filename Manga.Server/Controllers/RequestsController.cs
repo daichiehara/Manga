@@ -468,7 +468,7 @@ namespace Manga.Server.Controllers
                 return NotFound("No sell found with the given SellId.");
             }
 
-            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id && r.Status != RequestStatus.Withdrawn);
+            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id);
 
             var requesterSellsInfo = await requestQuery
                 .Select(r => new
