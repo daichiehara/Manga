@@ -420,18 +420,29 @@ namespace Manga.Server.Controllers
                 return NotFound();
             }
 
+            bool isPublic = sell.SellStatus == SellStatus.Recruiting || sell.SellStatus == SellStatus.Established;
+            bool isOwner = sell.UserAccountId == userId;
+
+            if (!isPublic && !isOwner)
+            {
+                return NotFound();
+            }
+
             RequestButtonStatus requestStatus;
             if (sell.SellStatus == SellStatus.Established) // 既にマッチングが成立している場合
             {
                 requestStatus = RequestButtonStatus.Matched;
             }
-            else if (await _context.Request.AnyAsync(r => r.RequesterId == userId && r.ResponderSellId == id && (r.Status == RequestStatus.Pending || r.Status == RequestStatus.Rejected)))
-            {
-                requestStatus = RequestButtonStatus.AlreadyRequested;
-            }
-            else if (sell.SellStatus != SellStatus.Established && sell.UserAccountId == userId)
+            else if (sell.UserAccountId == userId)
             {
                 requestStatus = RequestButtonStatus.OwnSell;
+            }
+            else if (await _context.Request.AnyAsync(r =>
+                        r.RequesterId == userId &&
+                        r.ResponderSellId == id &&
+                        r.Status != RequestStatus.Withdrawn))
+            {
+                requestStatus = RequestButtonStatus.AlreadyRequested;
             }
             else
             {
@@ -1030,23 +1041,50 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<List<RequestedSellDto>>> GetRequestedSell()
         {
             var userId = _userManager.GetUserId(User);
-
-            var requestedSells = await _context.Request
+            var requests = await _context.Request
                 .Where(r => r.RequesterId == userId)
-                .Select(r => new RequestedSellDto
+                .Select(r => new
                 {
-                    SellId = r.ResponderSellId,
-                    Title = r.ResponderSell.Title,
+                    r.ResponderSellId,
+                    r.ResponderSell.Title,
                     ImageUrl = r.ResponderSell.SellImages
                                     .OrderBy(si => si.Order)
                                     .Select(si => si.ImageUrl)
                                     .FirstOrDefault(),
-                    Created = r.Create,
-                    Status = r.Status
+                    r.Create,
+                    r.Status
                 })
                 .ToListAsync();
 
-            return requestedSells;
+            var prioritizedRequests = requests
+                .GroupBy(r => r.ResponderSellId)
+                .Select(g =>
+                {
+                    var prioritizedRequest = g.OrderBy(r => GetStatusPriority(r.Status)).First();
+                    return new RequestedSellDto
+                    {
+                        SellId = prioritizedRequest.ResponderSellId,
+                        Title = prioritizedRequest.Title,
+                        ImageUrl = prioritizedRequest.ImageUrl,
+                        Created = prioritizedRequest.Create,
+                        Status = prioritizedRequest.Status
+                    };
+                })
+                .ToList();
+
+            return prioritizedRequests;
+        }
+
+        private int GetStatusPriority(RequestStatus status)
+        {
+            return status switch
+            {
+                RequestStatus.Approved => 1,
+                RequestStatus.Withdrawn => 2,
+                RequestStatus.Pending => 3,
+                RequestStatus.Rejected => 4,
+                _ => 5
+            };
         }
 
         [HttpGet("RequestedSell/{sellId}")]
