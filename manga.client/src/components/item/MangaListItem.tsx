@@ -90,9 +90,8 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
           </Typography>
           
           <Box sx={{ display: 'flex', alignItems: 'center', py: 0.1 }}>
-            <ShoppingCartIcon sx={{ fontSize: '1.1rem', mr: 0.5, color: '#F3B13D' }} />
-            <Typography variant="subtitle2" component="span" sx={{mb:0.2, color: "#0F9ED5", fontWeight:`bold` }}>
-              want
+            <Typography variant="subtitle2" component="span" sx={{mb:0.2, color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic' }}>
+              want<Box component="span" sx={{ color: 'orange' }}>!!</Box>
             </Typography>
             <Typography variant="subtitle2" component="span" sx={{ml:0.5, mb:0.2, color: "#757575", fontSize:'0.7rem' }}>
               交換希望の漫画
