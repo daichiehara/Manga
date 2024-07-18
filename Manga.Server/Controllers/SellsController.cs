@@ -437,16 +437,27 @@ namespace Manga.Server.Controllers
             {
                 requestStatus = RequestButtonStatus.OwnSell;
             }
-            else if (await _context.Request.AnyAsync(r =>
-                        r.RequesterId == userId &&
-                        r.ResponderSellId == id &&
-                        r.Status != RequestStatus.Withdrawn))
-            {
-                requestStatus = RequestButtonStatus.AlreadyRequested;
-            }
             else
             {
-                requestStatus = RequestButtonStatus.CanRequest;
+                var userRequests = await _context.Request
+                    .Where(r => r.RequesterId == userId && r.ResponderSellId == id)
+                    .ToListAsync();
+
+                if (userRequests.Any())
+                {
+                    if (userRequests.Any(r => r.Status == RequestStatus.Withdrawn))
+                    {
+                        requestStatus = RequestButtonStatus.CanRequest;
+                    }
+                    else
+                    {
+                        requestStatus = RequestButtonStatus.AlreadyRequested;
+                    }
+                }
+                else
+                {
+                    requestStatus = RequestButtonStatus.CanRequest;
+                }
             }
 
             // 出品者のWishListを取得
