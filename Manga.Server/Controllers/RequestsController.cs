@@ -485,6 +485,7 @@ namespace Manga.Server.Controllers
                 })
                 .OrderBy(r => r.RequestStatus == RequestStatus.Approved ? 0 : 1)
                 .ThenBy(r => r.RequestStatus == RequestStatus.Pending ? 0 : 1)
+                .ThenBy(r => r.SellStatus == SellStatus.Recruiting ? 0 : 1)
                 .ThenByDescending(r => r.CreateTime)
                 .ToListAsync();
 
