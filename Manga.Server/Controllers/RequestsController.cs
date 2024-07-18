@@ -468,7 +468,7 @@ namespace Manga.Server.Controllers
                 return NotFound("No sell found with the given SellId.");
             }
 
-            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id && r.Status != RequestStatus.Withdrawn);
+            var requestQuery = _context.Request.Where(r => r.ResponderSellId == id);
 
             var requesterSellsInfo = await requestQuery
                 .Select(r => new
@@ -485,6 +485,7 @@ namespace Manga.Server.Controllers
                 })
                 .OrderBy(r => r.RequestStatus == RequestStatus.Approved ? 0 : 1)
                 .ThenBy(r => r.RequestStatus == RequestStatus.Pending ? 0 : 1)
+                .ThenBy(r => r.SellStatus == SellStatus.Recruiting ? 0 : 1)
                 .ThenByDescending(r => r.CreateTime)
                 .ToListAsync();
 
