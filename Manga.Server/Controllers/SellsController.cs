@@ -1103,7 +1103,7 @@ namespace Manga.Server.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var requesterSells = await _context.Request
-                .Where(r => r.ResponderSellId == sellId && r.RequesterId == userId)
+                .Where(r => r.ResponderSellId == sellId && r.RequesterId == userId && r.Status == RequestStatus.Pending)
                 .Select(r => new ItemDto { ItemId = r.RequesterSellId, Title = r.RequesterSell.Title })
                 .ToListAsync();
 
