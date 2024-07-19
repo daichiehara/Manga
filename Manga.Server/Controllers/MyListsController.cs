@@ -107,6 +107,7 @@ namespace Manga.Server.Controllers
 
         // PUT: api/MyLists/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /*
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMyList(int id, MyList myList)
         {
@@ -135,6 +136,7 @@ namespace Manga.Server.Controllers
 
             return NoContent();
         }
+        */
 
         // POST: api/MyLists
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -149,8 +151,8 @@ namespace Manga.Server.Controllers
         }
         */
         [Authorize]
-        [HttpPost]
-        public async Task<ActionResult<MyList>> AddToMyList(int sellId)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<MyListResponseDto>> ToggleMyList(int id)
         {
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
@@ -160,25 +162,39 @@ namespace Manga.Server.Controllers
 
             // すでに同じSellがMyListに登録されているかチェック
             var existingItem = await _context.MyList
-                .Where(m => m.UserAccountId == userId && m.SellId == sellId)
+                .Where(m => m.UserAccountId == userId && m.SellId == id)
                 .FirstOrDefaultAsync();
+
+            bool isAdded;
+
             if (existingItem != null)
             {
-                // 既に存在する場合は、何もせずにOKを返す（またはエラーメッセージを返す）
-                return Ok();
+                // 既に存在する場合は削除
+                _context.MyList.Remove(existingItem);
+                isAdded = false;
+            }
+            else
+            {
+                // 存在しない場合は新規追加
+                var myList = new MyList
+                {
+                    UserAccountId = userId,
+                    SellId = id
+                };
+                _context.MyList.Add(myList);
+                isAdded = true;
             }
 
-            // 新しいMyListエントリを作成
-            var myList = new MyList
-            {
-                UserAccountId = userId,
-                SellId = sellId
-            };
-
-            _context.MyList.Add(myList);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            // いいね！の総数を取得
+            var likeCount = await _context.MyList.CountAsync(m => m.SellId == id);
+
+            return Ok(new MyListResponseDto
+            {
+                IsLiked = isAdded,
+                LikeCount = likeCount
+            });
         }
 
         // DELETE: api/MyLists/5
