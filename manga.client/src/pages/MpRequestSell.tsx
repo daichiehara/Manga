@@ -7,6 +7,14 @@ import { AuthContext } from '../components/context/AuthContext';
 import PanToolIcon from '@mui/icons-material/PanTool';
 import RequestedSellDrawer from '../components/common/RequestedSellDrawer';
 import LoadingComponent from '../components/common/LoadingComponent';
+import theme from '../theme/theme';
+
+enum RequestStatus {
+  Pending = 1,
+  Approved = 2,
+  Rejected = 3,
+  Withdrawn = 4,
+}
 
 interface RequestedSell {
     sellId: number;
@@ -14,7 +22,7 @@ interface RequestedSell {
     imageUrl: string;
     created: string;
     status: number;
-    requesterSells: Array<{ itemId: number; title: string }>; // '?' を削除
+    requesterSells: Array<{ sellId: number; title: string; status: RequestStatus }>; // '?' を削除
   }
 
 function timeSince(date: string): string {
@@ -53,7 +61,7 @@ function getStatusStyle(status: number): StatusStyle {
     case 1:
       return { text: "申請中", color: "#4EA72E" };
     case 2:
-      return { text: "承認済み", color: "blue" };
+      return { text: "交換成立", color: theme.palette.info.main };
     case 3:
       return { text: "拒否されました", color: "red" };
     case 4:
@@ -126,7 +134,7 @@ const RequestedSellList: React.FC = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pt: 9 }}>
           <PanToolIcon sx={{ fontSize: 60, color: 'action.active', padding: 9 }} />
           <Typography variant="subtitle1">
-            交換申請をした漫画はありません
+            交換申請中の漫画はありません
           </Typography>
         </Box>
       </>

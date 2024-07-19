@@ -21,10 +21,18 @@ interface Notification {
   title: string; 
 }
 
+enum SellStatus {
+  Recruiting = 1,
+  Suspended = 2,
+  Established = 3,
+  Draft = 4,
+}
+
 interface SellInfoDto {
   sellId: number;
   title: string;
   imageUrl: string;
+  sellStatus: SellStatus;
   requestStatus: RequestStatus;
 }
 
