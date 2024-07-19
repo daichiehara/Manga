@@ -13,7 +13,6 @@ import NavigateToLoginBox from '../login/NavigateToLoginBox';
 import AddIcon from '@mui/icons-material/Add';
 import AddressLink from './AddressLink';
 import {useTheme} from '@mui/material/styles';
-import theme from '../../theme/theme';
 import { SnackbarContext } from '../context/SnackbarContext';
 
 interface ExchangeRequestModalProps {
@@ -55,7 +54,6 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     const [mpmysell, setmpmysell] = useState<MpMySell[]>([]);
     const [selectedSellIds, setSelectedSellIds] = useState<number[]>([]); // 選択されたsellIdを管理
     const contentRef = useRef<HTMLDivElement>(null);
-    const theme = useTheme();
     const [finalCheckModalOpen, setFinalCheckModalOpen] = React.useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false); // 送信中状態を管理
     const handleFinalCheckModalOpen = () => setFinalCheckModalOpen(true);
@@ -179,9 +177,9 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         <>
             <Box display="flex" alignItems="center" sx={{ my: 2, position: 'relative' }}>
                 <Button onClick={onClose} sx={{ p: 0, position: 'absolute', left: 0 }}>
-                    <CloseIcon sx={{fontSize:'1.9rem', color: theme.palette.info.main }} />
+                    <CloseIcon sx={{fontSize:'1.9rem', color: '#494949' }} />
                 </Button>
-                <Typography variant="h6" sx={{ color: theme.palette.info.main, fontWeight: 'bold', width: '100%', textAlign: 'center', fontSize:'1.1rem' }}>
+                <Typography variant="h6" sx={{ color: '#494949', fontWeight: 'bold', width: '100%', textAlign: 'center', fontSize:'1.1rem' }}>
                     交換を希望する
                 </Typography>
             </Box>

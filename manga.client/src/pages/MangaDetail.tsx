@@ -46,8 +46,11 @@ interface MangaDetail {
     sendPrefecture: string;
     sendDay: string;
     hasIdVerificationImage: boolean;
-    replies: Reply[]; 
     requestButtonStatus :number;
+    replies: Reply[]; 
+    replyCount:number;
+    isLiked:boolean;
+    likeCount:number;
 }  
 
 const MangaDetail = () => {
@@ -112,7 +115,7 @@ const MangaDetail = () => {
         console.error('漫画の詳細情報の取得に失敗:', error);
       }
     };
-
+    
     fetchMangaDetails();
   }, [sellId]);
 
@@ -131,7 +134,7 @@ const MangaDetail = () => {
 
         fetchMangaDetails();
     }
-}, [drawerOpen, sellId]);
+}, [drawerOpen]);
 
 
   const withdrawRequests = async () => {
@@ -237,6 +240,9 @@ const MangaDetail = () => {
               numberOfBooks={mangaDetail.numberOfBooks}
               bookState={mangaDetail.bookState}
               sellTime={mangaDetail.sellTime}
+              replyCount={mangaDetail.replyCount}
+              isLiked={mangaDetail.isLiked}
+              likeCount={mangaDetail.likeCount}
             />
 
             <Paper elevation={0} sx={{ pt: 0.5, pb: 1, pl: 2.0, pr: 2.0, border: 'none' }}>
