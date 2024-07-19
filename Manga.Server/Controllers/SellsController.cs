@@ -413,6 +413,7 @@ namespace Manga.Server.Controllers
             var sell = await _context.Sell
                 .Include(s => s.UserAccount)
                 .Include(s => s.SellImages)
+                .Include(s => s.MyLists)
                 .FirstOrDefaultAsync(s => s.SellId == id);
 
             if (sell == null)
@@ -507,6 +508,10 @@ namespace Manga.Server.Controllers
                 .Where(r => r.SellId == id)
                 .CountAsync();
 
+            // いいね！の情報を取得
+            bool isLiked = sell.MyLists.Any(ml => ml.UserAccountId == userId);
+            int likeCount = sell.MyLists.Count;
+
             var dto = new SellDetailsDto
             {
                 SellId = sell.SellId,
@@ -525,6 +530,8 @@ namespace Manga.Server.Controllers
                 WishTitles = wishTitles,
                 Replies = replies,
                 ReplyCount = replyCount,
+                IsLiked = isLiked,
+                LikeCount = likeCount,
                 RequestButtonStatus = requestStatus
             };
 

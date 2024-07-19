@@ -44,6 +44,9 @@ namespace Manga.Server.Models
 
         public int ReplyCount { get; set; }
 
+        public bool IsLiked { get; set; }
+        public int LikeCount { get; set; }
+
         public List<ReplyDto> Replies { get; set; } = new List<ReplyDto>();
 
         public List<string> ImageUrls { get; set; } = new List<string>();
