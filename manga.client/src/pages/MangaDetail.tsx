@@ -19,6 +19,8 @@ import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
 import axios from 'axios';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import CloseIcon from '@mui/icons-material/Close';
+import CustomToolbar from '../components/common/CustumToolbar';
+
 
 /**
  * MangaDetail コンポーネント
@@ -102,7 +104,11 @@ const MangaDetail = () => {
       });
         setMangaDetail(response.data);
       } catch (error) {
-        setError('漫画の詳細の読み込みに失敗しました。');
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setError('該当する漫画は削除されています');
+        } else {
+          setError('漫画の詳細の読み込みに失敗しました。');
+        }
         console.error('漫画の詳細情報の取得に失敗:', error);
       }
     };
@@ -152,7 +158,7 @@ const MangaDetail = () => {
 
   // Handle errors by rendering the ErrorDisplay component
   if (error) {
-    return <ErrorDisplay message={error} />;
+    return <><CustomToolbar title='詳細ページ'/><ErrorDisplay message={error} /></>;
   }
 
   // Handle the loading state
