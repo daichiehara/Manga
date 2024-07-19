@@ -7,7 +7,9 @@ import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 import MenuBar from '../components/menu/MenuBar';
+import LoadingComponent from '../components/common/LoadingComponent';
 import axios from 'axios';
+import ErrorDisplay from '../components/common/ErrorDisplay';
 
 interface MainSearch {
   sellId: number;
@@ -156,15 +158,14 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
     <>
       <Header onSearch={handleSearch} selectedTab={selectedTab} onTabChange={handleTabChange}/>
       
-      
-      
-      
+      {/* データ取得中のインジケーター */}
+      {loading && <Box sx={{}}><LoadingComponent /></Box>}
       
       <Box sx={{mt:'7rem',pt:`1rem`, pb:`6rem`}}>
-      {/* データ取得中のインジケーター */}
-      {loading && <div>ローディング中...</div>}
+
       {/* エラーメッセージ */}
-      {error && <div>{error}</div>}
+      {error && <ErrorDisplay message={error} />}
+
       {/* メインコンテンツ */}     
       {selectedTab === 0 && (
         myListData.length > 0 ? (
