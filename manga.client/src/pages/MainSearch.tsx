@@ -27,16 +27,15 @@ interface MainSearchProps {
 }
 
 const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
-  //const [selectedTab, setSelectedTab] = useState(0);
   const [mangaData, setMangaData] = useState<MainSearch[]>([]); 
   const [myListData, setMyListData] = useState<MainSearch[]>([]);
   const [RecommendData, setRecommendData] = useState<MainSearch[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState(initialTab);
-  // 新しいステートの追加
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fetchedTabs, setFetchedTabs] = useState({ favorite: false, recommend: false, new: false });
 
   /*
   useEffect(() => {
@@ -76,14 +75,17 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
   }, [location]);
 
   useEffect(() => {
-    if (selectedTab === 0) {
+    if (selectedTab === 0 && !fetchedTabs.favorite) {
       fetchMyListData();
-    } else if (selectedTab === 1) {
+      setFetchedTabs(prev => ({ ...prev, favorite: true }));
+    } else if (selectedTab === 1 && !fetchedTabs.recommend) {
       fetchRecommendData();
-    } else if (selectedTab === 2) {
+      setFetchedTabs(prev => ({ ...prev, recommend: true }));
+    } else if (selectedTab === 2 && !fetchedTabs.new) {
       fetchMangaData();
+      setFetchedTabs(prev => ({ ...prev, new: true }));
     }
-  }, [selectedTab]);  // selectedTabの変更を検知
+  }, [selectedTab, fetchedTabs]);
 
   const fetchMangaData = async () => {
     setLoading(true);
@@ -158,13 +160,15 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
     <>
       <Header onSearch={handleSearch} selectedTab={selectedTab} onTabChange={handleTabChange}/>
       
-      {/* データ取得中のインジケーター */}
-      {loading && <Box sx={{}}><LoadingComponent /></Box>}
+      
       
       <Box sx={{mt:'7rem',pt:`1rem`, pb:`6rem`}}>
 
       {/* エラーメッセージ */}
       {error && <ErrorDisplay message={error} />}
+
+      {/* データ取得中のインジケーター */}
+      {loading && <Box sx={{}}><LoadingComponent /></Box>} 
 
       {/* メインコンテンツ */}     
       {selectedTab === 0 && (
