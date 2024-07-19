@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 
 const LoadingComponent: React.FC = () => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
       <CircularProgress />
       
     </Box>
