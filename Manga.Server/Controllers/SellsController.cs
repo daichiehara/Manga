@@ -236,10 +236,6 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync()
         {
             var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return NotFound();
-            }
 
             // 現在のユーザーのOwnedListのタイトルリストを取得
             var ownedTitles = await _context.OwnedList
