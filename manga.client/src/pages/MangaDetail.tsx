@@ -20,6 +20,7 @@ import axios from 'axios';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomToolbar from '../components/common/CustumToolbar';
+import theme from '../theme/theme';
 
 
 /**
@@ -255,9 +256,12 @@ const MangaDetail = () => {
                 この人が欲しい漫画
               </Typography>
               <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
-              {mangaDetail && (
+              {mangaDetail.wishTitles.length > 0 ? (
                 <WishListDisplay wishTitles={mangaDetail.wishTitles} shouldTruncate={false}/>
-              )}
+              ):(
+                <Typography variant='subtitle2' sx={{color:theme.palette.text.secondary}}>欲しい漫画が設定されていせん</Typography>
+              )
+              }
               <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold'}}>
                 {`出品物の説明`}
               </Typography>
