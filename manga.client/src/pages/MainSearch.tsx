@@ -29,7 +29,15 @@ interface MainSearchProps {
 }
 
 const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
-  const { mangaData, myListData, recommendData, isLoading, error } = useContext(AppContext);
+  const { 
+    mangaData, 
+    myListData, 
+    recommendData, 
+    isLoadingManga, 
+    isLoadingMyList, 
+    isLoadingRecommend, 
+    error 
+  } = useContext(AppContext);
   const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -168,9 +176,13 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
   }, [navigate]);
   const MemoizedMangaListItem = React.memo(MangaListItem);
 */
-
-  // ローディング状態の判定
-  const isPageLoading = !authState.isInitialized || (authState.isAuthenticated && isLoading);
+  
+  const isCurrentTabLoading = () => {
+    if (selectedTab === 0) return isLoadingMyList;
+    if (selectedTab === 1) return isLoadingManga;
+    if (selectedTab === 2) return isLoadingRecommend;
+    return false;
+  };
 
   return (
     <>
@@ -178,11 +190,14 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
       
       <Box sx={{mt:'7rem',pt:`1rem`, pb:`6rem`}}>
         {error && <ErrorDisplay message={error} />}
-        {isPageLoading ? (
+        {!authState.isInitialized ? (
           <LoadingComponent />
         ) : (
           <>
               {selectedTab === 0 && (
+                isLoadingMyList ? (
+                  <LoadingComponent />
+                ) : (
                 myListData.length > 0 ? (
                 myListData.map((item, index) => (
                   <MangaListItem
@@ -225,9 +240,12 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
                   商品を検索する
                 </Button>
               </Box>
-            )
+            ))
           )}
           {selectedTab === 1 && (
+            isLoadingRecommend ? (
+              <LoadingComponent />
+            ) : (
               recommendData.map((item, index) => (
                 <MangaListItem 
                   key={index}
@@ -237,9 +255,12 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
                   numberOfBooks={item.numberOfBooks}
                   wishTitles={item.wishTitles}
                 />
-              ))
+              )))
             )}
             {selectedTab === 2 && (
+              isLoadingManga ? (
+                <LoadingComponent />
+              ) : (
               mangaData.map((item, index) => (
                 <MangaListItem 
                   key={index}
@@ -249,7 +270,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
                   numberOfBooks={item.numberOfBooks}
                   wishTitles={item.wishTitles}
                 />
-              ))
+              )))
             )}
           </>
         )}
