@@ -49,6 +49,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     const [address, setAddress] = useState<ChangeAddressDto | null>(null);
     const [addressWarningMessage, setAddressWarningMessage] = useState<string | null>(null);
     const [sellWarningMessage, setSellWarningMessage] = useState<string | null>(null);
+    const [checkBoxWarningMessage, setCheckBoxWarningMessage] = useState<string | null>(null);
     const [toMainDetailMessage, setToMainDetailMessage] = useState<string | null>(null);
     const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
     const [mpmysell, setmpmysell] = useState<MpMySell[]>([]);
@@ -122,12 +123,24 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
         );
     };
 
+    // チェックボックスの選択を検証する関数
+    const validateCheckboxSelection = () => {
+        if (selectedSellIds.length === 0) {
+            setCheckBoxWarningMessage("1つ以上選択してください。");
+        } else {
+            setCheckBoxWarningMessage(null);
+        }
+    };
+
     const handleFinalCheckModal = async () => {
+        validateCheckboxSelection(); // チェックボックス選択の検証を追加
         if (!isAddressValid) {
             setAddressWarningMessage("住所を登録してください。");
             return;
         } else if (mpmysell.filter(item => item.sellStatus === 1).length === 0) {
             setSellWarningMessage("最低1つ出品してください。");
+        } else if (selectedSellIds.length === 0) {
+            setCheckBoxWarningMessage("1つ以上選択してください。");
         } else {
             handleFinalCheckModalOpen();
         }
@@ -303,6 +316,13 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                         {sellWarningMessage}
                     </Alert>
                 )}
+
+                {checkBoxWarningMessage && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        {checkBoxWarningMessage}
+                    </Alert>
+                )}
+
                 {addressWarningMessage && (
                     <Alert severity="warning" sx={{ mb: 2 }}>
                         {addressWarningMessage}
