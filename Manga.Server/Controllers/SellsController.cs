@@ -322,9 +322,7 @@ namespace Manga.Server.Controllers
                 .Include(s => s.SellImages)
                 .Include(s => s.UserAccount.WishLists)
                 .Where(s => s.UserAccountId != userId &&
-                            (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established) &&
-                            (wishTitles.Contains(s.Title) ||
-                             s.UserAccount.WishLists.Any(w => userTitles.Contains(w.Title))))
+                            (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
                 .OrderByDescending(s => wishTitles.Contains(s.Title) && s.UserAccount.WishLists.Any(w => userTitles.Contains(w.Title)))
                 .ThenByDescending(s => wishTitles.Contains(s.Title))
                 .ThenByDescending(s => s.UserAccount.WishLists.Any(w => userTitles.Contains(w.Title)))
