@@ -6,6 +6,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import dayjs from 'dayjs';
 import axios from 'axios';
+import theme from '../../theme/theme';
 
 interface MangaDetailInfoProps {
   title: string;
@@ -69,23 +70,29 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
       <Typography variant="subtitle1" sx={{ pt: 2, pb: 0.5, color: '#156082' }}>
         {bookState}
       </Typography>
-      <Typography variant="subtitle1" sx={{ pt: 0.5, pb: 0, color: '#757575' }}>
-        {`${formattedSellTime}に出品`}
-      </Typography>
-      <Box>
-        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-          <IconButton onClick={handleLike} sx={{ color: liked ? 'red' : 'default' }} disableRipple>
-            {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-          </IconButton>
-          <Typography sx={{ pl: 1, pt: 1 }}>
-            {Number.isNaN(currentLikeCount) ? `いいね！` : currentLikeCount}
-          </Typography>
-          <ModeCommentOutlinedIcon sx={{ color: 'default', pl: 2, pt: 1 }} />
-          <Typography sx={{ pl: 1, pt: 1 }}>
+      
+
+      {/* いいねとコメント数 */}
+      <Box sx={{ display: 'flex', justifyContent: 'left', pt:1.5 }}>
+        <Typography variant="subtitle1" sx={{mr:1.4, pt: 0.5, pb: 0, color: '#757575' }}>
+          {`${formattedSellTime}に出品`}
+        </Typography>
+        <Box sx={{display: 'flex', justifyContent: 'right', alignItems: 'center', borderColor: theme.palette.text.secondary, borderWidth: 1, borderStyle: 'solid', borderRadius:'5px', p:0.1, mr:1.5 }}>
+            <IconButton onClick={handleLike} sx={{ py:0.3, color: liked ? 'red' : 'default' }} disableRipple >
+              {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </IconButton>
+            <Typography variant='subtitle2' sx={{ mr:0.8, fontWeight:'bold' }}>
+              {(Number.isNaN(currentLikeCount) || currentLikeCount === 0) ? `いいね！` : currentLikeCount}
+            </Typography>
+        </Box>
+        <Box sx={{display: 'flex', justifyContent: 'left', alignItems: 'center', borderColor: theme.palette.text.secondary, borderWidth: 1, borderStyle: 'solid', borderRadius:'5px' }}>
+          <ModeCommentOutlinedIcon sx={{ fontSize:'19px',color: theme.palette.text.secondary, px:0.8, py:0.3 }} />
+          <Typography variant='subtitle2' sx={{mr:0.8, fontWeight:'bold'}}>
             {replyCount ? replyCount : 'コメント'}
           </Typography>
         </Box>
       </Box>
+
     </Paper>
   );
 };
