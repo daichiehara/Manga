@@ -297,11 +297,11 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("Recommend")]
-        public async Task<ActionResult<PaginatedResultDto<HomeDto>>> GetRecommendedSellsAsync(int page = 1, int pageSize = 7)
+        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync()
         {
             var userId = _userManager.GetUserId(User);
 
-            // ユーザーの所有タイトルとWishリストを取得（変更なし）
+            // 1. ユーザーの所有タイトルとWishリストを一度のクエリで取得
             var userTitlesAndWishes = await (from u in _context.Users
                                              where u.Id == userId
                                              select new
@@ -317,8 +317,8 @@ namespace Manga.Server.Controllers
             var userTitles = userTitlesAndWishes.OwnedTitles.Union(userTitlesAndWishes.SellTitles).ToHashSet();
             var wishTitles = userTitlesAndWishes.WishTitles.ToHashSet();
 
-            // クエリを構築（ExecuteAsync()を呼び出さない）
-            var query = _context.Sell
+            // 2. 推奨される出品を一度のクエリで取得
+            var recommendedSells = await _context.Sell
                 .Include(s => s.SellImages)
                 .Include(s => s.UserAccount.WishLists)
                 .Where(s => s.UserAccountId != userId &&
@@ -345,19 +345,10 @@ namespace Manga.Server.Controllers
                     SellImage = s.SellImages
                         .OrderBy(si => si.Order)
                         .FirstOrDefault().ImageUrl
-                });
+                })
+                .ToListAsync();
 
-            // ページネーションを適用
-            var totalItems = await query.CountAsync();
-            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-
-            return new PaginatedResultDto<HomeDto>
-            {
-                Items = items,
-                TotalItems = totalItems,
-                Page = page,
-                PageSize = pageSize
-            };
+            return recommendedSells;
         }
 
         /*
@@ -458,6 +449,7 @@ namespace Manga.Server.Controllers
                     Title = wl.Title,
                     IsOwned = userTitles.Contains(wl.Title)
                 })
+                .OrderByDescending(w => w.IsOwned)
                 .ToList();
 
             var replies = await _context.Reply
