@@ -15,6 +15,7 @@ import SellSettingList from '../components/mypage/SellSettingList';
 import PolicyList from '../components/mypage/PolicyList';
 import { useContext } from 'react';
 import { AuthContext } from '../components/context/AuthContext';
+import { UserContext } from '../components/context/UserContext';
 import LogoutList from '../components/mypage/LogoutList';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import { useSnackbar } from '../hooks/useSnackbar';
@@ -30,7 +31,7 @@ interface MainMyPage {
 }
 
 const MainMyPage: React.FC = () => {
-  const [myPage, setMyPage] = useState<MainMyPage | null>(null);
+  const { userInfo } = useContext(UserContext);
   const { authState } = useContext(AuthContext);
 
   const navigate = useNavigate();
@@ -58,20 +59,6 @@ const MainMyPage: React.FC = () => {
       // ログインしていない場合は何もしない（あるいは、ここでログインページにリダイレクトさせるなど）
       return;
     }
-    
-    // ログインしている場合に実行するAPIコールなど
-    const fetchMyPage = async () => {
-      try {
-        const response = await axios.get('https://localhost:7103/api/Users/MyPage', {
-          withCredentials: true
-        });
-        setMyPage(response.data);
-      } catch (error) {
-        console.error('ユーザー情報の取得に失敗しました。', error);
-      }
-    };
-
-    fetchMyPage();
   }, [authState.isAuthenticated]);
 
   
@@ -82,13 +69,13 @@ const MainMyPage: React.FC = () => {
       {/* ログイン状態に応じて表示を切り替える */}
       {authState.isAuthenticated ? (
         // ログインしている場合の表示
-        myPage ? (
+        userInfo ? (
           // myPageデータがある場合の表示
           <Box px={{}}>
           <Grid container direction="column" display="flex" alignItems="center" justifyContent="center" spacing={2} sx={{pt:15, pb:8}}>
             <Box display="flex" alignItems="center" justifyContent="center">
               <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 1.8,}}>
-                <Avatar src={myPage.profileIcon} alt={myPage.nickName} sx={{width:`4rem`, height:`4rem`}}/>        
+                <Avatar src={userInfo.profileIcon} alt={userInfo.nickName} sx={{width:`4rem`, height:`4rem`}}/>        
               </Stack>
             </Box>
 
@@ -96,9 +83,9 @@ const MainMyPage: React.FC = () => {
                 <Grid container direction="column" alignItems="center" >
                     
                     <Typography variant="subtitle1" sx={{pb:1, display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
-                        {myPage.nickName}
+                        {userInfo.nickName}
                     </Typography>
-                    {myPage.hasIdVerificationImage ? (
+                    {userInfo.hasIdVerificationImage ? (
                         <Grid container spacing={0.5} alignItems="center"sx={{pt:1}}>
                             <BeenhereRoundedIcon color="primary" sx={{display: 'flex', justifyContent: 'center', alignItems: `center` }} />
                             <Typography variant="body1" sx={{pl:1, color: 'black'}}>

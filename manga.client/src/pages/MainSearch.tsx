@@ -10,6 +10,8 @@ import MenuBar from '../components/menu/MenuBar';
 import LoadingComponent from '../components/common/LoadingComponent';
 import axios from 'axios';
 import ErrorDisplay from '../components/common/ErrorDisplay';
+import { AppContext } from '../components/context/AppContext';
+import { AuthContext } from '../components/context/AuthContext';
 
 interface MainSearch {
   sellId: number;
@@ -27,16 +29,11 @@ interface MainSearchProps {
 }
 
 const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
-  const [mangaData, setMangaData] = useState<MainSearch[]>([]); 
-  const [myListData, setMyListData] = useState<MainSearch[]>([]);
-  const [RecommendData, setRecommendData] = useState<MainSearch[]>([]);
+  const { mangaData, myListData, recommendData, isLoading, error } = useContext(AppContext);
+  const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState(initialTab);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [fetchedTabs, setFetchedTabs] = useState({ favorite: false, recommend: false, new: false });
-
   /*
   useEffect(() => {
     const fetchMangaData = async () => {
@@ -58,6 +55,22 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
   }, []);  // 空の依存配列を使用して、コンポーネントのマウント時にのみ実行
   */
 
+  useEffect(() => {
+    const tabFromPath = location.pathname === '/item/favorite' ? 0 : location.pathname === '/' ? 1 : location.pathname === '/item/new' ? 2 : 0;
+    setSelectedTab(tabFromPath);
+  }, [location]);
+
+  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
+    if (newValue === 0) {
+      navigate('/item/favorite');
+    } else if (newValue === 1) {
+      navigate('/');
+    } else if (newValue === 2) {
+      navigate('/item/new');
+    }
+  }, [navigate]);
+/*
   useEffect(() => {
     // パスに基づいて selectedTab を更新
     const tabFromPath = location.pathname === '/item/favorite' ? 0 : location.pathname === '/' ? 1 : location.pathname === '/item/new' ? 2 : 0;
@@ -131,7 +144,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
       setLoading(false);
     }
   };
-
+*/
   const handleSearch = useCallback((query: string) => {
     // 検索処理
   }, []);  // 依存配列が空なので、コンポーネントのライフタイムで一度だけ生成される
@@ -142,7 +155,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
     setSelectedTab(newValue);
   }, []);
   */
-
+/*
   const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
     if (newValue === 0) {
@@ -154,92 +167,92 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
     }
   }, [navigate]);
   const MemoizedMangaListItem = React.memo(MangaListItem);
+*/
 
+  // ローディング状態の判定
+  const isPageLoading = !authState.isInitialized || (authState.isAuthenticated && isLoading);
 
   return (
     <>
       <Header onSearch={handleSearch} selectedTab={selectedTab} onTabChange={handleTabChange}/>
       
-      
-      
       <Box sx={{mt:'7rem',pt:`1rem`, pb:`6rem`}}>
-
-      {/* エラーメッセージ */}
-      {error && <ErrorDisplay message={error} />}
-
-      {/* データ取得中のインジケーター */}
-      {loading && <Box sx={{}}><LoadingComponent /></Box>} 
-
-      {/* メインコンテンツ */}     
-      {selectedTab === 0 && (
-        myListData.length > 0 ? (
-          myListData.map((item, index) => (
-            <MangaListItem
-              key={index}
-              sellId={item.sellId}
-              sellImage={item.sellImage}
-              sellTitle={item.sellTitle}
-              numberOfBooks={item.numberOfBooks}
-              wishTitles={item.wishTitles}
-            />
-          ))
+        {error && <ErrorDisplay message={error} />}
+        {isPageLoading ? (
+          <LoadingComponent />
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 15 }}>
-            <FavoriteIcon sx={{ fontSize: 60, color: 'red', mb:5 }} />
-            <Typography variant="subtitle1">
-              「いいね！」した商品はありません
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1 }}>
-              商品ページから「いいね！」すると、ここで見ることができます。
-            </Typography>
-            <Button
-              component={Link}
-              to="/"
-              variant="outlined"
-              color="primary"
-              sx={{
-                mt: 3,
-                backgroundColor: 'white',
-                width: '80%',
-                height: 40,
-                fontWeight: '700',
-                fontSize: 16,
-                '&:hover': {
-                  backgroundColor: '#ffebee',
-                  borderColor: 'darkred',
-                  color: 'darkred'
-                }
-              }}
-            >
-              商品を検索する
-            </Button>
-          </Box>
-        )
-      )}
-      {selectedTab === 1 && (
-        RecommendData.map((item, index) => (
-          <MangaListItem 
-            key={index}
-            sellId={item.sellId}
-            sellImage={item.sellImage} 
-            sellTitle={item.sellTitle} 
-            numberOfBooks={item.numberOfBooks}
-            wishTitles={item.wishTitles} // 修正
-          />
-        ))
-      )}
-      {selectedTab === 2 && (
-        mangaData.map((item, index) => (
-          <MangaListItem 
-            key={index}
-            sellId={item.sellId}
-            sellImage={item.sellImage} 
-            sellTitle={item.sellTitle} 
-            numberOfBooks={item.numberOfBooks}
-            wishTitles={item.wishTitles} // 修正
-          />
-        ))
-      )}
+          <>
+              {selectedTab === 0 && (
+                myListData.length > 0 ? (
+                myListData.map((item, index) => (
+                  <MangaListItem
+                    key={index}
+                    sellId={item.sellId}
+                    sellImage={item.sellImage}
+                    sellTitle={item.sellTitle}
+                    numberOfBooks={item.numberOfBooks}
+                    wishTitles={item.wishTitles}
+                  />
+                ))
+              ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 15 }}>
+                <FavoriteIcon sx={{ fontSize: 60, color: 'red', mb:5 }} />
+                <Typography variant="subtitle1">
+                  「いいね！」した商品はありません
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1 }}>
+                  商品ページから「いいね！」すると、ここで見ることができます。
+                </Typography>
+                <Button
+                  component={Link}
+                  to="/"
+                  variant="outlined"
+                  color="primary"
+                  sx={{
+                    mt: 3,
+                    backgroundColor: 'white',
+                    width: '80%',
+                    height: 40,
+                    fontWeight: '700',
+                    fontSize: 16,
+                    '&:hover': {
+                      backgroundColor: '#ffebee',
+                      borderColor: 'darkred',
+                      color: 'darkred'
+                    }
+                  }}
+                >
+                  商品を検索する
+                </Button>
+              </Box>
+            )
+          )}
+          {selectedTab === 1 && (
+              recommendData.map((item, index) => (
+                <MangaListItem 
+                  key={index}
+                  sellId={item.sellId}
+                  sellImage={item.sellImage} 
+                  sellTitle={item.sellTitle} 
+                  numberOfBooks={item.numberOfBooks}
+                  wishTitles={item.wishTitles}
+                />
+              ))
+            )}
+            {selectedTab === 2 && (
+              mangaData.map((item, index) => (
+                <MangaListItem 
+                  key={index}
+                  sellId={item.sellId}
+                  sellImage={item.sellImage} 
+                  sellTitle={item.sellTitle} 
+                  numberOfBooks={item.numberOfBooks}
+                  wishTitles={item.wishTitles}
+                />
+              ))
+            )}
+          </>
+        )}
       </Box>
       <MenuBar />
     </>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Box, Button, useTheme, useMediaQuery, Typography, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CustomToolbar from '../components/common/CustumToolbar';
@@ -7,6 +7,9 @@ import axios from 'axios';
 import CameraVideoComponent from '../components/common/CameraVideo';
 import ImageShow from '../components/common/ImageShow';
 import CameraButton from '../components/common/CameraButton';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { SnackbarContext } from '../components/context/SnackbarContext';
+import { UserContext } from '../components/context/UserContext';
 
 const CameraPage: React.FC = () => {
   window.scrollTo({top:0, behavior: "instant"});
@@ -19,6 +22,9 @@ const CameraPage: React.FC = () => {
   const [open, setOpen] = useState(true);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const customNavigate = useCustomNavigate();
+  const { showSnackbar } = useContext(SnackbarContext);
+  const { refreshUserInfo } = useContext(UserContext);
   
   
   const handleClose = () => {
@@ -62,25 +68,25 @@ const CameraPage: React.FC = () => {
         if (error instanceof Error) {
           if (error.name === 'NotAllowedError') {
             // NotAllowedErrorの場合の処理
-            alert('撮影を開始するにはカメラのアクセスを許可する必要があります。');
+            showSnackbar('撮影を開始するにはカメラのアクセスを許可する必要があります。。', 'error');
             // 前の画面に戻る
-            navigate(-1);
+            customNavigate();
           } else if (error.name === 'PermissionDeniedError') {
             // PermissionDeniedErrorの場合の処理
-            alert('カメラのアクセスが拒否されました。ブラウザの設定でカメラのアクセスを許可してください。');
+            showSnackbar('カメラのアクセスが拒否されました。ブラウザの設定でカメラのアクセスを許可してください。', 'error');
             // 前の画面に戻る
-            navigate(-1);
+            customNavigate();
           } else {
             // その他のエラーの場合の処理
-            alert('カメラへのアクセスエラーが発生しました。');
+            showSnackbar('カメラへのアクセスエラーが発生しました。', 'error');
             // 前の画面に戻る
-            navigate(-1);
+            customNavigate();
           }
         } else {
           // error が Error 型でない場合の処理
-          alert('カメラへのアクセスエラーが発生しました。');
+          showSnackbar('カメラへのアクセスエラーが発生しました。', 'error');
           // 前の画面に戻る
-          navigate(-1);
+          customNavigate();
         }
       }
   };
@@ -191,22 +197,24 @@ const CameraPage: React.FC = () => {
         const result = await axios.post('https://localhost:7103/api/Users/uploadIdVerificationImage', formData, config);
   
         if (result.status === 200) {
-            console.log('Image uploaded successfully');
+          await refreshUserInfo();
             // アップロード成功後の処理を追加
-            navigate('/main-page', { state: { snackOpen: true, snackMessage: 'アップロード完了' } });
+            customNavigate();
+            showSnackbar('アップロード完了', 'success');
+            navigate('/main-page');
         } else {
             console.error('Failed to upload image');
             // アップロード失敗時の処理を追加
-            alert('アップロードに失敗しました。時間をおいて再度試してください。');
+            showSnackbar('アップロードに失敗しました。時間をおいて再度試してください。', 'error');
             // 前の画面に戻る
-            navigate(-1);
+            customNavigate();
         }
       } catch (error) {
         console.error('Error uploading image:', error);
         // エラー処理を追加
-        alert('予期せぬエラーが起こりました。時間をおいて再度試してください。');
-            // 前の画面に戻る
-        navigate(-1);
+        showSnackbar('予期せぬエラーが起こりました。時間をおいて再度試してください。', 'error');
+        // 前の画面に戻る
+        customNavigate();
       }
     }
   };

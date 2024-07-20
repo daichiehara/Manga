@@ -7,6 +7,8 @@ import axios from 'axios';
 interface BookAutocompleteProps {
   inputValue: string;
   onInputChange: (event: React.SyntheticEvent, value: string) => void;
+  value: string;
+  onChange: (event: React.SyntheticEvent, value: string | null) => void;
   error?: boolean;
   helperText?: string;
 }
@@ -24,6 +26,8 @@ const famousTitles = [
 const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
   inputValue,
   onInputChange,
+  value,
+  onChange,
   error,
   helperText,
   ...rest
@@ -77,12 +81,25 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
     return () => debouncedFetchMangaTitles.cancel();
   }, [inputValue, debouncedFetchMangaTitles]);
 
+  useEffect(() => {
+    if (value && !options.includes(value)) {
+      setOptions(prevOptions => Array.from(new Set([...prevOptions, value])));
+    }
+  }, [value, options]);
   return (
     <Autocomplete
       {...rest}
       options={options}
       popupIcon={false}
-      filterOptions={(x) => x}
+      filterOptions={(options, params) => {
+        const filtered = options.filter(option => 
+          option.toLowerCase().includes(params.inputValue.toLowerCase())
+        );
+        if (params.inputValue !== '' && !filtered.includes(params.inputValue)) {
+          filtered.push(params.inputValue);
+        }
+        return filtered;
+      }}
       getOptionLabel={(option) => option}
       renderOption={(props, option) => (
         <ListItem {...props} key={option}>
@@ -118,17 +135,13 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
           helperText={helperText}
         />
       )}
+      value={options.includes(value) ? value : null}
       inputValue={inputValue}
-      onInputChange={(_, newInputValue) => {
-        onInputChange(_, newInputValue);
-        if (!newInputValue) {
-          setIsLoading(false);
-          //setOptions(famousTitles);
-        }
-      }}
-      onChange={(_, newValue) => {
-        onInputChange(_, newValue || '');
-      }}
+      onInputChange={onInputChange}
+      onChange={onChange}
+      isOptionEqualToValue={(option, value) => 
+        option.toLowerCase() === (typeof value === 'string' ? value.toLowerCase() : '')
+      }
     />
   );
 };

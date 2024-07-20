@@ -5,6 +5,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
+import { UserContext } from '../components/context/UserContext';
 import axios from 'axios';
 
 interface ProfileFormData {
@@ -17,6 +18,7 @@ const MpProfile: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const customNavigate = useCustomNavigate();
   const { showSnackbar } = useContext(SnackbarContext);
+  const { refreshUserInfo } = useContext(UserContext);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     nickName: '',
@@ -79,8 +81,7 @@ const MpProfile: React.FC = () => {
       const response = await axios.put('https://localhost:7103/api/Users/UpdateProfile', formDataToSend, { withCredentials: true });
 
       if (response.status === 200) {
-        // Profile updated successfully
-        console.log('Profile updated');
+        await refreshUserInfo();
         customNavigate();
         showSnackbar('正常に更新されました。', 'success');
       } else {

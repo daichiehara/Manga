@@ -7,6 +7,8 @@ import theme from './theme/theme';
 import { AuthProvider } from './components/context/AuthContext';
 import { BooksProvider } from './components/context/BookContext';
 import { SnackbarProvider } from './components/context/SnackbarContext';
+import { UserProvider } from './components/context/UserContext';
+import { AppProvider } from './components/context/AppContext';
 import './utils/http'
 
 
@@ -20,11 +22,15 @@ if (container) {
     <React.StrictMode>
       <ThemeProvider theme={theme}>
         <AuthProvider>
-          <BooksProvider>
-            <SnackbarProvider>
-              <App />
-            </SnackbarProvider>
-          </BooksProvider>
+        <UserProvider>
+          <AppProvider>
+            <BooksProvider>
+              <SnackbarProvider>
+                <App />
+              </SnackbarProvider>
+            </BooksProvider>
+          </AppProvider>
+        </UserProvider>
         </AuthProvider>
       </ThemeProvider>
     </React.StrictMode>

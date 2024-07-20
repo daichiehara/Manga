@@ -267,7 +267,10 @@ const SellForm: React.FC = () => {
   };
 
   const handleSell = () => {
-    setIsPreSellDialogOpen(true);
+    const isValid = validateForm(control._formValues as FormData);
+    if (isValid) {
+      setIsPreSellDialogOpen(true);
+    }
   };
 
   const handleConfirmListing = () => {
@@ -376,21 +379,24 @@ const SellForm: React.FC = () => {
               作品タイトル (選択)
             </Typography>
             <Controller
-            name="title"
-            control={control}
-            defaultValue=""
-            render={({ field: { ref, onChange, value, ...rest }, fieldState: { error } }) => (
-              <BookAutocomplete
-                {...rest}
-                inputValue={inputValue}
-                onInputChange={(_, newInputValue) => {
-                  onChange(newInputValue);
-                  setInputValue(newInputValue);
-                }}
-                error={!!error}
-                helperText={error?.message}
-              />
-            )}
+              name="title"
+              control={control}
+              defaultValue=""
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <BookAutocomplete
+                  inputValue={inputValue}
+                  onInputChange={(_, newInputValue) => {
+                    setInputValue(newInputValue);
+                  }}
+                  value={value}
+                  onChange={(_, newValue) => {
+                    onChange(newValue);
+                    setInputValue(newValue || '');
+                  }}
+                  error={!!error}
+                  helperText={error?.message}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12} mb={2}>
