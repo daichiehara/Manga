@@ -20,6 +20,7 @@ import axios from 'axios';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomToolbar from '../components/common/CustumToolbar';
+import theme from '../theme/theme';
 
 
 /**
@@ -96,6 +97,10 @@ const MangaDetail = () => {
   const handlCancelClickSuccess = () => {
     showSnackbar('交換申請がキャンセルされました', 'success');
   };
+
+  const handleCommentNavigate = () => {
+    //navigate();
+  }
 
   
 
@@ -251,9 +256,12 @@ const MangaDetail = () => {
                 この人が欲しい漫画
               </Typography>
               <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
-              {mangaDetail && (
+              {mangaDetail.wishTitles.length > 0 ? (
                 <WishListDisplay wishTitles={mangaDetail.wishTitles} shouldTruncate={false}/>
-              )}
+              ):(
+                <Typography variant='subtitle2' sx={{color:theme.palette.text.secondary}}>欲しい漫画が設定されていせん</Typography>
+              )
+              }
               <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold'}}>
                 {`出品物の説明`}
               </Typography>
@@ -285,10 +293,27 @@ const MangaDetail = () => {
 
               {/* Add the Recent Comments section */}
               <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold' }}>
-                {`コメント`}
+                コメント({mangaDetail.replyCount})
               </Typography>
+              
               <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
-              {mangaDetail.replies && <RecentCommentsDisplay replies={mangaDetail.replies} />}
+              {mangaDetail.replies && mangaDetail.replies.length > 0 ? (
+                  <RecentCommentsDisplay replies={mangaDetail.replies} />
+              ) : (
+                <Box sx={{py:2, position: 'relative', bottom: 0,right: 0, display: 'flex', justifyContent: 'center',  boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
+                  <Button variant="outlined" 
+                    sx={{ maxWidth: '640px', width: '100%', 
+                    boxShadow: 'none',
+                    color: 'red',
+                    borderColor:'red',
+                    fontWeight:'bold',
+                    borderWidth:'1.2px'                   
+                    }}
+                  >
+                    コメントする
+                  </Button>
+                </Box>
+              )}
 
               <Box sx={{pb:5}}></Box>
             </Paper>
