@@ -99,7 +99,7 @@ const MangaDetail = () => {
   };
 
   const handleCommentNavigate = () => {
-    //navigate();
+    navigate("/item/${sellId}/comment");
   }
 
   
@@ -302,6 +302,7 @@ const MangaDetail = () => {
               ) : (
                 <Box sx={{py:2, position: 'relative', bottom: 0,right: 0, display: 'flex', justifyContent: 'center',  boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
                   <Button variant="outlined" 
+                    onClick={handleCommentNavigate}
                     sx={{ maxWidth: '640px', width: '100%', 
                     boxShadow: 'none',
                     color: 'red',
