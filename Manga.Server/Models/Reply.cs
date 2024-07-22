@@ -10,7 +10,7 @@ namespace Manga.Server.Models
 
         [Display(Name = "メッセージ")]
         [Required]
-        [StringLength(200, ErrorMessage = "メッセージは200文字以内で入力してください。")]
+        [StringLength(400, ErrorMessage = "メッセージは200文字以内で入力してください。")]
         public string Message { get; set; }
 
         [Display(Name = "投稿日時")]

@@ -9,6 +9,7 @@ using Manga.Server.Data;
 using Manga.Server.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
 
 namespace Manga.Server.Controllers
 {
@@ -60,6 +61,60 @@ namespace Manga.Server.Controllers
                 .ToListAsync();
 
             return notifications;
+        }
+
+        [HttpGet("sse")]
+        public async Task GetSSE()
+        {
+            var response = Response;
+            response.Headers.Add("Content-Type", "text/event-stream");
+
+            while (!HttpContext.RequestAborted.IsCancellationRequested)
+            {
+                var notifications = await GetNotifications(); // 最新の通知を取得するメソッド
+                var data = JsonSerializer.Serialize(notifications);
+
+                await response.WriteAsync($"data: {data}\n\n");
+                await response.Body.FlushAsync();
+
+                await Task.Delay(5000); // 5秒ごとに更新
+            }
+        }
+
+        [HttpGet("unread-count")]
+        public async Task<ActionResult<int>> GetUnreadNotificationsCount()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var count = await _context.Notification
+                .Where(n => n.UserAccountId == userId && !n.IsRead)
+                .CountAsync();
+            return count;
+        }
+
+        [HttpPost("mark-all-as-read")]
+        public async Task<IActionResult> MarkAllNotificationsAsRead()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var unreadNotifications = await _context.Notification
+                .Where(n => n.UserAccountId == userId && !n.IsRead)
+                .ToListAsync();
+
+            foreach (var notification in unreadNotifications)
+            {
+                notification.IsRead = true;
+            }
+
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         // GET: api/Notifications/5
