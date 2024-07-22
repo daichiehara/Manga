@@ -311,9 +311,6 @@ namespace Manga.Server.Controllers
                                                  WishTitles = u.WishLists.Select(w => w.Title)
                                              }).FirstOrDefaultAsync();
 
-            if (userTitlesAndWishes == null)
-                return NotFound("User not found");
-
             var userTitles = userTitlesAndWishes.OwnedTitles.Union(userTitlesAndWishes.SellTitles).ToHashSet();
             var wishTitles = userTitlesAndWishes.WishTitles.ToHashSet();
 
