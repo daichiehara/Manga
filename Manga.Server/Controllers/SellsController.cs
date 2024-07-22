@@ -66,17 +66,15 @@ namespace Manga.Server.Controllers
                 return await GetLatestSellsAsync(page, pageSize);
             }
 
-            var userSellAndOwnedTitles = await _context.Users
-                .Where(u => u.Id == userId)
-                .Select(u => new
-                {
-                    Titles = u.OwnedLists.Select(o => o.Title)
-                        .Concat(u.Sells.Select(s => s.Title))
-                        .Distinct()
-                })
-                .FirstOrDefaultAsync();
+            var userSellAndOwnedTitles = await (from u in _context.Users
+                                             where u.Id == userId
+                                             select new
+                                             {
+                                                 OwnedTitles = u.OwnedLists.Select(o => o.Title),
+                                                 SellTitles = u.Sells.Select(s => s.Title),
+                                             }).FirstOrDefaultAsync();
 
-            var userTitles = userSellAndOwnedTitles.Titles.ToHashSet();
+            var userTitles = userSellAndOwnedTitles.OwnedTitles.Union(userSellAndOwnedTitles.SellTitles).ToHashSet();
 
             var query = _context.Sell
                 .Include(s => s.SellImages)
