@@ -130,6 +130,8 @@ const MainNotification: React.FC = () => {
   const handleNotificationClick = useCallback((notification: Notification) => {
     if (notification.type === 3) {
       navigate('/mypage/matchedsell');
+    } else if (notification.type === 1){
+      navigate(`/item/${notification.sellId}/comment`);
     } else {
       setSelectedSellId(notification.sellId);
       setDrawerOpen(true);
