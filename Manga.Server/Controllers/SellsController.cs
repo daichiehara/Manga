@@ -56,60 +56,66 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet]
-        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync()
+        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync(int page = 1, int pageSize = 10)
         {
             var userId = _userManager.GetUserId(User);
 
-            // 現在のユーザーのOwnedListのタイトルリストを取得
-            var ownedTitles = await _context.OwnedList
-                                             .Where(o => o.UserAccountId == userId)
-                                             .Select(o => o.Title)
-                                             .ToListAsync();
-
-            // 現在のユーザーのSellのタイトルリストも取得
-            var sellTitles = await _context.Sell
-                                            .Where(s => s.UserAccountId == userId)
-                                            .Select(s => s.Title)
-                                            .ToListAsync();
-
-            // 両方のリストを結合
-            var userTitles = ownedTitles.Union(sellTitles).ToList();
-
-            var sells = await _context.Sell
-                          .Include(s => s.SellImages)
-                          .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
-                          .OrderByDescending(s => s.SellTime)
-                          .ToListAsync();
-
-            var homeDtos = new List<HomeDto>();
-
-            foreach (var sell in sells)
+            if (string.IsNullOrEmpty(userId))
             {
-                var wishTitles = await _context.WishList
-                                               .Where(w => w.UserAccountId == sell.UserAccountId)
-                                               .Select(w => new WishTitleInfo
-                                               {
-                                                   Title = w.Title,
-                                                   IsOwned = userTitles.Contains(w.Title)
-                                               })
-                                               .OrderByDescending(w => w.IsOwned)
-                                               .ToListAsync();
-
-                var dto = new HomeDto
-                {
-                    SellId = sell.SellId,
-                    SellTitle = sell.Title,
-                    NumberOfBooks = sell.NumberOfBooks,
-                    WishTitles = wishTitles,
-                    SellImage = sell.SellImages
-                                    .OrderBy(si => si.Order)
-                                    .FirstOrDefault()?.ImageUrl
-                };
-
-                homeDtos.Add(dto);
+                // ログインしていないユーザーの場合、新着順で返す
+                return await GetLatestSellsAsync(page, pageSize);
             }
 
-            return homeDtos;
+            var userSellAndOwnedTitles = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new
+                {
+                    Titles = u.OwnedLists.Select(o => o.Title)
+                        .Concat(u.Sells.Select(s => s.Title))
+                        .Distinct()
+                })
+                .FirstOrDefaultAsync();
+
+            var userTitles = userSellAndOwnedTitles.Titles.ToHashSet();
+
+            var query = _context.Sell
+                .Include(s => s.SellImages)
+                .Include(s => s.UserAccount.WishLists)
+                .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
+                .OrderByDescending(s => s.SellTime)
+                .Select(s => new HomeDto
+                {
+                    SellId = s.SellId,
+                    SellTitle = s.Title,
+                    NumberOfBooks = s.NumberOfBooks,
+                    WishTitles = s.UserAccount.WishLists
+                        .Select(w => new WishTitleInfo
+                        {
+                            Title = w.Title,
+                            IsOwned = userTitles.Contains(w.Title)
+                        })
+                        .OrderByDescending(w => userTitles.Contains(w.Title))
+                        .ToList(),
+                    SellImage = s.SellImages
+                        .OrderBy(si => si.Order)
+                        .FirstOrDefault().ImageUrl
+                });
+
+            var totalItems = await query.CountAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var result = new
+            {
+                Items = items,
+                TotalItems = totalItems,
+                CurrentPage = page,
+                PageSize = pageSize
+            };
+
+            return Ok(result);
         }
 
         [HttpGet("SearchByTitle")]
@@ -233,67 +239,45 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("MyFavorite")]
-        public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync()
+        public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync(int page = 1, int pageSize = 10)
         {
             var userId = _userManager.GetUserId(User);
 
-            // 現在のユーザーのOwnedListのタイトルリストを取得
-            var ownedTitles = await _context.OwnedList
-                                             .Where(o => o.UserAccountId == userId)
-                                             .Select(o => o.Title)
-                                             .ToListAsync();
-
-            // 現在のユーザーのSellのタイトルリストも取得
-            var sellTitles = await _context.Sell
-                                            .Where(s => s.UserAccountId == userId)
-                                            .Select(s => s.Title)
-                                            .ToListAsync();
-
-            // 両方のリストを結合
-            var userTitles = ownedTitles.Union(sellTitles).ToList();
-
-            // 現在のユーザーがMyListに登録したSellのIDを取得
-            var myListSellIds = await _context.MyList
-                .Where(m => m.UserAccountId == userId)
-                .Select(m => m.SellId)
-                .ToListAsync();
-
-            // 上記IDを使用して、Sellの詳細を取得
-            var sells = await _context.Sell
-                .Include(s => s.SellImages)
-                .Where(s => myListSellIds.Contains(s.SellId) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
-                .OrderByDescending(s => s.SellTime)
-                .ToListAsync();
-
-            var homeDtos = new List<HomeDto>();
-
-            foreach (var sell in sells)
+            if (string.IsNullOrEmpty(userId))
             {
-                var wishTitles = await _context.WishList
-                                               .Where(w => w.UserAccountId == sell.UserAccountId)
-                                               .Select(w => new WishTitleInfo
-                                               {
-                                                   Title = w.Title,
-                                                   IsOwned = userTitles.Contains(w.Title)
-                                               })
-                                               .OrderByDescending(w => w.IsOwned)
-                                               .ToListAsync();
-
-                var dto = new HomeDto
-                {
-                    SellId = sell.SellId,
-                    SellTitle = sell.Title,
-                    NumberOfBooks = sell.NumberOfBooks,
-                    WishTitles = wishTitles,
-                    SellImage = sell.SellImages
-                                    .OrderBy(si => si.Order)
-                                    .FirstOrDefault()?.ImageUrl
-                };
-
-                homeDtos.Add(dto);
+                return Ok("ゲストユーザー");
             }
 
-            return homeDtos;
+            var query = _context.MyList
+                .Where(m => m.UserAccountId == userId)
+                .Select(m => m.Sell)
+                .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
+                .OrderByDescending(s => s.SellTime)
+                .Select(s => new HomeDto
+                {
+                    SellId = s.SellId,
+                    SellTitle = s.Title,
+                    NumberOfBooks = s.NumberOfBooks,
+                    WishTitles = s.UserAccount.WishLists
+                        .Select(w => new WishTitleInfo
+                        {
+                            Title = w.Title,
+                            IsOwned = s.UserAccount.OwnedLists.Any(o => o.Title == w.Title) ||
+                                      s.UserAccount.Sells.Any(sell => sell.Title == w.Title)
+                        })
+                        .OrderByDescending(w => w.IsOwned)
+                        .ToList(),
+                    SellImage = s.SellImages
+                        .OrderBy(si => si.Order)
+                        .FirstOrDefault().ImageUrl
+                });
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return items;
         }
 
         [HttpGet("Recommend")]
