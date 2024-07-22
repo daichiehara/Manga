@@ -3,7 +3,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
-import { Box, TextField, Button, Card, CardContent, Chip, Typography, Avatar } from '@mui/material';
+import { Box, TextField, Button, Card, CardContent, Chip, Divider, Typography, Avatar } from '@mui/material';
 
 // APIレスポンスの型定義
 interface ReplyDto {
@@ -21,35 +21,37 @@ interface ReplyForSellDto {
 }
 
 const Comment: React.FC<{ reply: ReplyDto }> = React.memo(({ reply }) => (
-  <Box sx={{ p: '1rem', display: 'flex', alignItems: 'flex-start' }}>
-  <Avatar sx={{ height: '3rem', width: '3rem', marginRight: '0.5rem' }} src={reply.profileIcon || undefined} />
-  <Box>
-    <Typography variant="subtitle2">
-      {reply.nickName || '削除されたユーザー'}
-    </Typography>
-    <Chip
-      sx={{
-        height: 'auto',
-        pl:0,
-        '& .MuiChip-label': {
-          display: 'block',
-          whiteSpace: 'normal',
-          padding: '0.5rem',
-        },
-      }}
-      label={
-        <Box>
-          <Typography variant="body2">
-            {reply.message || 'このコメントは削除されました。'}
-          </Typography>
-          <Typography variant="caption" color="textSecondary">
-            {new Date(reply.created).toLocaleString()}
-          </Typography>
-        </Box>
-      }
-    />
-  </Box>
-</Box>
+  
+    <Box sx={{ p: '0.4rem', display: 'flex', alignItems: 'flex-start' }}>
+      <Avatar sx={{ height: '3rem', width: '3rem', marginRight: '0.7rem' }} src={reply.profileIcon || undefined} />
+      <Box>
+        <Typography variant="subtitle2" sx={{pl:1}} >
+          {reply.nickName || '削除されたユーザー'}
+        </Typography>
+        <Chip
+          sx={{
+            height: 'auto',
+            pl:0,
+            '& .MuiChip-label': {
+              display: 'block',
+              whiteSpace: 'normal',
+              padding: '0.5rem',
+            },
+          }}
+          label={
+            <Box>
+              <Typography variant="body2">
+                {reply.message || 'このコメントは削除されました。'}
+              </Typography>
+              <Typography variant="caption" color="textSecondary">
+                {new Date(reply.created).toLocaleString()}
+              </Typography>
+            </Box>
+          }
+        />
+      </Box>
+    </Box>
+  
 ));
 
 const CommentPage: React.FC = () => {
@@ -125,40 +127,46 @@ const CommentPage: React.FC = () => {
       {/* 見出しのToolbar */}
       <CustomToolbar title="コメント" />
       <Box sx={{ pt: '4rem' }}>
+        {/* 注意事項 */}
+        <Typography sx={{ fontSize:'0.7rem', p:'1rem', pt:'0.5rem', }}>
+          相手のことを考え丁重なコメントを心がけましょう。不快な言葉づかいなどは利用制限や退会処分となることがあります。
+        </Typography>
+        <Divider />
         {/* コメントの表示 */}
-        <div>
+        <Box sx={{pt:1}}>
           {renderedReplies}
-        </div>
+        </Box>
 
         {/* コメント入力 */}
-        <Box sx={{ p: '1rem' }}>
-          {isAuthenticated ? (
-            <Box sx={{ mt: '4rem' }}>
-              <TextField
-                label="コメントを追加"
-                multiline
-                rows={4}
-                value={newReply}
-                onChange={(e) => setNewReply(e.target.value)}
-                variant="outlined"
-                fullWidth
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handlePostReply}
-                disabled={!newReply.trim()} // 入力フィールドが空の場合はボタンを無効にする
-                style={{ marginTop: '1rem' }}
-              >
-                コメントを投稿
-              </Button>
-            </Box>
-          ) : (
-            <Typography variant="body1" color="textSecondary">
-              コメントを投稿するにはログインしてください。
-            </Typography>
-          )}
-        </Box>
+<Box sx={{ px: '1rem', py: '0.3rem' }}>
+  {isAuthenticated ? (
+    <Box sx={{ mt: '4rem', display: 'flex', alignItems: 'flex-end' }}>
+      <TextField
+        label="コメントを追加"
+        multiline
+        rows={4}
+        value={newReply}
+        onChange={(e) => setNewReply(e.target.value)}
+        variant="outlined"
+        sx={{ flex: 1, marginRight: '1rem' }} // TextFieldがButtonの左側に配置され、余白を追加
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handlePostReply}
+        disabled={!newReply.trim()} // 入力フィールドが空の場合はボタンを無効にする
+        sx={{ width:'5rem',alignSelf: 'flex-end' }} // ButtonをTextFieldの下に寄せる
+      >
+        コメントを投稿
+      </Button>
+    </Box>
+  ) : (
+    <Typography variant="body1" color="textSecondary">
+      コメントを投稿するにはログインしてください。
+    </Typography>
+  )}
+</Box>
+
       </Box>
     </>
   );
