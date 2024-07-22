@@ -99,7 +99,7 @@ const MangaDetail = () => {
   };
 
   const handleCommentNavigate = () => {
-    navigate("/item/${sellId}/comment");
+    navigate(`/item/${sellId}/comment`);
   }
 
   
@@ -297,9 +297,9 @@ const MangaDetail = () => {
               </Typography>
               
               <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
-              {mangaDetail.replies && mangaDetail.replies.length > 0 ? (
+              
                   <RecentCommentsDisplay replies={mangaDetail.replies} />
-              ) : (
+              
                 <Box sx={{py:2, position: 'relative', bottom: 0,right: 0, display: 'flex', justifyContent: 'center',  boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
                   <Button variant="outlined" 
                     onClick={handleCommentNavigate}
@@ -314,7 +314,7 @@ const MangaDetail = () => {
                     コメントする
                   </Button>
                 </Box>
-              )}
+            
 
               <Box sx={{pb:5}}></Box>
             </Paper>
