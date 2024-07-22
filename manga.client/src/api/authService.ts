@@ -80,7 +80,7 @@ export const authService = {
       .catch(error => {
         console.error('Failed to refresh token:', error);
         updateGlobalAuthState({ isAuthenticated: false });
-        throw error;
+        //throw error;
       })
       .finally(() => {
         isRefreshing = false;
