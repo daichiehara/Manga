@@ -105,15 +105,7 @@ namespace Manga.Server.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            var result = new
-            {
-                Items = items,
-                TotalItems = totalItems,
-                CurrentPage = page,
-                PageSize = pageSize
-            };
-
-            return Ok(result);
+            return items;
         }
 
         [HttpGet("SearchByTitle")]
