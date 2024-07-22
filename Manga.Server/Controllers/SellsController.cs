@@ -245,7 +245,7 @@ namespace Manga.Server.Controllers
 
             if (string.IsNullOrEmpty(userId))
             {
-                return Ok("ゲストユーザー");
+                return new List<HomeDto>();
             }
 
             var query = _context.MyList
