@@ -297,7 +297,7 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("Recommend")]
-        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync()
+        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync(int page = 1, int pageSize = 10)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -341,6 +341,8 @@ namespace Manga.Server.Controllers
                         .OrderBy(si => si.Order)
                         .FirstOrDefault().ImageUrl
                 })
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return recommendedSells;
