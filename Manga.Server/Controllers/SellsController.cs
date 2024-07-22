@@ -301,6 +301,12 @@ namespace Manga.Server.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
+            if (string.IsNullOrEmpty(userId))
+            {
+                // ログインしていないユーザーの場合、新着順で返す
+                return await GetLatestSellsAsync(page, pageSize);
+            }
+
             // 1. ユーザーの所有タイトルとWishリストを一度のクエリで取得
             var userTitlesAndWishes = await (from u in _context.Users
                                              where u.Id == userId
@@ -346,6 +352,36 @@ namespace Manga.Server.Controllers
                 .ToListAsync();
 
             return recommendedSells;
+        }
+
+        private async Task<ActionResult<List<HomeDto>>> GetLatestSellsAsync(int page = 1, int pageSize = 10)
+        {
+            var latestSells = await _context.Sell
+                .Include(s => s.SellImages)
+                .Include(s => s.UserAccount.WishLists)  // WishListsを含める
+                .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
+                .OrderByDescending(s => s.SellTime)
+                .Select(s => new HomeDto
+                {
+                    SellId = s.SellId,
+                    SellTitle = s.Title,
+                    NumberOfBooks = s.NumberOfBooks,
+                    WishTitles = s.UserAccount.WishLists
+                        .Select(w => new WishTitleInfo
+                        {
+                            Title = w.Title,
+                            IsOwned = false
+                        })
+                        .ToList(),
+                    SellImage = s.SellImages
+                        .OrderBy(si => si.Order)
+                        .FirstOrDefault().ImageUrl
+                })
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return latestSells;
         }
 
         /*
