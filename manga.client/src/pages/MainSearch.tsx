@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import TabsComponent from '../components/common/TabsComponent';
@@ -12,6 +12,7 @@ import axios from 'axios';
 import ErrorDisplay from '../components/common/ErrorDisplay';
 import { AppContext } from '../components/context/AppContext';
 import { AuthContext } from '../components/context/AuthContext';
+import { useInView } from 'react-intersection-observer';
 
 interface MainSearch {
   sellId: number;
@@ -36,12 +37,35 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
     isLoadingManga, 
     isLoadingMyList, 
     isLoadingRecommend, 
-    error 
+    error,
+    fetchMoreData,
+    hasMore
   } = useContext(AppContext);
   const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState(initialTab);
+  const isCurrentTabHasMore = hasMore[selectedTab];
+  const { ref, inView } = useInView({
+    threshold: 0,
+    triggerOnce: false,
+    rootMargin: '0px 0px 400px 0px' // 画面下端から200px手前で発火
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (inView && hasMore) {
+        console.log('Fetching more data');
+        fetchMoreData(selectedTab);
+      }
+    }, 200); // 200ms の遅延
+  
+    return () => clearTimeout(timer);
+  }, [inView]);
+
+  useEffect(() => {
+    console.log('inView changed:', inView);
+  }, [inView]);
   
   useEffect(() => {
     const tabFromPath = location.pathname === '/item/favorite' ? 0 : location.pathname === '/' ? 1 : location.pathname === '/item/new' ? 2 : 0;
@@ -70,6 +94,10 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
     if (selectedTab === 2) return isLoadingRecommend;
     return false;
   };
+  
+  useEffect(() => {
+    console.log('hasMore changed:', hasMore);
+  }, [hasMore]);
 
   return (
     <>
@@ -82,10 +110,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
         ) : (
           <>
               {selectedTab === 0 && (
-                isLoadingMyList ? (
-                  <LoadingComponent />
-                ) : (
-                myListData.length > 0 ? (
+              myListData.length > 0 ? (
                 myListData.map((item, index) => (
                   <MangaListItem
                     key={index}
@@ -127,12 +152,9 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
                   商品を検索する
                 </Button>
               </Box>
-            ))
+            )
           )}
           {selectedTab === 1 && (
-            isLoadingRecommend ? (
-              <LoadingComponent />
-            ) : (
               recommendData.map((item, index) => (
                 <MangaListItem 
                   key={index}
@@ -142,12 +164,9 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
                   numberOfBooks={item.numberOfBooks}
                   wishTitles={item.wishTitles}
                 />
-              )))
+              ))
             )}
             {selectedTab === 2 && (
-              isLoadingManga ? (
-                <LoadingComponent />
-              ) : (
               mangaData.map((item, index) => (
                 <MangaListItem 
                   key={index}
@@ -157,10 +176,20 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
                   numberOfBooks={item.numberOfBooks}
                   wishTitles={item.wishTitles}
                 />
-              )))
+              ))
             )}
           </>
         )}
+        <div ref={ref} style={{ height: '20px', margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          {(isLoadingManga || isLoadingMyList || isLoadingRecommend) && (
+            <CircularProgress size={20} style={{ marginRight: '10px' }} />
+          )}
+          {!isCurrentTabHasMore && (
+            <Typography variant="body2" align="center">
+              すべてのデータを読み込みました
+            </Typography>
+          )}
+        </div>
       </Box>
       <MenuBar />
     </>

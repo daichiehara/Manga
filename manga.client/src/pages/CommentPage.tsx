@@ -3,7 +3,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
-import { Box, TextField, Button, Card, CardContent, Typography, Avatar } from '@mui/material';
+import { Box, TextField, Button, Card, CardContent, Chip, Typography, Avatar } from '@mui/material';
 
 // APIレスポンスの型定義
 interface ReplyDto {
@@ -21,20 +21,35 @@ interface ReplyForSellDto {
 }
 
 const Comment: React.FC<{ reply: ReplyDto }> = React.memo(({ reply }) => (
-  <Card style={{ marginTop: '1rem' }}>
-    <CardContent>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar src={reply.profileIcon || undefined} />
-        <Typography variant="h6" style={{ marginLeft: '0.5rem' }}>
-          {reply.nickName || '削除されたユーザー'}
-        </Typography>
-      </div>
-      <Typography variant="body1">{reply.message || 'このコメントは削除されました。'}</Typography>
-      <Typography variant="caption" color="textSecondary">
-        {new Date(reply.created).toLocaleString()}
-      </Typography>
-    </CardContent>
-  </Card>
+  <Box sx={{ p: '1rem', display: 'flex', alignItems: 'flex-start' }}>
+  <Avatar sx={{ height: '3rem', width: '3rem', marginRight: '0.5rem' }} src={reply.profileIcon || undefined} />
+  <Box>
+    <Typography variant="subtitle2">
+      {reply.nickName || '削除されたユーザー'}
+    </Typography>
+    <Chip
+      sx={{
+        height: 'auto',
+        pl:0,
+        '& .MuiChip-label': {
+          display: 'block',
+          whiteSpace: 'normal',
+          padding: '0.5rem',
+        },
+      }}
+      label={
+        <Box>
+          <Typography variant="body2">
+            {reply.message || 'このコメントは削除されました。'}
+          </Typography>
+          <Typography variant="caption" color="textSecondary">
+            {new Date(reply.created).toLocaleString()}
+          </Typography>
+        </Box>
+      }
+    />
+  </Box>
+</Box>
 ));
 
 const CommentPage: React.FC = () => {
@@ -66,7 +81,8 @@ const CommentPage: React.FC = () => {
       const response = await axios.get<ReplyForSellDto>(`https://localhost:7103/api/replies/${sellId}`, {
         withCredentials: true, // クロスオリジンリクエストにクッキーを含める
       });
-      setReplies(response.data.replies || []); // 取得したデータが存在しない場合に空配列をセット
+      const reversedReplies = response.data.replies.reverse(); // 取得したコメントを逆順に並べ替え
+      setReplies(reversedReplies || []); // 取得したデータが存在しない場合に空配列をセット
       setIsCurrentUserSeller(response.data.isCurrentUserSeller);
     } catch (error) {
       console.error('Error fetching replies:', error);
@@ -108,40 +124,41 @@ const CommentPage: React.FC = () => {
     <>
       {/* 見出しのToolbar */}
       <CustomToolbar title="コメント" />
+      <Box sx={{ pt: '4rem' }}>
+        {/* コメントの表示 */}
+        <div>
+          {renderedReplies}
+        </div>
 
-      {/* コメントの表示 */}
-      <div>
-        {renderedReplies}
-      </div>
-
-      {/* コメント入力 */}
-      <Box sx={{ p: '1rem' }}>
-        {isAuthenticated ? (
-          <Box sx={{ mt: '4rem' }}>
-            <TextField
-              label="コメントを追加"
-              multiline
-              rows={4}
-              value={newReply}
-              onChange={(e) => setNewReply(e.target.value)}
-              variant="outlined"
-              fullWidth
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handlePostReply}
-              disabled={!newReply.trim()} // 入力フィールドが空の場合はボタンを無効にする
-              style={{ marginTop: '1rem' }}
-            >
-              コメントを投稿
-            </Button>
-          </Box>
-        ) : (
-          <Typography variant="body1" color="textSecondary">
-            コメントを投稿するにはログインしてください。
-          </Typography>
-        )}
+        {/* コメント入力 */}
+        <Box sx={{ p: '1rem' }}>
+          {isAuthenticated ? (
+            <Box sx={{ mt: '4rem' }}>
+              <TextField
+                label="コメントを追加"
+                multiline
+                rows={4}
+                value={newReply}
+                onChange={(e) => setNewReply(e.target.value)}
+                variant="outlined"
+                fullWidth
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handlePostReply}
+                disabled={!newReply.trim()} // 入力フィールドが空の場合はボタンを無効にする
+                style={{ marginTop: '1rem' }}
+              >
+                コメントを投稿
+              </Button>
+            </Box>
+          ) : (
+            <Typography variant="body1" color="textSecondary">
+              コメントを投稿するにはログインしてください。
+            </Typography>
+          )}
+        </Box>
       </Box>
     </>
   );

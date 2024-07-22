@@ -19,7 +19,7 @@ if (container) {
   const root = createRoot(container);
   
   root.render(
-    <React.StrictMode>
+    //<React.StrictMode>
       <ThemeProvider theme={theme}>
         <AuthProvider>
         <UserProvider>
@@ -33,7 +33,7 @@ if (container) {
         </UserProvider>
         </AuthProvider>
       </ThemeProvider>
-    </React.StrictMode>
+    //</React.StrictMode>
   );
 } else {
   console.error('Failed to find the root element');
