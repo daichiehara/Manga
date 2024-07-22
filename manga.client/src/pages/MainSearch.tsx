@@ -42,27 +42,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState(initialTab);
-  /*
-  useEffect(() => {
-    const fetchMangaData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('https://localhost:7103/api/Sells', {
-          withCredentials: true
-        });
-        setMangaData(response.data);
-      } catch (error) {
-        console.error('データ取得に失敗しました:', error);
-        setError('データのロードに失敗しました');
-      } finally {
-        setLoading(false);
-      }
-    };
   
-    fetchMangaData();
-  }, []);  // 空の依存配列を使用して、コンポーネントのマウント時にのみ実行
-  */
-
   useEffect(() => {
     const tabFromPath = location.pathname === '/item/favorite' ? 0 : location.pathname === '/' ? 1 : location.pathname === '/item/new' ? 2 : 0;
     setSelectedTab(tabFromPath);
@@ -78,104 +58,11 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
       navigate('/item/new');
     }
   }, [navigate]);
-/*
-  useEffect(() => {
-    // パスに基づいて selectedTab を更新
-    const tabFromPath = location.pathname === '/item/favorite' ? 0 : location.pathname === '/' ? 1 : location.pathname === '/item/new' ? 2 : 0;
-    setSelectedTab(tabFromPath);
-  }, [location]);
 
-  useEffect(() => {
-    if (location.pathname === '/item/favorite') {
-      setSelectedTab(0);
-    } else if (location.pathname === '/') {
-      setSelectedTab(1);
-    } else if (location.pathname === '/item/new') {
-      setSelectedTab(2);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (selectedTab === 0 && !fetchedTabs.favorite) {
-      fetchMyListData();
-      setFetchedTabs(prev => ({ ...prev, favorite: true }));
-    } else if (selectedTab === 1 && !fetchedTabs.recommend) {
-      fetchRecommendData();
-      setFetchedTabs(prev => ({ ...prev, recommend: true }));
-    } else if (selectedTab === 2 && !fetchedTabs.new) {
-      fetchMangaData();
-      setFetchedTabs(prev => ({ ...prev, new: true }));
-    }
-  }, [selectedTab, fetchedTabs]);
-
-  const fetchMangaData = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('https://localhost:7103/api/Sells', {
-        withCredentials: true
-      });
-      setMangaData(response.data);
-    } catch (error) {
-      console.error('データ取得に失敗しました:', error);
-      setError('データのロードに失敗しました');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchMyListData = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('https://localhost:7103/api/Sells/MyFavorite', {
-        withCredentials: true
-      });
-      setMyListData(response.data);
-    } catch (error) {
-      console.error('データ取得に失敗しました:', error);
-      setError('データのロードに失敗しました');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchRecommendData = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('https://localhost:7103/api/Sells/Recommend', {
-        withCredentials: true
-      });
-      setRecommendData(response.data);
-    } catch (error) {
-      console.error('データ取得に失敗しました:', error);
-      setError('データのロードに失敗しました');
-    } finally {
-      setLoading(false);
-    }
-  };
-*/
   const handleSearch = useCallback((query: string) => {
     // 検索処理
   }, []);  // 依存配列が空なので、コンポーネントのライフタイムで一度だけ生成される
 
-  // タブが変更されたときに呼び出される関数
-  /*
-  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
-  }, []);
-  */
-/*
-  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
-    if (newValue === 0) {
-      navigate('/item/favorite');
-    } else if (newValue === 1) {
-      navigate('/');
-    } else if (newValue === 2) {
-      navigate('/item/new');
-    }
-  }, [navigate]);
-  const MemoizedMangaListItem = React.memo(MangaListItem);
-*/
   
   const isCurrentTabLoading = () => {
     if (selectedTab === 0) return isLoadingMyList;
