@@ -3,7 +3,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
-import { Box, TextField, Button, Card, CardContent, Chip, Divider, Typography, Avatar } from '@mui/material';
+import { Box, TextField, Button, Input, Card, CardContent, Chip, Divider, Typography, Avatar } from '@mui/material';
 
 // APIレスポンスの型定義
 interface ReplyDto {
@@ -133,39 +133,45 @@ const CommentPage: React.FC = () => {
         </Typography>
         <Divider />
         {/* コメントの表示 */}
-        <Box sx={{pt:1}}>
+        <Box sx={{pt:1, pb:'5rem'}}>
           {renderedReplies}
         </Box>
 
         {/* コメント入力 */}
-<Box sx={{ px: '1rem', py: '0.3rem' }}>
-  {isAuthenticated ? (
-    <Box sx={{ mt: '4rem', display: 'flex', alignItems: 'flex-end' }}>
-      <TextField
-        label="コメントを追加"
-        multiline
-        rows={4}
-        value={newReply}
-        onChange={(e) => setNewReply(e.target.value)}
-        variant="outlined"
-        sx={{ flex: 1, marginRight: '1rem' }} // TextFieldがButtonの左側に配置され、余白を追加
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handlePostReply}
-        disabled={!newReply.trim()} // 入力フィールドが空の場合はボタンを無効にする
-        sx={{ width:'5rem',alignSelf: 'flex-end' }} // ButtonをTextFieldの下に寄せる
-      >
-        コメントを投稿
-      </Button>
-    </Box>
-  ) : (
-    <Typography variant="body1" color="textSecondary">
-      コメントを投稿するにはログインしてください。
-    </Typography>
-  )}
-</Box>
+        <Box sx={{ position: 'fixed', bottom: 0, width: '100%',maxWidth: '640px', px: '0.7rem', py: '0.5rem', bgcolor: 'background.paper', justifyContent: 'center', alignItems: 'center',boxSizing: 'border-box', }}>
+          {isAuthenticated ? (
+            <Box sx={{ display: 'flex', alignItems: 'flex-end', width: '100%', maxWidth: '640px', boxSizing: 'border-box' }}>
+              <TextField
+                placeholder="コメントをする" //ここでlabelではなく、placeholderを使うと良い。
+                multiline
+                
+                maxRows={4}
+                value={newReply}
+                onChange={(e) => setNewReply(e.target.value)}
+                variant="outlined"
+                sx={{ flex: 1, mr: '0.7rem' }}
+                size="medium"
+                InputLabelProps={{
+                  shrink:false
+                }}
+                
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handlePostReply}
+                disabled={!newReply.trim()}
+                sx={{ height:'2.5rem', alignSelf: 'flex-end' }}
+              >
+                送信
+              </Button>
+            </Box>
+          ) : (
+            <Typography variant="body1" color="textSecondary">
+              コメントを投稿するにはログインしてください。
+            </Typography>
+          )}
+        </Box>
 
       </Box>
     </>
