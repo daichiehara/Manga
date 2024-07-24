@@ -3,7 +3,8 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
-import { Box, TextField, Button, Input, Card, CardContent, Chip, Divider, Typography, Avatar } from '@mui/material';
+import { Box, TextField, Button, Divider, Typography } from '@mui/material';
+import CommentList from '../components/comment/CommentList';
 
 // APIレスポンスの型定義
 interface ReplyDto {
@@ -19,40 +20,6 @@ interface ReplyForSellDto {
   replies: ReplyDto[];
   isCurrentUserSeller: boolean;
 }
-
-const Comment: React.FC<{ reply: ReplyDto }> = React.memo(({ reply }) => (
-  
-    <Box sx={{ p: '0.4rem', display: 'flex', alignItems: 'flex-start' }}>
-      <Avatar sx={{ height: '3rem', width: '3rem', marginRight: '0.7rem' }} src={reply.profileIcon || undefined} />
-      <Box>
-        <Typography variant="subtitle2" sx={{pl:1}} >
-          {reply.nickName || '削除されたユーザー'}
-        </Typography>
-        <Chip
-          sx={{
-            height: 'auto',
-            pl:0,
-            '& .MuiChip-label': {
-              display: 'block',
-              whiteSpace: 'normal',
-              padding: '0.5rem',
-            },
-          }}
-          label={
-            <Box>
-              <Typography variant="body2">
-                {reply.message || 'このコメントは削除されました。'}
-              </Typography>
-              <Typography variant="caption" color="textSecondary">
-                {new Date(reply.created).toLocaleString()}
-              </Typography>
-            </Box>
-          }
-        />
-      </Box>
-    </Box>
-  
-));
 
 const CommentPage: React.FC = () => {
   const navigate = useNavigate();
@@ -117,11 +84,6 @@ const CommentPage: React.FC = () => {
     }
   }, [newReply, sellId, fetchReplies]);
 
-  // コメントリストのメモ化
-  const renderedReplies = useMemo(() => (
-    replies.map((reply) => <Comment key={reply.replyId} reply={reply} />)
-  ), [replies]);
-
   return (
     <>
       {/* 見出しのToolbar */}
@@ -133,18 +95,15 @@ const CommentPage: React.FC = () => {
         </Typography>
         <Divider />
         {/* コメントの表示 */}
-        <Box sx={{pt:1, pb:'5rem'}}>
-          {renderedReplies}
-        </Box>
+        <CommentList replies={replies} />
 
         {/* コメント入力 */}
         <Box sx={{ position: 'fixed', bottom: 0, width: '100%',maxWidth: '640px', px: '0.7rem', py: '0.5rem', bgcolor: 'background.paper', justifyContent: 'center', alignItems: 'center',boxSizing: 'border-box', }}>
           {isAuthenticated ? (
             <Box sx={{ display: 'flex', alignItems: 'flex-end', width: '100%', maxWidth: '640px', boxSizing: 'border-box' }}>
               <TextField
-                placeholder="コメントをする" //ここでlabelではなく、placeholderを使うと良い。
+                placeholder="コメントをする" // ここでlabelではなく、placeholderを使うと良い。
                 multiline
-                
                 maxRows={4}
                 value={newReply}
                 onChange={(e) => setNewReply(e.target.value)}
@@ -152,9 +111,8 @@ const CommentPage: React.FC = () => {
                 sx={{ flex: 1, mr: '0.7rem' }}
                 size="medium"
                 InputLabelProps={{
-                  shrink:false
+                  shrink: false,
                 }}
-                
               />
               <Button
                 variant="contained"
@@ -172,7 +130,6 @@ const CommentPage: React.FC = () => {
             </Typography>
           )}
         </Box>
-
       </Box>
     </>
   );

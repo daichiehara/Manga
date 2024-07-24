@@ -12,8 +12,7 @@ import LoadingComponent from '../components/common/LoadingComponent';
 import ErrorDisplay from '../components/common/ErrorDisplay';
 import SellerInfo from '../components/common/SellerInfo';
 import ImageModal from '../components/common/ImageModal';
-import RecentCommentsDisplay from '../components/item/RecentCommentsDisplay'; 
-import { Reply } from '../components/item/RecentCommentsDisplay'; // Reply インターフェイスのインポート
+import RecentCommentsDisplay from '../components/comment/RecentCommentsDisplay';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
 import axios from 'axios';
@@ -53,6 +52,15 @@ interface MangaDetail {
     isLiked:boolean;
     likeCount:number;
 }  
+
+interface Reply {
+  replyId: number;
+  message: string;
+  created: string;
+  nickName: string;
+  profileIcon: string | null;
+}
+
 
 const MangaDetail = () => {
   const { sellId } = useParams();
