@@ -24,23 +24,24 @@ const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange }) =
     // AppBar コンポーネントは検索バーを含むツールバーとタブを表示
     <AppBar position="fixed" sx={{
       pb: '0rem',
-      //background: 'linear-gradient(to right, #0068B7, #30D5C8)',  // グラデーションの背景色
-      background: 'linear-gradient(to right, #fce2c4, orange)',
+      //background: 'linear-gradient(to right, #fce2c4, orange)',
+      background:'#53A422',
+      //background:'#759A5E',
       boxShadow: 'none',  // 影を消去
       maxWidth: '640px',
       width: '100%',
       left: '50%',
       transform: 'translateX(-50%)',  // 中央に配置
     }}>
-      <Toolbar disableGutters sx={{ width: 'auto', mt: '1rem', mb: 0, px: 2 }}>
+      <Toolbar disableGutters sx={{ width: 'auto', mt: '1rem', mb: 0, px: 1 }}>
         {/* 検索フォーム */}
         <Paper component="form" sx={{
           display: 'flex',
           alignItems: 'center',
           width: '100%',
-          boxShadow: '0px 4px 4px -1px rgba(0,0,0,0.2)',  // 軽い影を追加
+          boxShadow: 'none',  // 軽い影を追加
           margin: 'auto',
-          borderRadius: '50px'  // ラウンドした形状
+          borderRadius: '5px'  // ラウンドした形状
         }} onSubmit={handleSearch}>
           {/* 検索アイコン */}
           <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
