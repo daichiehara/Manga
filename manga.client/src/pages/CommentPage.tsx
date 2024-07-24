@@ -50,8 +50,7 @@ const CommentPage: React.FC = () => {
       const response = await axios.get<ReplyForSellDto>(`https://localhost:7103/api/replies/${sellId}`, {
         withCredentials: true, // クロスオリジンリクエストにクッキーを含める
       });
-      const reversedReplies = response.data.replies.reverse(); // 取得したコメントを逆順に並べ替え
-      setReplies(reversedReplies || []); // 取得したデータが存在しない場合に空配列をセット
+      setReplies(response.data.replies || []); // 取得したデータが存在しない場合に空配列をセット
       setIsCurrentUserSeller(response.data.isCurrentUserSeller);
     } catch (error) {
       console.error('Error fetching replies:', error);
