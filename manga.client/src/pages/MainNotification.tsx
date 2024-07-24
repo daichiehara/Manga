@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardActionArea, CardContent, CardMedia} from '@mui/material';
 import MenuBar from '../components/menu/MenuBar';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -10,15 +9,16 @@ import ExchangeAcceptDrawer from '../components/common/ExchangeAcceptDrawer';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { useNavigate } from 'react-router-dom';
+import { NotificationContext } from '../components/context/NotificationContext';
 
 
 interface Notification {
   sellId: number;
   message: string;
   sellImage: string;
-  updatedDateTime: string
-  type:number
-  title: string; 
+  updatedDateTime: string;
+  type: number;
+  title: string;
 }
 
 enum SellStatus {
@@ -72,7 +72,24 @@ function timeSince(date: string): string {
 
 
 const MainNotification: React.FC = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { 
+    notifications, 
+    markAllAsRead,
+    updateUnreadCount,
+    isLoading,
+    unreadCount
+  } = useContext(NotificationContext);
+  const { authState } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (authState.isAuthenticated && unreadCount > 0) {
+      const handleMarkAllAsRead = async () => {
+        await markAllAsRead();
+      };
+      handleMarkAllAsRead();
+    }
+  }, [authState.isAuthenticated]);
+
   const [drawerOpen, setDrawerOpen] = useState(() => {
     const savedState = sessionStorage.getItem('notificationState');
     return savedState ? JSON.parse(savedState).drawerOpen : false;
@@ -86,8 +103,6 @@ const MainNotification: React.FC = () => {
     const parsedState = savedState ? JSON.parse(savedState).selectedRequesterSells : {};
     return Object.keys(parsedState).length > 0 ? parsedState : {};
   });
-  const { authState } = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
 
   const saveState = useCallback(() => {
     const stateToSave = { selectedRequesterSells, drawerOpen, selectedSellId };
@@ -99,21 +114,6 @@ const MainNotification: React.FC = () => {
   useEffect(() => {
     saveState();
   }, [saveState]);
-
-  const fetchNotifications = useCallback(async () => {
-    if (!authState.isAuthenticated) return;
-    setIsLoading(true);
-    try {
-      const response = await axios.get('https://localhost:7103/api/Notifications', {
-        withCredentials: true
-      });
-      setNotifications(response.data);
-    } catch (error) {
-      console.error('通知データの取得に失敗:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [authState.isAuthenticated]);
 
   const fetchExchangeRequest = useCallback(async (id: number) => {
     try {
@@ -151,14 +151,10 @@ const MainNotification: React.FC = () => {
     }
   }, [selectedSellId]);
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
-
-  const handleExchangeConfirmed = useCallback(() => {
-    fetchNotifications(); // 通知リストを再取得
-    setDrawerOpen(false); // Drawerを閉じる
-  }, [fetchNotifications]);
+const handleExchangeConfirmed = useCallback(() => {
+  updateUnreadCount();
+  setDrawerOpen(false);
+}, []);
 
   if (isLoading) {
     return (
@@ -188,7 +184,7 @@ const MainNotification: React.FC = () => {
     );
   }
   //通知がない場合の表示
-  if (notifications.length === 0) {
+  if (!Array.isArray(notifications) || notifications.length === 0) {
     return (
       <>
         {/* 見出しのToolbar */}

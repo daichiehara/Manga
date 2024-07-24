@@ -1,6 +1,6 @@
 //MenuBar.tsx
-import React, { useState, useEffect, useCallback, memo } from 'react';
-import { BottomNavigation, BottomNavigationAction, Paper} from '@mui/material';
+import React, { useState, useEffect, useCallback, memo, useContext } from 'react';
+import { BottomNavigation, BottomNavigationAction, Paper, Badge} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import NotificationsOutlined from '@mui/icons-material/NotificationsOutlined';
@@ -13,6 +13,7 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import SellIcon from '@mui/icons-material/Sell';
 import PersonIcon from '@mui/icons-material/Person';
 import MyBookModal from '../common/MyBookModal';
+import { NotificationContext } from '../context/NotificationContext';
 
 // determineActiveIndexをコンポーネント外に移動
 function determineActiveIndex(pathname: string): number {
@@ -39,6 +40,7 @@ const MenuBar = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
   const [value, setValue] = useState(-1);
+  const { unreadCount } = useContext(NotificationContext);
 
   useEffect(() => {
     const newIndex = determineActiveIndex(location.pathname);
@@ -78,6 +80,14 @@ const MenuBar = memo(() => {
   
 
   const getIcon = (index: number, outlined: React.ReactNode, filled: React.ReactNode) => {
+    if (index === 1) { // 通知アイコンの場合
+      const icon = value === index ? filled : outlined;
+      return (
+        <Badge badgeContent={unreadCount} color="error">
+          {icon}
+        </Badge>
+      );
+    }
     return value === index ? filled : outlined;
   };
   
@@ -183,15 +193,14 @@ const MenuBar = memo(() => {
         showLabels
         sx={{ width: '100%' }}
       >
-      <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined sx={{fontSize:`1.4rem`}}/>, <SearchIcon sx={{fontSize:`1.4rem`}} />)} sx={actionStyle} />
-      <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined sx={{fontSize:`1.4rem`}} />, <NotificationsIcon sx={{fontSize:`1.4rem`}} />)} sx={noticeStyle} />
-      <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon sx={{fontSize:`1.4rem`}} />, <AutoStoriesIcon sx={{fontSize:`1.4rem`}} />)} sx={myBookshelfStyle} />
-      <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined sx={{fontSize:`1.4rem`}}/>, <SellIcon sx={{fontSize:`1.4rem`}}/>)} sx={sellStyle} />
-      <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline sx={{fontSize:`1.4rem`}} />, <PersonIcon sx={{fontSize:`1.4rem`}}/>)} sx={searchStyle} />
-    </BottomNavigation>
-    <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
+        <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined sx={{fontSize:`1.4rem`}}/>, <SearchIcon sx={{fontSize:`1.4rem`}} />)} sx={actionStyle} />
+        <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined sx={{fontSize:`1.4rem`}} />, <NotificationsIcon sx={{fontSize:`1.4rem`}} />)} sx={noticeStyle} />
+        <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon sx={{fontSize:`1.4rem`}} />, <AutoStoriesIcon sx={{fontSize:`1.4rem`}} />)} sx={myBookshelfStyle} />
+        <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined sx={{fontSize:`1.4rem`}}/>, <SellIcon sx={{fontSize:`1.4rem`}}/>)} sx={sellStyle} />
+        <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline sx={{fontSize:`1.4rem`}} />, <PersonIcon sx={{fontSize:`1.4rem`}}/>)} sx={searchStyle} />
+      </BottomNavigation>
+      <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
     </Paper>
-    
   );
 });
 
