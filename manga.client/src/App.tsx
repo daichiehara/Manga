@@ -33,8 +33,7 @@ import EmailConfirmation from './pages/EmailConfirmation';
 import MpRequestSell from './pages/MpRequestSell.tsx';
 import MpContact from './pages/MpContact.tsx';
 import CommentPage from './pages/CommentPage.tsx';
-import path from 'path';
-
+import RegisterPage from './pages/RegisterPage.tsx';
 
 const AppLayout = () => {
   return (
@@ -80,6 +79,7 @@ const router = createBrowserRouter(
         <Route path="/mypage/profile" element={<MpProfile />} />
         <Route path="/email-confirmation" element={<EmailConfirmation />} />
         <Route path="/item/:sellId/comment" element={<CommentPage />} />
+        <Route path="/login-page/Register" element={<RegisterPage />} />
     </Route>
   )
 );
