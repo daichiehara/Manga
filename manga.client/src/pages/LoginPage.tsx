@@ -83,7 +83,7 @@ const Login: React.FC = () => {
   };
 
   const handleNavigateRegisterPage = () => {
-    navigate('/login-page/Register');
+    navigate('/login-page/signup');
   }
 
 

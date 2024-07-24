@@ -3,7 +3,7 @@ import { Box, Button, Container, TextField, Typography, CircularProgress, Alert 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const RegisterPage: React.FC = () => {
+const SignupByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [nickName, setNickName] = useState<string>('');
@@ -12,7 +12,7 @@ const RegisterPage: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleRegister = async () => {
+  const handleSignup = async () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -22,7 +22,7 @@ const RegisterPage: React.FC = () => {
         email,
         password,
         nickName,
-      });
+      }, {withCredentials:true});
 
       setSuccess(response.data.Message);
       setLoading(false);
@@ -96,7 +96,7 @@ const RegisterPage: React.FC = () => {
             variant="contained"
             color="primary"
             sx={{ mt: 3, mb: 2 }}
-            onClick={handleRegister}
+            onClick={handleSignup}
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} /> : '登録'}
@@ -107,4 +107,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-export default RegisterPage;
+export default SignupByEmail;
