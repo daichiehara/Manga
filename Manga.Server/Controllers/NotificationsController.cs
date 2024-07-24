@@ -63,24 +63,6 @@ namespace Manga.Server.Controllers
             return notifications;
         }
 
-        [HttpGet("sse")]
-        public async Task GetSSE()
-        {
-            var response = Response;
-            response.Headers.Add("Content-Type", "text/event-stream");
-
-            while (!HttpContext.RequestAborted.IsCancellationRequested)
-            {
-                var notifications = await GetNotifications(); // 最新の通知を取得するメソッド
-                var data = JsonSerializer.Serialize(notifications);
-
-                await response.WriteAsync($"data: {data}\n\n");
-                await response.Body.FlushAsync();
-
-                await Task.Delay(5000); // 5秒ごとに更新
-            }
-        }
-
         [HttpGet("unread-count")]
         public async Task<ActionResult<int>> GetUnreadNotificationsCount()
         {
