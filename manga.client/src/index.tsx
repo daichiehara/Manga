@@ -9,6 +9,7 @@ import { BooksProvider } from './components/context/BookContext';
 import { SnackbarProvider } from './components/context/SnackbarContext';
 import { UserProvider } from './components/context/UserContext';
 import { AppProvider } from './components/context/AppContext';
+import { NotificationProvider } from './components/context/NotificationContext';
 import './utils/http'
 
 
@@ -19,21 +20,23 @@ if (container) {
   const root = createRoot(container);
   
   root.render(
-    //<React.StrictMode>
+    <React.StrictMode>
       <ThemeProvider theme={theme}>
         <AuthProvider>
-        <UserProvider>
           <AppProvider>
-            <BooksProvider>
-              <SnackbarProvider>
-                <App />
-              </SnackbarProvider>
-            </BooksProvider>
+            <UserProvider>
+                <NotificationProvider>
+                  <BooksProvider>
+                    <SnackbarProvider>
+                      <App />
+                    </SnackbarProvider>
+                  </BooksProvider>
+                </NotificationProvider>
+            </UserProvider>
           </AppProvider>
-        </UserProvider>
         </AuthProvider>
       </ThemeProvider>
-    //</React.StrictMode>
+    </React.StrictMode>
   );
 } else {
   console.error('Failed to find the root element');

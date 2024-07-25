@@ -10,6 +10,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { useNavigate } from 'react-router-dom';
 import { NotificationContext } from '../components/context/NotificationContext';
+import useTimeSince from '../hooks/useTimeSince';
 
 
 interface Notification {
@@ -202,44 +203,46 @@ const handleExchangeConfirmed = useCallback(() => {
       </>
     );
   }
+
+  const renderNotification = useCallback((notification: Notification, index: number) => {
+    const timeSinceString = useTimeSince(notification.updatedDateTime);  // useTimeSinceフックを使用
+
+    return (
+      <Grid item xs={12} key={index} style={{ 
+        borderBottom: index !== notifications.length - 1 ? '1px solid #e0e0e0' : '' 
+      }}>
+        <Card elevation={0} sx={{ display: 'flex', alignItems: 'center'}}>
+          <CardActionArea onClick={() => handleNotificationClick(notification)}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <CardMedia
+                component="img"
+                sx={{ width: 88, height: 70, margin: 2, borderRadius: '10px' }}
+                image={notification.sellImage}
+              />
+              <CardContent sx={{ flexGrow: 1, '&:last-child': { paddingBottom: '8px' }, padding: '4px' }}>
+                <Typography variant="body2" sx={{ fontWeight: '570'}}>
+                  {notification.message}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{fontSize: 12, mt:0.5}}>
+                  {timeSinceString}  {/* 新しいフックの結果を使用 */}
+                </Typography>
+              </CardContent>
+              <ArrowForwardIosIcon sx={{ marginRight: 2, fontSize: '24px', color: '#707070'}} />
+            </Box>
+          </CardActionArea>
+        </Card>
+      </Grid>
+    );
+  }, [handleNotificationClick]);
   
 
   return (
     <>
-      {/* メインコンテンツエリア */}
-      {/* 見出しのToolbar */}
       <CustomToolbar title='お知らせ' showBackButton={false} />
       
-      {/* 通知カードのリスト */}
       <Box sx={{mt: 8, mb: 8}}>
         <Grid container spacing={0.5}>
-          {notifications.map((notification, index) => (
-            <Grid item xs={12} key={index} style={{ 
-              borderBottom: index !== notifications.length - 1 ? '1px solid #e0e0e0' : '' 
-            }}>
-              <Card elevation={0} sx={{ display: 'flex', alignItems: 'center'}}>
-                <CardActionArea onClick={() => handleNotificationClick(notification)}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <CardMedia
-                      component="img"
-                      sx={{ width: 88, height: 70, margin: 2, borderRadius: '10px' }}
-                      image={notification.sellImage}
-                    />
-                    <CardContent sx={{ flexGrow: 1, '&:last-child': { paddingBottom: '8px' }, padding: '4px' }}>
-                      <Typography variant="body2" sx={{ fontWeight: '570'}}>
-                        {notification.message}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary"sx={{fontSize: 12, mt:0.5}}>
-                        {timeSince(notification.updatedDateTime)}
-                      </Typography>
-                    </CardContent>
-                    <ArrowForwardIosIcon sx={{ marginRight: 2, fontSize: '24px', color: '#707070'}} />
-                  </Box>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-          
+          {notifications.map((notification, index) => renderNotification(notification, index))}
         </Grid>
       </Box>
 
@@ -253,7 +256,7 @@ const handleExchangeConfirmed = useCallback(() => {
         onExchangeConfirmed={handleExchangeConfirmed}
       />
 
-      <MenuBar /> {/* 画像のボトムのナビゲーションバーに対応するコンポーネント */}
+      <MenuBar />
     </>
   );
 };
