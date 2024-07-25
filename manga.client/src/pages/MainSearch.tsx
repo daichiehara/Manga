@@ -185,9 +185,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
             <CircularProgress size={20} style={{ marginRight: '10px' }} />
           )}
           {!isCurrentTabHasMore && (
-            <Typography variant="body2" align="center">
-              すべてのデータを読み込みました
-            </Typography>
+            <Box />
           )}
         </div>
       </Box>

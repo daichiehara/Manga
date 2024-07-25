@@ -82,6 +82,11 @@ const Login: React.FC = () => {
       
   };
 
+  const handleNavigateRegisterPage = () => {
+    navigate('/login-page/signup');
+  }
+
+
   return (
     <Box sx={{pt:`4rem`, p:`1.2rem`, boxShadow:"none", border:'none'}}>
         <BackButton handleBack={handleBack} />
@@ -114,6 +119,9 @@ const Login: React.FC = () => {
         {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : 'Login'}
         </Button>
       </form>
+      <Button onClick={handleNavigateRegisterPage}>
+        会員登録
+      </Button>
       
     </Box>
   );
