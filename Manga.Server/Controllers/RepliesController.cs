@@ -154,36 +154,31 @@ namespace Manga.Server.Controllers
 
 
 
-        [HttpPost("DeleteReply/{replyId}")]
+        [HttpPut("DeleteReply/{replyId}")]
         public async Task<IActionResult> DeleteReply(int replyId)
         {
-            var userId = _userManager.GetUserId(User); // 現在のユーザーIDを取得
-
-            // 指定されたIDを持つ返信とその関連する出品をデータベースから検索
+            var userId = _userManager.GetUserId(User);
             var reply = await _context.Reply
-                .Include(r => r.Sell) // Sell情報も一緒に取得
+                .Include(r => r.Sell)
                 .FirstOrDefaultAsync(r => r.ReplyId == replyId);
 
-            // 返信が見つからない、または返信に関連する出品が見つからない場合は、NotFoundを返す
             if (reply == null || reply.Sell == null)
             {
                 return NotFound("該当するコメントまたは出品が見つかりません。");
             }
 
-            // 現在のユーザーが返信に関連する出品の出品者でない場合は、権限エラーを返す
             if (reply.Sell.UserAccountId != userId)
             {
-                return new ObjectResult("出品者以外はコメントを削除することはできません。") { StatusCode = StatusCodes.Status403Forbidden };// または適切なエラーメッセージと共に BadRequest を返す
+                return new ObjectResult("出品者以外はコメントを削除することはできません。")
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
             }
 
-            // 返信が見つかり、現在のユーザーが出品者である場合は、IsDeletedをtrueに設定
             reply.IsDeleted = true;
-
-            // データベースの変更を保存
             await _context.SaveChangesAsync();
 
-            // 成功のレスポンスを返す（ここでは204 No Contentを返しています）
-            return Ok();
+            return NoContent();
         }
 
         /*
