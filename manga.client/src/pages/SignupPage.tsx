@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
-import { Box, Button, Container, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, Button, Container, Typography, CircularProgress, Alert, ButtonBase } from '@mui/material';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
 
 const SignupPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('xs'));
+  const isIse = useMediaQuery(theme.breakpoints.between('xs', 'ise'));
+  const isSm = useMediaQuery(theme.breakpoints.between('ise', 'sm'));
+  const isMd = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const isLg = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+
+  const buttonWidth = isXs ? '100%' : isIse ? '350px' : isSm ? '400px' : isMd ? '400px' : isLg ? '400px' : '400px';
+
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setLoading(true);
@@ -39,25 +52,28 @@ const SignupPage: React.FC = () => {
     setError('Google認証に失敗しました。');
   };
 
+  
+
   return (
     <GoogleOAuthProvider clientId="1013291515281-j5re58a4bjt9qk9dgp6sdoquick9mv8j.apps.googleusercontent.com">
-      <Container maxWidth="sm">
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', justifyContent: 'center' }}>
-          <img
-            src="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp"
-            alt="Tocaeru Logo"
-            style={{ width: '200px', marginBottom: '16px' }} // ロゴのサイズとマージンを調整
-          />
+      <CustomTocaeruToolbar />
+      
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width:'100%' }}>
           <Typography component="h1" variant="h5">
-            サインイン
+            会員登録
           </Typography>
-          <Box sx={{ mt: 3 }}>
+          <Box sx={{ mt: '5rem' }}>
             {loading ? (
               <CircularProgress />
             ) : (
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleFailure}
+                text='signup_with'
+                width={buttonWidth}
+                size='large'
+                logo_alignment='center'
+                
               />
             )}
           </Box>
@@ -75,13 +91,14 @@ const SignupPage: React.FC = () => {
             fullWidth
             variant="contained"
             color="primary"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 3, mb: 2, width:buttonWidth}}
             onClick={() => navigate('/login-page/signup/Email')}
+            startIcon={<MailOutlineOutlinedIcon  />}
           >
             メールで登録
           </Button>
         </Box>
-      </Container>
+   
     </GoogleOAuthProvider>
   );
 };
