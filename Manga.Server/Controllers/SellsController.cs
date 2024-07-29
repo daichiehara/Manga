@@ -373,7 +373,7 @@ namespace Manga.Server.Controllers
             return sell;
         }
         */
-
+        [HttpGet("{id}")]
         public async Task<ActionResult<SellDetailsDto>> GetSellDetails(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -403,12 +403,12 @@ namespace Manga.Server.Controllers
 
             // 非同期タスクを並列実行
             var tasks = new List<Task>
-    {
-        GetRequestStatus(userId, id, sell.SellStatus, sell.UserAccountId),
-        GetWishTitles(userId, sell.UserAccountId),
-        GetReplies(id),
-        GetReplyCount(id)
-    };
+            {
+                GetRequestStatus(userId, id, sell.SellStatus, sell.UserAccountId),
+                GetWishTitles(userId, sell.UserAccountId),
+                GetReplies(id),
+                GetReplyCount(id)
+            };
 
             await Task.WhenAll(tasks);
 

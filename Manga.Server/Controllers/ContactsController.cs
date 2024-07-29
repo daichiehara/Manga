@@ -154,7 +154,7 @@ namespace Manga.Server.Controllers
                 var body = string.Format(Resources.EmailTemplates.ContactMessage,
                     sanitizedContact.Name, sanitizedContact.Email, sanitizedContact.Message);
 
-                await _emailSender.SendEmailAsync(sanitizedContact.Email, "お問い合わせ確認", body);
+                await _emailSender.SendEmailAsync(sanitizedContact.Email, "お問い合わせありがとうございます", body);
 
                 // 管理者向けメール
                 var adminBody = $"お問い合わせがありました。<br /><br />{sanitizedContact.Email}<br />{sanitizedContact.Name}<br />{sanitizedContact.Message}";
