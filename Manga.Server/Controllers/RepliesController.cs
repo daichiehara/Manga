@@ -60,7 +60,7 @@ namespace Manga.Server.Controllers
 
             var replies = await _context.Reply
                 .Where(r => r.SellId == id)
-                .OrderByDescending(r => r.Created)
+                .OrderBy(r => r.Created)
                 .Select(r => new ReplyDto
                 {
                     ReplyId = r.ReplyId,

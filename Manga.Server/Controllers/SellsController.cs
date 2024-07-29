@@ -374,115 +374,52 @@ namespace Manga.Server.Controllers
         }
         */
 
-        [HttpGet("{id}")]
         public async Task<ActionResult<SellDetailsDto>> GetSellDetails(int id)
         {
-            var userId = _userManager.GetUserId(User); // 現在のユーザーIDを取得
-            var sell = await _context.Sell
+            var userId = _userManager.GetUserId(User);
+
+            // 必要なデータを1回のクエリで取得
+            var sellQuery = await _context.Sell
                 .Include(s => s.UserAccount)
                 .Include(s => s.SellImages)
                 .Include(s => s.MyLists)
-                .FirstOrDefaultAsync(s => s.SellId == id);
+                .Where(s => s.SellId == id)
+                .Select(s => new
+                {
+                    Sell = s,
+                    IsPublic = s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established,
+                    IsOwner = s.UserAccountId == userId,
+                    LikeCount = s.MyLists.Count,
+                    IsLiked = s.MyLists.Any(ml => ml.UserAccountId == userId)
+                })
+                .FirstOrDefaultAsync();
 
-            if (sell == null)
+            if (sellQuery == null || (!sellQuery.IsPublic && !sellQuery.IsOwner))
             {
                 return NotFound();
             }
 
-            bool isPublic = sell.SellStatus == SellStatus.Recruiting || sell.SellStatus == SellStatus.Established;
-            bool isOwner = sell.UserAccountId == userId;
+            var sell = sellQuery.Sell;
 
-            if (!isPublic && !isOwner)
-            {
-                return NotFound();
-            }
+            // 非同期タスクを並列実行
+            var tasks = new List<Task>
+    {
+        GetRequestStatus(userId, id, sell.SellStatus, sell.UserAccountId),
+        GetWishTitles(userId, sell.UserAccountId),
+        GetReplies(id),
+        GetReplyCount(id)
+    };
 
-            RequestButtonStatus requestStatus;
-            if (sell.SellStatus == SellStatus.Established) // 既にマッチングが成立している場合
-            {
-                requestStatus = RequestButtonStatus.Matched;
-            }
-            else if (sell.UserAccountId == userId)
-            {
-                requestStatus = RequestButtonStatus.OwnSell;
-            }
-            else
-            {
-                var userRequests = await _context.Request
-                    .Where(r => r.RequesterId == userId && r.ResponderSellId == id)
-                    .ToListAsync();
+            await Task.WhenAll(tasks);
 
-                if (userRequests.Any())
-                {
-                    if (userRequests.Any(r => r.Status == RequestStatus.Withdrawn))
-                    {
-                        requestStatus = RequestButtonStatus.CanRequest;
-                    }
-                    else
-                    {
-                        requestStatus = RequestButtonStatus.AlreadyRequested;
-                    }
-                }
-                else
-                {
-                    requestStatus = RequestButtonStatus.CanRequest;
-                }
-            }
-
-            // 出品者のWishListを取得
-            var wishLists = await _context.WishList
-                .Where(w => w.UserAccountId == sell.UserAccountId)
-                .ToListAsync();
-
-            // 現在のユーザーのOwnedListに含まれるタイトルのリストを取得
-            var ownedTitles = await _context.OwnedList
-                .Where(m => m.UserAccountId == userId)
-                .Select(m => m.Title)
-                .ToListAsync();
-
-            // 現在のユーザーのSellのタイトルリストも取得
-            var sellTitles = await _context.Sell
-                                            .Where(s => s.UserAccountId == userId)
-                                            .Select(s => s.Title)
-                                            .ToListAsync();
-
-            // 両方のリストを結合
-            var userTitles = ownedTitles.Union(sellTitles).ToList();
-
-            // WishListからWishTitleInfoリストを作成
-            var wishTitles = wishLists
-                .Select(wl => new WishTitleInfo
-                {
-                    Title = wl.Title,
-                    IsOwned = userTitles.Contains(wl.Title)
-                })
-                .OrderByDescending(w => w.IsOwned)
-                .ToList();
-
-            var replies = await _context.Reply
-                .Where(r => r.SellId == id)
-                .OrderByDescending(r => r.Created) // 最新の返信から
-                .Take(3) // 上位3件のみ
-                .Select(r => new ReplyDto
-                {
-                    ReplyId = r.ReplyId,
-                    NickName = r.UserAccount.NickName,
-                    ProfileIcon = r.UserAccount.ProfileIcon,
-                    Message = r.Message,
-                    Created = r.Created,
-                })
-                .ToListAsync();
-
-            var replyCount = await _context.Reply
-                .Where(r => r.SellId == id)
-                .CountAsync();
-
-            // いいね！の情報を取得
-            bool isLiked = sell.MyLists.Any(ml => ml.UserAccountId == userId);
-            int likeCount = sell.MyLists.Count;
+            var requestStatus = ((Task<RequestButtonStatus>)tasks[0]).Result;
+            var wishTitles = ((Task<List<WishTitleInfo>>)tasks[1]).Result;
+            var replies = ((Task<List<ReplyDto>>)tasks[2]).Result;
+            var replyCount = ((Task<int>)tasks[3]).Result;
 
             var dto = new SellDetailsDto
             {
+                // DTOプロパティの設定
                 SellId = sell.SellId,
                 Title = sell.Title,
                 SendPrefecture = sell.SendPrefecture.GetDisplayName(),
@@ -499,14 +436,78 @@ namespace Manga.Server.Controllers
                 WishTitles = wishTitles,
                 Replies = replies,
                 ReplyCount = replyCount,
-                IsLiked = isLiked,
-                LikeCount = likeCount,
+                IsLiked = sellQuery.IsLiked,
+                LikeCount = sellQuery.LikeCount,
                 RequestButtonStatus = requestStatus
             };
 
             return dto;
         }
-        
+
+        private async Task<RequestButtonStatus> GetRequestStatus(string userId, int sellId, SellStatus sellStatus, string sellUserAccountId)
+        {
+            if (sellStatus == SellStatus.Established)
+                return RequestButtonStatus.Matched;
+            if (sellUserAccountId == userId)
+                return RequestButtonStatus.OwnSell;
+
+            var userRequest = await _context.Request
+                .Where(r => r.RequesterId == userId && r.ResponderSellId == sellId)
+                .Select(r => r.Status)
+                .FirstOrDefaultAsync();
+
+            if (userRequest == RequestStatus.Withdrawn || userRequest == null)
+                return RequestButtonStatus.CanRequest;
+            return RequestButtonStatus.AlreadyRequested;
+        }
+
+        private async Task<List<WishTitleInfo>> GetWishTitles(string userId, string sellUserAccountId)
+        {
+            var wishListQuery = _context.WishList.Where(w => w.UserAccountId == sellUserAccountId);
+            var userTitlesQuery = _context.OwnedList.Where(m => m.UserAccountId == userId)
+                .Select(m => m.Title)
+                .Union(_context.Sell.Where(s => s.UserAccountId == userId).Select(s => s.Title));
+
+            var wishListTask = wishListQuery.ToListAsync();
+            var userTitlesTask = userTitlesQuery.ToListAsync();
+
+            await Task.WhenAll(wishListTask, userTitlesTask);
+
+            var wishList = await wishListTask;
+            var userTitles = await userTitlesTask;
+
+            return wishList
+                .Select(wl => new WishTitleInfo
+                {
+                    Title = wl.Title,
+                    IsOwned = userTitles.Contains(wl.Title)
+                })
+                .OrderByDescending(w => w.IsOwned)
+                .ToList();
+        }
+
+        private async Task<List<ReplyDto>> GetReplies(int sellId)
+        {
+            return await _context.Reply
+                .Where(r => r.SellId == sellId)
+                .OrderByDescending(r => r.Created)
+                .Take(3)
+                .Select(r => new ReplyDto
+                {
+                    ReplyId = r.ReplyId,
+                    NickName = r.UserAccount.NickName,
+                    ProfileIcon = r.UserAccount.ProfileIcon,
+                    Message = r.Message,
+                    Created = r.Created,
+                })
+                .ToListAsync();
+        }
+
+        private async Task<int> GetReplyCount(int sellId)
+        {
+            return await _context.Reply.CountAsync(r => r.SellId == sellId);
+        }
+
 
 
         // PUT: api/Sells/5
