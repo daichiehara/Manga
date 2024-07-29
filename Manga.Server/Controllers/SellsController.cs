@@ -374,6 +374,7 @@ namespace Manga.Server.Controllers
             return sell;
         }
         */
+        [HttpGet("{id}")]
         public async Task<ActionResult<SellDetailsDto>> GetSellDetails(int id)
         {
             var userId = _userManager.GetUserId(User);
