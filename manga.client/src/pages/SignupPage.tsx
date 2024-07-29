@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Container, Typography, CircularProgress, Alert, ButtonBase } from '@mui/material';
+import { Box, Button, Typography, CircularProgress, Alert, ButtonBase } from '@mui/material';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -72,7 +72,7 @@ const SignupPage: React.FC = () => {
                 text='signup_with'
                 width={buttonWidth}
                 size='large'
-                logo_alignment='center'
+                logo_alignment='left'
                 
               />
             )}
@@ -87,16 +87,30 @@ const SignupPage: React.FC = () => {
               {success}
             </Alert>
           )}
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, mb: 2, width:buttonWidth}}
-            onClick={() => navigate('/login-page/signup/Email')}
-            startIcon={<MailOutlineOutlinedIcon  />}
-          >
-            メールで登録
-          </Button>
+          <ButtonBase
+      onClick={() => navigate('/login-page/signup/Email')}
+      sx={{
+        width:buttonWidth,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: 'primary.main',
+        color: 'white',
+        mt:'1rem',
+        pl:'10px',
+        pr:'20px',
+        py:'8px',
+        borderRadius: 1,
+        '&:hover': {
+          bgcolor: 'primary.dark',
+        },
+      }}
+    >
+      <MailOutlineOutlinedIcon sx={{ marginRight: 'auto',}} />
+      <Typography variant='subtitle2' sx={{ flexGrow: 1, textAlign: 'center',  }}>
+        メールで登録
+      </Typography>
+    </ButtonBase>
         </Box>
    
     </GoogleOAuthProvider>
