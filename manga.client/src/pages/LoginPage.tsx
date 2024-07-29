@@ -222,7 +222,7 @@ const Login: React.FC = () => {
         onClick={() => navigate('/login-page/signup')}
         variant='outlined'
         fullWidth
-        sx={{fontWeight:'bold', color:'red', borderColor:'red'}}
+        sx={{fontWeight:'bold',color:'red', borderColor:'red'}}
         >
           会員登録
         </Button>
