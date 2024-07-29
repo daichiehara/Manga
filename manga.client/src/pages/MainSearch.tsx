@@ -8,7 +8,6 @@ import Header from '../components/common/Header';
 //import MangaImage1 from '../assets/images/MangaImage1.jpg';
 import MenuBar from '../components/menu/MenuBar';
 import LoadingComponent from '../components/common/LoadingComponent';
-import axios from 'axios';
 import ErrorDisplay from '../components/common/ErrorDisplay';
 import { AppContext } from '../components/context/AppContext';
 import { AuthContext } from '../components/context/AuthContext';
@@ -39,7 +38,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab = 1}) => {
     isLoadingRecommend, 
     error,
     fetchMoreData,
-    hasMore
+    hasMore,
   } = useContext(AppContext);
   const { authState } = useContext(AuthContext);
   const navigate = useNavigate();

@@ -35,6 +35,8 @@ import MpContact from './pages/MpContact.tsx';
 import CommentPage from './pages/CommentPage.tsx';
 import SignupPage from './pages/SignupPage.tsx';
 import SignupByEmail from './pages/SignupByEmail.tsx';
+import { AxiosInterceptorProvider } from './components/context/AxiosInterceptorProvider';
+import path from 'path';
 
 
 const AppLayout = () => {
@@ -55,7 +57,8 @@ const AppLayout = () => {
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<AppLayout />}>
+    <Route element={<AxiosInterceptorProvider><AppLayout /></AxiosInterceptorProvider>}>
+      <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
       <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
         <Route path="/" element={<MainSearch initialTab={1} />} />
         <Route path="/item/new" element={<MainSearch initialTab={2} />} />
@@ -88,6 +91,13 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
+  /*
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigateFunction(navigate);
+  }, [navigate]);
+  */
   useEffect(() => {
     const initializeAuth = async () => {
       try {
