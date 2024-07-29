@@ -17,7 +17,26 @@ const SignupByEmail: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  const validatePassword = (password: string) => {
+    if (/[！-～]/.test(password)) {
+      return '全角文字を含めないでください';
+    }
+    if (password.length < 8) {
+      return 'パスワードは8文字以上にしてください';
+    }
+    if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      return 'パスワードは小文字、大文字、数字を含めてください';
+    }
+    return null;
+  };
+
   const handleSignup = async () => {
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -27,7 +46,7 @@ const SignupByEmail: React.FC = () => {
         email,
         password,
         nickName,
-      }, {withCredentials:true});
+      }, { withCredentials: true });
 
       setSuccess(response.data.Message);
       setLoading(false);
@@ -128,7 +147,7 @@ const SignupByEmail: React.FC = () => {
           >
             {loading ? <CircularProgress size={24} /> : '登録'}
           </Button>
-          <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
+          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
             このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
           </Typography>
         </Box>
