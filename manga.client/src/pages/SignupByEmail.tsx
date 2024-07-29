@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Button, Container, TextField, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, Button, TextField, Typography, CircularProgress, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { IconButton, InputAdornment } from '@mui/material';
+import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
+import theme from '../theme/theme';
 
 const SignupByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -10,6 +14,7 @@ const SignupByEmail: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async () => {
@@ -36,49 +41,71 @@ const SignupByEmail: React.FC = () => {
     }
   };
 
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">
-          会員登録
-        </Typography>
-        <Box component="form" sx={{ mt: 1 }}>
+    <Box sx={{ px: '1rem' }}>
+      <CustomTocaeruToolbar showSubtitle subtitle={'会員登録'} />
+      <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box component="form" sx={{ mt: 1, width: '100%', maxWidth: 400 }}>
+          <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: theme.palette.text.secondary, mb: 1 }}>
+            メールアドレス
+          </Typography>
           <TextField
             variant="outlined"
-            margin="normal"
             required
             fullWidth
             id="email"
-            label="メールアドレス"
+            placeholder="tocaeru@email.com"
             name="email"
             autoComplete="email"
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            sx={{ mb: 2 }}
           />
+          <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: theme.palette.text.secondary, mb: 1 }}>
+            パスワード
+          </Typography>
           <TextField
             variant="outlined"
-            margin="normal"
             required
             fullWidth
             name="password"
-            label="パスワード"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             id="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
+          <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: theme.palette.text.secondary, mb: 1 }}>
+            ニックネーム
+          </Typography>
           <TextField
             variant="outlined"
-            margin="normal"
             required
             fullWidth
             name="nickName"
-            label="ニックネーム"
+            placeholder="例 : トカエル君"
             id="nickName"
             value={nickName}
             onChange={(e) => setNickName(e.target.value)}
+            sx={{ mb: 2 }}
           />
           {error && (
             <Alert severity="error" sx={{ mt: 2 }}>
@@ -101,9 +128,12 @@ const SignupByEmail: React.FC = () => {
           >
             {loading ? <CircularProgress size={24} /> : '登録'}
           </Button>
+          <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
+            このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
+          </Typography>
         </Box>
       </Box>
-    </Container>
+    </Box>
   );
 };
 

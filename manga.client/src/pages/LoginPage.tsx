@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
+import { TextField, Button, Box, Divider, Typography, Alert, CircularProgress, IconButton, InputAdornment } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import { updateGlobalAuthState } from '../components/context/AuthContext';
-
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import theme from '../theme/theme';
 
 type LoginFormInputs = {
   email: string;
@@ -13,117 +17,217 @@ type LoginFormInputs = {
 };
 
 type ApiErrors = {
-    email?: string;
-    password?: string;
-    message?: string; // Add this line
-  };
+  email?: string;
+  password?: string;
+  message?: string; 
+};
 
 const Login: React.FC = () => {
-  const [apiErrors, setApiErrors] = useState<ApiErrors>({}); 
+  const [apiErrors, setApiErrors] = useState<ApiErrors>({});
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
 
   const handleBack = () => {
-    navigate(-1); // 前のページに戻る
+    navigate(-1);
   };
- 
+
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const onSubmit = (data: LoginFormInputs) => {
-    setApiErrors({}); // Clear previous errors
-    setIsLoading(true); 
+    setApiErrors({});
+    setIsLoading(true);
 
     axios.post('https://localhost:7103/api/Users/Login', {
       Email: data.email,
       Password: data.password
-    },{
+    }, {
       headers: {
         'Content-Type': 'application/json'
       },
       withCredentials: true
     })
     .then(response => {
-    setIsLoginSuccessful(true);
-    updateGlobalAuthState({ isAuthenticated: true }); 
-    navigate(-1);
+      setIsLoginSuccessful(true);
+      updateGlobalAuthState({ isAuthenticated: true });
+      navigate(-1);
     })
     .catch(error => {
-        setIsLoginSuccessful(false);
-        if (error.response && error.response.data) {
-          let newErrors: ApiErrors = {};
-      
-          // Handle field-specific errors
-          const fieldErrors = error.response.data.errors;
-          if (fieldErrors) {
-            if (fieldErrors.Email) {
-              newErrors.email = fieldErrors.Email[0];
-            }
-            if (fieldErrors.Password) {
-              newErrors.password = fieldErrors.Password[0];
-            }
+      setIsLoginSuccessful(false);
+      if (error.response && error.response.data) {
+        let newErrors: ApiErrors = {};
+        const fieldErrors = error.response.data.errors;
+        if (fieldErrors) {
+          if (fieldErrors.Email) {
+            newErrors.email = fieldErrors.Email[0];
           }
-      
-          // Handle general message error
-          const messageError = error.response.data.messageerrors;
-          if (messageError && messageError.Message) {
-            newErrors.message = messageError.Message[0];
+          if (fieldErrors.Password) {
+            newErrors.password = fieldErrors.Password[0];
           }
-      
-          console.log('API Errors:', newErrors);
-          setApiErrors(newErrors);
         }
-      })
-    
+        const messageError = error.response.data.messageerrors;
+        if (messageError && messageError.Message) {
+          newErrors.message = messageError.Message[0];
+        }
+        console.log('API Errors:', newErrors);
+        setApiErrors(newErrors);
+      }
+    })
     .finally(() => {
-        setIsLoading(false); 
+      setIsLoading(false);
     });
-      
   };
 
   const handleNavigateRegisterPage = () => {
     navigate('/login-page/signup');
   }
 
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await axios.get('https://localhost:7103/api/Users/signin-google', {
+        headers: {
+          Authorization: `Bearer ${credentialResponse.credential}`,
+        },
+        withCredentials: true,
+      });
+
+      setSuccess('Googleアカウントでのログインが成功しました。');
+      setIsLoading(false);
+
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+    } catch (err: any) {
+      setError('Google認証に失敗しました。');
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleFailure = () => {
+    setError('Google認証に失敗しました。');
+  };
+
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('xs'));
+  const isIse = useMediaQuery(theme.breakpoints.between('xs', 'ise'));
+  const isSm = useMediaQuery(theme.breakpoints.between('ise', 'sm'));
+  const isMd = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const isLg = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+
+  const buttonWidth = isXs ? '100%' : isIse ? '350px' : isSm ? '400px' : isMd ? '400px' : isLg ? '400px' : '400px';
 
   return (
-    <>
-      <CustomTocaeruToolbar showSubtitle subtitle={'ログイン'}/>
-      <Box sx={{p:`1.2rem`}}>
+    <GoogleOAuthProvider clientId="1013291515281-j5re58a4bjt9qk9dgp6sdoquick9mv8j.apps.googleusercontent.com">
+      <CustomTocaeruToolbar showSubtitle subtitle={'ログイン'} />
+      <Box sx={{ px: `1.2rem`, pt:'0.5rem', pb:0 }}>
+        <Box sx={{display:'flex', justifyContent:'right'}}>
+          <Button onClick={handleNavigateRegisterPage}>
+            会員登録はこちら
+          </Button>
+        </Box>
         {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
         {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
         <form onSubmit={handleSubmit(onSubmit)}>
+          <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: theme.palette.text.secondary }}>
+            メールアドレス
+          </Typography>
           <TextField
-            label="メールアドレス"
+            placeholder='Tocaeru@email.com'
             variant="outlined"
-            margin="normal"
             fullWidth
             {...register('email')}
             error={!!apiErrors.email}
             helperText={apiErrors.email}
-            sx={{boxShadow:'none'}}
+            sx={{ boxShadow: 'none' }}
           />
+          <Typography variant='subtitle1' sx={{pt:'1rem', fontWeight: 'bold', color: theme.palette.text.secondary }}>
+            パスワード
+          </Typography>
           <TextField
-            label="パスワード"
-            type="password"
+            placeholder="パスワード"
+            type={showPassword ? 'text' : 'password'}
             variant="outlined"
-            margin="normal"
             fullWidth
             {...register('password')}
             error={!!apiErrors.password}
             helperText={apiErrors.password}
-
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
-
-          <Button type="submit" variant="contained" color="primary" fullWidth sx={{my:1, background: 'linear-gradient(to right, #FCCF31, #F55555)'}} disabled={isLoading}>
-          {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : 'Login'}
+          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: '2.5rem', mb:'1rem', background: 'red', fontWeight:'bold' }} disabled={isLoading}>
+            {isLoading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'ログイン'}
           </Button>
         </form>
-        <Button onClick={handleNavigateRegisterPage}>
+        <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
+          利用規約およびプライバシーポリシーに同意の上、ログインへお進みください。
+        </Typography>
+        <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
+          このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
+        </Typography>
+        <Divider sx={{py:1, color: theme.palette.text.secondary}}>
+          または
+        </Divider>
+      </Box>
+      
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleFailure}
+          width={buttonWidth}
+          text='signin_with'
+        />
+      </Box>
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
+      {success && (
+        <Alert severity="success" sx={{ mt: 2 }}>
+          {success}
+        </Alert>
+      )}
+
+      <Box sx={{py:'2rem', px:'1rem'}}>
+        <Divider />
+      </Box>
+
+      <Box sx={{pb:'0.5rem',px:'1rem', display:'flex', justifyContent:'center'}}>
+        <Typography variant='body1' sx={{color: theme.palette.text.secondary}}>
+          アカウントをお持ちでない方
+        </Typography>
+      </Box>
+      <Box sx={{mt:'0.8rem',px:'1rem', display:'flex', justifyContent:'center'}} >
+        <Button
+        onClick={() => navigate('/login-page/signup')}
+        variant='outlined'
+        fullWidth
+        sx={{fontWeight:'bold',color:'red', borderColor:'red'}}
+        >
           会員登録
         </Button>
-        
       </Box>
-    </>
+    </GoogleOAuthProvider>
   );
 };
 

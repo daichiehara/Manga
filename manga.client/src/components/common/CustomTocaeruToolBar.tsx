@@ -57,7 +57,7 @@ const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackBut
     </Toolbar>
     {showSubtitle && (
         <Box sx={{mt:'3.5rem',  pt:'1.2rem', display:'flex', justifyContent:'center'}}>
-            <Typography variant='h6' sx={{fontWeight:'bold', color:theme.palette.text.primary}} >
+            <Typography variant='body1' sx={{fontWeight:'bold', color:theme.palette.text.primary}} >
                 {subtitle}
             </Typography>
         </Box>

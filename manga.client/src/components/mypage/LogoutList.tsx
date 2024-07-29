@@ -12,7 +12,7 @@ import { authService } from '../../api/authService';
 
 const LogoutList: React.FC = () => {
     const menuItems = [
-      { name: 'ログアウト', path: '/login-page' },
+      { name: 'ログアウト', path: '/mypage' },
     ];
   
     const handleLogout = useCallback(() => {
