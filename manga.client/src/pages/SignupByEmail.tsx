@@ -6,6 +6,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment } from '@mui/material';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import theme from '../theme/theme';
+import CheckModal from '../components/common/CheckModal';
 
 const SignupByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -15,6 +16,7 @@ const SignupByEmail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const validatePassword = (password: string) => {
@@ -52,7 +54,7 @@ const SignupByEmail: React.FC = () => {
       setLoading(false);
 
       setTimeout(() => {
-        navigate('/login');
+        navigate(-2);
       }, 2000);
     } catch (err: any) {
       setError(err.response?.data?.Errors?.[0] || '登録に失敗しました');
@@ -62,6 +64,24 @@ const SignupByEmail: React.FC = () => {
 
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  const handleOpenModal = () => {
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleAgree = () => {
+    setIsModalOpen(false);
+    handleSignup();
   };
 
   return (
@@ -120,7 +140,7 @@ const SignupByEmail: React.FC = () => {
             required
             fullWidth
             name="nickName"
-            placeholder="例 : トカエル君"
+            placeholder="例 : トカエルくん"
             id="nickName"
             value={nickName}
             onChange={(e) => setNickName(e.target.value)}
@@ -142,7 +162,7 @@ const SignupByEmail: React.FC = () => {
             variant="contained"
             color="primary"
             sx={{ mt: 3, mb: 2 }}
-            onClick={handleSignup}
+            onClick={handleOpenModal}
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} /> : '登録'}
@@ -152,6 +172,31 @@ const SignupByEmail: React.FC = () => {
           </Typography>
         </Box>
       </Box>
+      <CheckModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        questionText="以下の内容で登録しますか？"
+        agreeText="登録する"
+        onAgree={handleAgree}
+      >
+        <Box
+  sx={{
+    marginTop: 2,
+    padding: 2,
+    borderRadius: 2,
+    border: '1px solid',
+    borderColor: theme.palette.divider,
+    backgroundColor: theme.palette.background.paper,
+  }}
+>
+  <Typography variant='subtitle2' sx={{ marginBottom: 1,color: theme.palette.text.secondary }}>メールアドレス:</Typography>
+  <Typography variant='body2' sx={{ marginBottom: 2 }}>{email}</Typography>
+  <Typography variant='subtitle2' sx={{ marginBottom: 1 ,color: theme.palette.text.secondary}}>パスワード:</Typography>
+  <Typography variant='body2' sx={{ marginBottom: 2 }}>{'•'.repeat(password.length)}</Typography>
+  <Typography variant='subtitle2' sx={{ marginBottom: 1,color: theme.palette.text.secondary }}>ニックネーム:</Typography>
+  <Typography variant='body2'>{nickName}</Typography>
+</Box>
+      </CheckModal>
     </Box>
   );
 };
