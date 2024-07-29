@@ -18,6 +18,7 @@ using System.Xml;
 using System.Xml.XPath;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Manga.Server.Controllers
 {
@@ -373,12 +374,11 @@ namespace Manga.Server.Controllers
             return sell;
         }
         */
-        [HttpGet("{id}")]
         public async Task<ActionResult<SellDetailsDto>> GetSellDetails(int id)
         {
             var userId = _userManager.GetUserId(User);
 
-            // 必要なデータを1回のクエリで取得
+            // メインのクエリを実行
             var sellQuery = await _context.Sell
                 .Include(s => s.UserAccount)
                 .Include(s => s.SellImages)
@@ -392,6 +392,7 @@ namespace Manga.Server.Controllers
                     LikeCount = s.MyLists.Count,
                     IsLiked = s.MyLists.Any(ml => ml.UserAccountId == userId)
                 })
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             if (sellQuery == null || (!sellQuery.IsPublic && !sellQuery.IsOwner))
@@ -401,25 +402,15 @@ namespace Manga.Server.Controllers
 
             var sell = sellQuery.Sell;
 
-            // 非同期タスクを並列実行
-            var tasks = new List<Task>
-            {
-                GetRequestStatus(userId, id, sell.SellStatus, sell.UserAccountId),
-                GetWishTitles(userId, sell.UserAccountId),
-                GetReplies(id),
-                GetReplyCount(id)
-            };
-
-            await Task.WhenAll(tasks);
-
-            var requestStatus = ((Task<RequestButtonStatus>)tasks[0]).Result;
-            var wishTitles = ((Task<List<WishTitleInfo>>)tasks[1]).Result;
-            var replies = ((Task<List<ReplyDto>>)tasks[2]).Result;
-            var replyCount = ((Task<int>)tasks[3]).Result;
+            // 残りのデータを順次取得
+            var requestStatus = await GetRequestStatus(userId, id, sell.SellStatus, sell.UserAccountId);
+            var wishTitles = await GetWishTitles(userId, sell.UserAccountId);
+            var replies = await GetReplies(id);
+            var replyCount = await GetReplyCount(id);
 
             var dto = new SellDetailsDto
             {
-                // DTOプロパティの設定
+                // DTOプロパティの設定（変更なし）
                 SellId = sell.SellId,
                 Title = sell.Title,
                 SendPrefecture = sell.SendPrefecture.GetDisplayName(),
@@ -463,18 +454,17 @@ namespace Manga.Server.Controllers
 
         private async Task<List<WishTitleInfo>> GetWishTitles(string userId, string sellUserAccountId)
         {
-            var wishListQuery = _context.WishList.Where(w => w.UserAccountId == sellUserAccountId);
-            var userTitlesQuery = _context.OwnedList.Where(m => m.UserAccountId == userId)
+            var wishList = await _context.WishList
+                .Where(w => w.UserAccountId == sellUserAccountId)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var userTitles = await _context.OwnedList
+                .Where(m => m.UserAccountId == userId)
                 .Select(m => m.Title)
-                .Union(_context.Sell.Where(s => s.UserAccountId == userId).Select(s => s.Title));
-
-            var wishListTask = wishListQuery.ToListAsync();
-            var userTitlesTask = userTitlesQuery.ToListAsync();
-
-            await Task.WhenAll(wishListTask, userTitlesTask);
-
-            var wishList = await wishListTask;
-            var userTitles = await userTitlesTask;
+                .Union(_context.Sell.Where(s => s.UserAccountId == userId).Select(s => s.Title))
+                .AsNoTracking()
+                .ToListAsync();
 
             return wishList
                 .Select(wl => new WishTitleInfo
@@ -500,6 +490,7 @@ namespace Manga.Server.Controllers
                     Message = r.Message,
                     Created = r.Created,
                 })
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -507,7 +498,6 @@ namespace Manga.Server.Controllers
         {
             return await _context.Reply.CountAsync(r => r.SellId == sellId);
         }
-
 
 
         // PUT: api/Sells/5
