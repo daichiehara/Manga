@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, CircularProgress, Alert, ButtonBase } from '@mui/material';
+import { Box, Button, Divider, Typography, CircularProgress, Alert, ButtonBase } from '@mui/material';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -58,10 +58,32 @@ const SignupPage: React.FC = () => {
     <GoogleOAuthProvider clientId="1013291515281-j5re58a4bjt9qk9dgp6sdoquick9mv8j.apps.googleusercontent.com">
       <CustomTocaeruToolbar showSubtitle subtitle={'会員登録'}/>
       
-        <Box sx={{mt:'3.5rem', pt:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width:'100%' }}>
-          <Typography component="h1" variant="h5">
-            会員登録
-          </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width:'100%' }}>
+        <ButtonBase
+            onClick={() => navigate('/login-page/signup/Email')}
+            sx={{
+              width:buttonWidth,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor: 'inherit',
+              color:theme.palette.text.secondary,
+              border: `1px solid ${theme.palette.text.secondary}`, 
+              mt:'1rem',
+              pl:'10px',
+              pr:'20px',
+              py:'8px',
+              borderRadius: 1,
+              '&:hover': {
+                bgcolor: 'dark',
+              },
+            }}
+          >
+            <MailOutlineOutlinedIcon sx={{ marginRight: 'auto',}} />
+            <Typography variant='subtitle2' sx={{ flexGrow: 1, textAlign: 'center', fontWeight:'bold',color:theme.palette.text.secondary }}>
+              メールアドレスで登録
+            </Typography>
+          </ButtonBase>
           <Box sx={{ mt: '1rem' }}>
             {loading ? (
               <CircularProgress />
@@ -87,31 +109,35 @@ const SignupPage: React.FC = () => {
               {success}
             </Alert>
           )}
-          <ButtonBase
-            onClick={() => navigate('/login-page/signup/Email')}
-            sx={{
-              width:buttonWidth,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bgcolor: 'primary.main',
-              color: 'white',
-              mt:'1rem',
-              pl:'10px',
-              pr:'20px',
-              py:'8px',
-              borderRadius: 1,
-              '&:hover': {
-                bgcolor: 'primary.dark',
-              },
-            }}
-          >
-            <MailOutlineOutlinedIcon sx={{ marginRight: 'auto',}} />
-            <Typography variant='subtitle2' sx={{ flexGrow: 1, textAlign: 'center',  }}>
-              メールで登録
-            </Typography>
-          </ButtonBase>
+
+          
+          
         </Box>
+        
+        <Box sx={{pt:'1rem', px:'1rem'}}>
+          <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
+            利用規約およびプライバシーポリシーに同意の上、登録又はログインへお進みください。
+          </Typography>
+        </Box>
+        <Box sx={{py:'2rem', px:'1rem'}}>
+          <Divider />
+        </Box>
+        <Box sx={{px:'1rem', display:'flex', justifyContent:'center'}}>
+          <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
+            アカウントをお持ちの方
+          </Typography>
+        </Box>
+        <Box sx={{mt:'0.8rem',px:'1rem', display:'flex', justifyContent:'center'}} >
+          <Button
+          onClick={() => navigate('/login-page')}
+          variant='outlined'
+          fullWidth
+          sx={{fontWeight:'bold', color:'red',borderColor:'red'}}
+          >
+            ログイン
+          </Button>
+        </Box>
+        
    
     </GoogleOAuthProvider>
   );
