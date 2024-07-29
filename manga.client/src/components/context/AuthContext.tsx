@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, useEffect} from 'react';
+import { createContext, useState, ReactNode, useEffect, useCallback, useRef} from 'react';
 import { authService } from '../../api/authService';
 
 // 認証情報の型定義
@@ -28,28 +28,63 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const REFRESH_INTERVAL = 28 * 60 * 1000; // 28分をミリ秒で表現
+const MAX_RETRY_COUNT = 3;
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [authState, setAuthState] = useState<AuthState>(initialAuthState);
+  const retryCount = useRef(0);
+  const intervalId = useRef<NodeJS.Timeout | null>(null);
 
-  const updateAuthState = (newState: Partial<AuthState>) => {
+  const updateAuthState = useCallback((newState: Partial<AuthState>) => {
     setAuthState(prevState => ({ ...prevState, ...newState }));
-  };
+  }, []);
 
   globalUpdateAuthState = updateAuthState; // グローバル変数に関数を割り当てる
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        await authService.refreshToken();
-        updateAuthState({ isAuthenticated: true, isInitialized: true });
-      } catch (error) {
-        console.error('Failed to initialize authentication:', error);
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout();
+      updateAuthState({ isAuthenticated: false });
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+        intervalId.current = null;
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }, [updateAuthState]);
+
+  const refreshTokenAndUpdateState = useCallback(async () => {
+    try {
+      console.log('refreshTokenAndUpdateState');
+      await authService.refreshToken();
+      updateAuthState({ isAuthenticated: true, isInitialized: true });
+      retryCount.current = 0;
+    } catch (error) {
+      console.error('Failed to refresh tokentoken:', error);
+      console.log(authState.isInitialized)
+      retryCount.current++;
+      if (retryCount.current >= MAX_RETRY_COUNT) {
+        console.log('Max retry count reached. Logging out...');
+        await logout();
+      } else {
         updateAuthState({ isAuthenticated: false, isInitialized: true });
       }
-    };
+    }
+  }, [updateAuthState, logout]);
 
-    initializeAuth();
-  }, []);
+  useEffect(() => {
+    refreshTokenAndUpdateState();
+
+    intervalId.current = setInterval(refreshTokenAndUpdateState, REFRESH_INTERVAL);
+
+    return () => {
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+      }
+    };
+  }, [refreshTokenAndUpdateState]);
 
   // 現在の状態と更新関数をログに出力
   //console.log('現在の認証状態:', authState);

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
@@ -49,8 +49,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [page, setPage] = useState<{ [key: number]: number }>({ 0: 1, 1: 1, 2: 1 });
   const [hasMore, setHasMore] = useState<{ [key: number]: boolean }>({ 0: true, 1: true, 2: true });
 
-  const fetchData = async (tabIndex: number, isInitialLoad: boolean = false) => {
-    if (!authState.isInitialized || !authState.isAuthenticated) return;
+  const resetState = useCallback(() => {
+    console.log('リセット開始');
+    setMangaData([]);
+    setMyListData([]);
+    setRecommendData([]);
+    setPage({ 0: 1, 1: 1, 2: 1 });
+    setHasMore({ 0: true, 1: true, 2: true });
+    setError(null);
+    console.log('リセット完了');
+  }, []);
+
+  const fetchData = useCallback(async (tabIndex: number, isInitialLoad: boolean = false, currentPage: number) => {
+    if (!authState.isInitialized) return;
+    console.log(`fetchData開始: tabIndex=${tabIndex}, isInitialLoad=${isInitialLoad}, currentPage=${currentPage}`);
 
     const setLoading = (tabIndex: number, value: boolean) => {
       if (tabIndex === 0) setIsLoadingMyList(value);
@@ -67,7 +79,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       else url = 'https://localhost:7103/api/Sells';
 
       const response = await axios.get(url, {
-        params: { page: page[tabIndex], pageSize: 10 },
+        params: { page: currentPage, pageSize: 10 },
         withCredentials: true
       });
 
@@ -76,28 +88,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       setDataFunction(prevData => isInitialLoad ? newData : [...prevData, ...newData]);
       setHasMore(prev => ({ ...prev, [tabIndex]: newData.length === 10 }));
-      setPage(prev => ({ ...prev, [tabIndex]: prev[tabIndex] + 1 }));
+      setPage(prev => ({ ...prev, [tabIndex]: currentPage + 1 }));
+
+      console.log(`fetchData完了: tabIndex=${tabIndex}, newPage=${currentPage + 1}`);
     } catch (error) {
       console.error('データの取得に失敗しました:', error);
       setError('データのロードに失敗しました');
     } finally {
       setLoading(tabIndex, false);
     }
-  };
+  }, [authState.isInitialized]);
 
-  const fetchMoreData = async (tabIndex: number) => {
+  const fetchMoreData = useCallback(async (tabIndex: number) => {
     if (hasMore[tabIndex]) {
-      await fetchData(tabIndex);
+      await fetchData(tabIndex, false, page[tabIndex]);
     }
-  };
+  }, [hasMore, fetchData, page]);
 
   useEffect(() => {
-    if (authState.isInitialized && authState.isAuthenticated) {
-      fetchData(0, true);
-      fetchData(1, true);
-      fetchData(2, true);
-    }
+    let isMounted = true;
+
+    const fetchAllData = async () => {
+      if (authState.isInitialized && isMounted) {
+        console.log('fetchAllData開始');
+        resetState();
+        
+        // 状態更新が反映されるのを待つ
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
+        if (isMounted) {
+          console.log('Current page state:', page);
+          await fetchData(0, true, 1);
+          if (isMounted) await fetchData(1, true, 1);
+          if (isMounted) await fetchData(2, true, 1);
+        }
+        console.log('fetchAllData完了');
+      }
+    };
+
+    fetchAllData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [authState.isInitialized, authState.isAuthenticated]);
+
+
 
   return (
     <AppContext.Provider value={{ 
@@ -109,7 +145,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isLoadingRecommend,
         error,
         fetchMoreData,
-        hasMore
+        hasMore,
         }}>
       {children}
     </AppContext.Provider>

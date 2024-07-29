@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
-import { updateGlobalAuthState } from '../components/context/AuthContext';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { updateGlobalAuthState, AuthContext } from '../components/context/AuthContext';
 import { addGlobalBook, removeGlobalBook } from '../components/context/BookContext';
 
 interface Book {
@@ -18,6 +19,7 @@ type WishList = Book[]; // WishListはBookの配列です
 
 
 const API_BASE_URL = 'https://localhost:7103/api';
+
 
 export const bookService = {
   
@@ -79,8 +81,7 @@ export const authService = {
       })
       .catch(error => {
         console.error('Failed to refresh token:', error);
-        updateGlobalAuthState({ isAuthenticated: false });
-        //throw error;
+        throw error;
       })
       .finally(() => {
         isRefreshing = false;

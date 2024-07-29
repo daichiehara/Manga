@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { authService } from '../api/authService';
 import { updateGlobalAuthState } from '../components/context/AuthContext';
+import { customNavigate } from './navigation';
 
 console.log('http.tsxが読み込まれた。');
+/*
 axios.interceptors.response.use(
     response => {
       console.log('H1_Responseを受け取った。RefreshTokenは叩かれない。:', response);
@@ -35,5 +37,38 @@ axios.interceptors.response.use(
       return Promise.reject(error);
     }
   );
+  */
+  axios.interceptors.response.use(
+    response => {
+      console.log('H1_Responseを受け取った。RefreshTokenは叩かれない。:', response);
+      return response;
+    },
+    async error => {
+      console.log('H2_何かしらErrorを受け取った。:', error.response);
   
+      if (error.response) {
+        if (error.response.status === 401) {
+          console.log('H3_401エラー。ログインページに遷移します。');
+          //updateGlobalAuthState({ isAuthenticated: false });
+          customNavigate('/login-page/signup');
+          return Promise.reject(error);
+        } /*else {
+          try {
+            console.log('H4_401以外のエラー。リフレッシュトークンを試みます。');
+            await authService.refreshToken();
+            console.log('H5_Token refreshed successfully');
+            return axios(error.config);
+          } catch (error) {
+            console.error('H6_リフレッシュトークンAPIを叩くことに失敗。:', error);
+            updateGlobalAuthState({ isAuthenticated: false });
+            //customNavigate('/login-page/signup');
+            return Promise.reject(error);
+          }
+        }*/
+      } else {
+        console.error('H7_レスポンス無し:', error);
+      }
+      return Promise.reject(error);
+    }
+  );
   // ... 他のHTTP設定

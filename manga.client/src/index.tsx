@@ -10,7 +10,7 @@ import { SnackbarProvider } from './components/context/SnackbarContext';
 import { UserProvider } from './components/context/UserContext';
 import { AppProvider } from './components/context/AppContext';
 import { NotificationProvider } from './components/context/NotificationContext';
-import './utils/http'
+//import './utils/http'
 
 
 const container = document.getElementById('root');
