@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
-import BackButton from '../components/common/BackButton';
+import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import { updateGlobalAuthState } from '../components/context/AuthContext';
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 type LoginFormInputs = {
@@ -88,42 +86,44 @@ const Login: React.FC = () => {
 
 
   return (
-    <Box sx={{pt:`4rem`, p:`1.2rem`, boxShadow:"none", border:'none'}}>
-        <BackButton handleBack={handleBack} />
-      <Typography variant="h5"sx={{ textAlign: 'center', fontWeight:'550' }}>ログイン</Typography>
-      {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
-      {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextField
-          label="メールアドレス"
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          {...register('email')}
-          error={!!apiErrors.email}
-          helperText={apiErrors.email}
-        />
-        <TextField
-          label="パスワード"
-          type="password"
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          {...register('password')}
-          error={!!apiErrors.password}
-          helperText={apiErrors.password}
+    <>
+      <CustomTocaeruToolbar showSubtitle subtitle={'ログイン'}/>
+      <Box sx={{p:`1.2rem`}}>
+        {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
+        {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            label="メールアドレス"
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            {...register('email')}
+            error={!!apiErrors.email}
+            helperText={apiErrors.email}
+            sx={{boxShadow:'none'}}
+          />
+          <TextField
+            label="パスワード"
+            type="password"
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            {...register('password')}
+            error={!!apiErrors.password}
+            helperText={apiErrors.password}
 
-        />
+          />
 
-        <Button type="submit" variant="contained" color="primary" fullWidth sx={{my:1, background: 'linear-gradient(to right, #FCCF31, #F55555)'}} disabled={isLoading}>
-        {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : 'Login'}
+          <Button type="submit" variant="contained" color="primary" fullWidth sx={{my:1, background: 'linear-gradient(to right, #FCCF31, #F55555)'}} disabled={isLoading}>
+          {isLoading ? <CircularProgress size={24} sx={{color:'white'}}/> : 'Login'}
+          </Button>
+        </form>
+        <Button onClick={handleNavigateRegisterPage}>
+          会員登録
         </Button>
-      </form>
-      <Button onClick={handleNavigateRegisterPage}>
-        会員登録
-      </Button>
-      
-    </Box>
+        
+      </Box>
+    </>
   );
 };
 

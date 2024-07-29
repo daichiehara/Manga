@@ -2,15 +2,20 @@ import React from 'react';
 import { Box, Toolbar, Typography, IconButton } from '@mui/material';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useCustomNavigate } from '../../hooks/useCustomNavigate'; // パスは適宜調整してください
+import { useTheme } from '@mui/material/styles';
 
 type CustomTocaeruToolbarProps = {
   showBackButton?: boolean;
+  showSubtitle?: boolean;
+  subtitle?: string | null;
 };
 
-const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackButton = true }) => {
+const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackButton = true, showSubtitle= false, subtitle=null }) => {
   const customNavigate = useCustomNavigate();
+  const theme = useTheme();
 
   return (
+    <>
     <Toolbar disableGutters sx={{
       borderBottom: '0.05px solid #BFBFBF',
       background: '#FFFFFF',
@@ -50,6 +55,15 @@ const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackBut
       </Box>
       <div style={{ width: 48, height: 48 }} />
     </Toolbar>
+    {showSubtitle && (
+        <Box sx={{mt:'3.5rem',  pt:'1.2rem', display:'flex', justifyContent:'center'}}>
+            <Typography variant='h6' sx={{fontWeight:'bold', color:theme.palette.text.primary}} >
+                {subtitle}
+            </Typography>
+        </Box>
+    )}
+    
+    </>
   );
 };
 
