@@ -137,6 +137,34 @@ namespace Manga.Server.Resources {
         }
         
         /// <summary>
+        ///   // Resources/EmailTemplates.resx ファイル内
+        ///
+        ///&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;root&gt;
+        ///  &lt;data name=&quot;ReportMessage&quot; xml:space=&quot;preserve&quot;&gt;
+        ///    &lt;value&gt;
+        ///&lt;![CDATA[
+        ///&lt;!DOCTYPE html&gt;
+        ///&lt;html lang=&apos;ja&apos;&gt;
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&apos;UTF-8&apos;&gt;
+        ///    &lt;meta name=&apos;viewport&apos; content=&apos;width=device-width, initial-scale=1.0&apos;&gt;
+        ///    &lt;title&gt;新しい通報通知&lt;/title&gt;
+        ///    &lt;style&gt;
+        ///        body {{
+        ///            font-family: Arial, sans-serif;
+        ///            line-height: 1.6;
+        ///            color: #333;
+        ///            max-width: 600px;
+        ///         [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ReportMessage {
+            get {
+                return ResourceManager.GetString("ReportMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   トカエルをご利用いただきありがとうございます。
         ///
         ///{0}さんの出品「{1}」に交換申請がありました。

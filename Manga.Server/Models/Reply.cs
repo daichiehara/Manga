@@ -10,7 +10,7 @@ namespace Manga.Server.Models
 
         [Display(Name = "メッセージ")]
         [Required]
-        [StringLength(400, ErrorMessage = "メッセージは200文字以内で入力してください。")]
+        [StringLength(400, ErrorMessage = "メッセージは400文字以内で入力してください。")]
         public string Message { get; set; }
 
         [Display(Name = "投稿日時")]
@@ -22,5 +22,7 @@ namespace Manga.Server.Models
         public virtual UserAccount UserAccount { get; set; }
         public int SellId { get; set; }
         public virtual Sell Sell { get; set; }
+
+        public virtual ICollection<Report> Reports { get; set; }
     }
 }
