@@ -320,7 +320,7 @@ namespace Manga.Server.Controllers
             return Ok(new { message = "ログアウトしました。" });
         }
 
-        [HttpPost("forgot-password")]
+        [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
@@ -345,7 +345,7 @@ namespace Manga.Server.Controllers
             return Ok(new { message = "パスワード再設定の手順をメールで送信しました。" });
         }
 
-        [HttpPost("reset-password")]
+        [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
