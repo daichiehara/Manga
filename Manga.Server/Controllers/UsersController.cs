@@ -336,12 +336,11 @@ namespace Manga.Server.Controllers
             var encodedUserId = Uri.EscapeDataString(user.Id);
 
             var resetUrl = $"{_configuration["FrontendUrl"]}/reset-password?userId={encodedUserId}&token={encodedToken}";
-            var encodedResetUrl = HtmlEncoder.Default.Encode(resetUrl);
 
             await _emailSender.SendEmailAsync(
                 model.Email,
                 "パスワードのリセット",
-                $"パスワードをリセットするには、<a href='{HtmlEncoder.Default.Encode(encodedResetUrl)}'>こちらをクリック</a>してください。");
+                $"パスワードをリセットするには、<a href='{HtmlEncoder.Default.Encode(resetUrl)}'>こちらをクリック</a>してください。");
 
             return Ok(new { message = "パスワード再設定の手順をメールで送信しました。" });
         }
