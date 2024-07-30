@@ -36,6 +36,9 @@ import CommentPage from './pages/CommentPage.tsx';
 import SignupPage from './pages/SignupPage.tsx';
 import SignupByEmail from './pages/SignupByEmail.tsx';
 import { AxiosInterceptorProvider } from './components/context/AxiosInterceptorProvider';
+import ForgotPassword from './pages/ForgotPassword.tsx';
+import ResetPassword from './pages/ResetPassword.tsx';
+
 import path from 'path';
 
 
@@ -86,6 +89,8 @@ const router = createBrowserRouter(
         <Route path="/item/:sellId/comment" element={<CommentPage />} />
         <Route path="/login-page/signup" element={<SignupPage />} />
         <Route path="/login-page/signup/Email" element={<SignupByEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
     </Route>
   )
 );
