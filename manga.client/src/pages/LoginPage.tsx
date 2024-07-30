@@ -186,6 +186,15 @@ const Login: React.FC = () => {
         <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
           このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
         </Typography>
+
+        <Button onClick={() => navigate('/forgot-password')} sx={{color:'skyblue'}}>
+        パスワード忘れた方はこちら
+      </Button>
+
+      <Button onClick={() => navigate('/reset-password')}>
+        仮置き リセットのページ
+      </Button>
+
         <Divider sx={{py:1, color: theme.palette.text.secondary}}>
           または
         </Divider>
