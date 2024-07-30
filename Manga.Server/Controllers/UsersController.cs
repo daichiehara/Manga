@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Google.Cloud.RecaptchaEnterprise.V1;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net.Http;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text.Encodings.Web;
 
 namespace Manga.Server.Controllers
 {
@@ -316,6 +318,52 @@ namespace Manga.Server.Controllers
             Response.Cookies.Append("RefreshToken", "", cookieOptions); // トークンをクリア
 
             return Ok(new { message = "ログアウトしました。" });
+        }
+
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                // ユーザーが存在しないか、メールが確認されていない場合でも、
+                // セキュリティのために同じメッセージを返す
+                return Ok(new { message = "パスワード再設定の手順をメールで送信しました。" });
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var resetUrl = $"{_configuration["FrontendUrl"]}/reset-password?userId={user.Id}&token={encodedToken}";
+            var encodedResetUrl = HtmlEncoder.Default.Encode(resetUrl);
+
+            await _emailSender.SendEmailAsync(
+                model.Email,
+                "パスワードのリセット",
+                $"パスワードをリセットするには、<a href='{HtmlEncoder.Default.Encode(encodedResetUrl)}'>こちらをクリック</a>してください。");
+
+            return Ok(new { message = "パスワード再設定の手順をメールで送信しました。" });
+        }
+
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                // ユーザーが見つからない場合でも、セキュリティのために同じメッセージを返す
+                return Ok(new { message = "パスワードがリセットされました。" });
+            }
+
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok(new { message = "パスワードがリセットされました。" });
+            }
+
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
         }
 
         [HttpGet("MyPage")]
