@@ -109,67 +109,55 @@ namespace Manga.Server.Controllers
             return items;
         }
 
-        [HttpGet("SearchByTitle")]
-        public async Task<ActionResult<List<HomeDto>>> SearchSellsByTitleAsync([FromQuery] string title)
+        [HttpGet("SearchByWord")]
+        public async Task<ActionResult<List<HomeDto>>> SearchSellsAsync([FromQuery] string searchTerm)
         {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("検索語が指定されていません。");
+            }
+
             var userId = _userManager.GetUserId(User);
 
-            // 現在のユーザーのownedTitlesのリストを取得
-            var ownedTitles = await _context.OwnedList
+            // 1. ユーザーのタイトルを一度に取得
+            var userTitlesQuery = _context.OwnedList
                 .Where(o => o.UserAccountId == userId)
                 .Select(o => o.Title)
-                .ToListAsync();
+                .Union(_context.Sell
+                    .Where(s => s.UserAccountId == userId)
+                    .Select(s => s.Title));
 
-            // 現在のユーザーのSellのタイトルリストも取得
-            var sellTitles = await _context.Sell
-                                            .Where(s => s.UserAccountId == userId)
-                                            .Select(s => s.Title)
-                                            .ToListAsync();
-
-            // 両方のリストを結合
-            var userTitles = ownedTitles.Union(sellTitles).ToList();
-
-            // 直接一致するSellのレコードを取得
-            var matchingSells = await _context.Sell
+            // 2. メインクエリ：Sell、WishList、SellImagesを一度に取得
+            var query = _context.Sell
                 .Include(s => s.SellImages)
-                .Where(s => s.Title.Contains(title) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
-                .Where(s => s.Title.Contains(title))
-                .ToListAsync();
-
-            // 検索タイトルがWishListテーブルのタイトルと同じだったユーザーのIdを取得
-            var wishMatchingUserIds = await _context.WishList
-                .Where(w => w.Title == title)
-                .Select(w => w.UserAccountId)
-                .ToListAsync();
-
-            // wishMatchingUserIdsに含まれるユーザーのSellのレコードを取得
-            var wishMatchingSells = await _context.Sell
-                .Include(s => s.SellImages)
-                .Where(s => wishMatchingUserIds.Contains(s.UserAccountId) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
-                .ToListAsync();
-
-            // リストを結合し、SellTimeの降順で並び替え
-            var allMatchingSells = matchingSells.Concat(wishMatchingSells)
-                .Distinct()
+                .Include(s => s.UserAccount.WishLists)
+                .Where(s => (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established) &&
+                            (EF.Functions.ILike(s.Title, $"%{searchTerm}%") ||
+                             EF.Functions.ILike(s.SellMessage, $"%{searchTerm}%") ||
+                             s.UserAccount.WishLists.Any(w => EF.Functions.ILike(w.Title, $"%{searchTerm}%"))))
                 .OrderByDescending(s => s.SellTime)
-                .ToList();
+                .Select(s => new
+                {
+                    Sell = s,
+                    WishLists = s.UserAccount.WishLists.Select(w => new { w.Title }).ToList(),
+                    SellImage = s.SellImages.OrderBy(si => si.Order).FirstOrDefault().ImageUrl
+                });
 
-            // allMatchingSellsに基づいてHomeDtoのリストを作成
-            var homeDtos = allMatchingSells.Select(sell => new HomeDto
+            var results = await query.ToListAsync();
+            var userTitles = await userTitlesQuery.ToListAsync();
+
+            var homeDtos = results.Select(r => new HomeDto
             {
-                SellId = sell.SellId,
-                SellTitle = sell.Title,
-                NumberOfBooks = sell.NumberOfBooks,
-                WishTitles = _context.WishList
-                    .Where(w => w.UserAccountId == sell.UserAccountId)
-                    .Select(w => new WishTitleInfo
-                    {
-                        Title = w.Title,
-                        IsOwned = userTitles.Contains(w.Title)
-                    })
-                    .OrderByDescending(w => w.IsOwned)
-                    .ToList(),
-                SellImage = sell.SellImages.OrderBy(si => si.Order).FirstOrDefault()?.ImageUrl
+                SellId = r.Sell.SellId,
+                SellTitle = r.Sell.Title,
+                NumberOfBooks = r.Sell.NumberOfBooks,
+                //SellMessage = r.Sell.SellMessage, // SellMessageを追加
+                WishTitles = r.WishLists.Select(w => new WishTitleInfo
+                {
+                    Title = w.Title,
+                    IsOwned = userTitles.Contains(w.Title)
+                }).OrderByDescending(w => w.IsOwned).ToList(),
+                SellImage = r.SellImage
             }).ToList();
 
             return homeDtos;
@@ -1160,22 +1148,23 @@ namespace Manga.Server.Controllers
             var mangaTitles = await _context.MangaTitles
                 .FromSqlRaw(@"
                     SELECT main_title
+                    FROM (
+                        SELECT DISTINCT ON (main_title) main_title, count
                         FROM (
-                            SELECT DISTINCT ON (main_title) main_title, count
-                            FROM (
-                                (SELECT main_title, count FROM manga_titles WHERE main_title =% {0})
-                                UNION ALL
-                                (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1})
-                                UNION ALL
-                                (SELECT main_title, count FROM manga_titles WHERE author =% {0})
-                            ) AS combined
-                            ORDER BY main_title, count DESC
-                        ) AS distinct_titles
-                        ORDER BY count DESC
-                        LIMIT 20",
-                query, katakanaQuery)
+                            (SELECT main_title, count FROM manga_titles WHERE main_title =% {0})
+                            UNION ALL
+                            (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1})
+                            UNION ALL
+                            (SELECT main_title, count FROM manga_titles WHERE author ILIKE {2} ORDER BY count DESC LIMIT 5)
+                        ) AS combined
+                        ORDER BY main_title, count DESC
+                    ) AS distinct_titles
+                    ORDER BY count DESC
+                    LIMIT 20",
+                query, katakanaQuery, $"%{query}%")
                 .Select(m => m.MainTitle)
                 .ToListAsync();
+
             var normalizedTitles = NormalizeTitles(mangaTitles);
             return Ok(normalizedTitles);
         }

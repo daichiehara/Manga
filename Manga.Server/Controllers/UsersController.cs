@@ -333,8 +333,9 @@ namespace Manga.Server.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var encodedUserId = Uri.EscapeDataString(user.Id);
 
-            var resetUrl = $"{_configuration["FrontendUrl"]}/reset-password?userId={user.Id}&token={encodedToken}";
+            var resetUrl = $"{_configuration["FrontendUrl"]}/reset-password?userId={encodedUserId}&token={encodedToken}";
             var encodedResetUrl = HtmlEncoder.Default.Encode(resetUrl);
 
             await _emailSender.SendEmailAsync(
@@ -348,16 +349,36 @@ namespace Manga.Server.Controllers
         [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            string decodedUserId;
+            try
+            {
+                decodedUserId = Uri.UnescapeDataString(model.UserId);
+            }
+            catch (FormatException)
+            {
+                // UserId のデコードに失敗した場合
+                return BadRequest(new { message = "無効なユーザーIDです。" });
+            }
+
+            var user = await _userManager.FindByIdAsync(decodedUserId);
             if (user == null)
             {
                 // ユーザーが見つからない場合でも、セキュリティのために同じメッセージを返す
                 return Ok(new { message = "パスワードがリセットされました。" });
             }
 
-            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
-            var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+            string decodedToken;
+            try
+            {
+                decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
+            }
+            catch (FormatException)
+            {
+                // トークンのデコードに失敗した場合
+                return BadRequest(new { message = "無効なトークンです。" });
+            }
 
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
             if (result.Succeeded)
             {
                 return Ok(new { message = "パスワードがリセットされました。" });
