@@ -74,7 +74,7 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('https://localhost:7103/api/Users/ResetPassword', { userId, token, newPassword: password }, { withCredentials: true });
+      const response = await axios.post('https://localhost:7103/api/Users/ResetPassword', { userId, token, newPassword: password, confirmPassword: confirmPassword }, { withCredentials: true });
       setMessage(response.data.message);
       setError('');
       navigate('/login-page'); // リセット成功後にログインページにリダイレクト
