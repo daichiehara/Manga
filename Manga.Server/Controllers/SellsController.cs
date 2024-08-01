@@ -168,42 +168,40 @@ namespace Manga.Server.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            // 現在のユーザーのownedTitlesのリストを取得
-            var ownedTitles = await _context.OwnedList
+            // ユーザーの所有タイトルを取得
+            var userTitles = await _context.OwnedList
                 .Where(o => o.UserAccountId == userId)
                 .Select(o => o.Title)
+                .Union(_context.Sell
+                    .Where(s => s.UserAccountId == userId)
+                    .Select(s => s.Title))
                 .ToListAsync();
 
-            // 現在のユーザーのSellのタイトルリストも取得
-            var sellTitles = await _context.Sell
-                .Where(s => s.UserAccountId == userId)
-                .Select(s => s.Title)
+            // メインクエリ
+            var query = from sell in _context.Sell
+                        join wishList in _context.WishList on sell.UserAccountId equals wishList.UserAccountId
+                        where wishList.Title == title
+                            && (sell.SellStatus == SellStatus.Recruiting || sell.SellStatus == SellStatus.Established)
+                        select new
+                        {
+                            Sell = sell,
+                            WishLists = sell.UserAccount.WishLists,
+                            SellImage = sell.SellImages.OrderBy(si => si.Order).FirstOrDefault().ImageUrl,
+                            OwnedCount = sell.UserAccount.WishLists.Count(w => userTitles.Contains(w.Title))
+                        };
+
+            var results = await query
+                .OrderByDescending(x => x.OwnedCount)
+                .ThenByDescending(x => x.Sell.SellTime)
                 .ToListAsync();
 
-            // 両方のリストを結合
-            var userTitles = ownedTitles.Union(sellTitles).ToList();
-
-            // 検索タイトルがWishListテーブルのタイトルと同じだったユーザーのIdを取得
-            var wishMatchingUserIds = await _context.WishList
-                .Where(w => w.Title == title)
-                .Select(w => w.UserAccountId)
-                .ToListAsync();
-
-            // wishMatchingUserIdsに含まれるユーザーのSellのレコードを取得
-            var wishMatchingSells = await _context.Sell
-                .Include(s => s.SellImages)
-                .Where(s => wishMatchingUserIds.Contains(s.UserAccountId) && (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established))
-                .OrderByDescending(s => s.SellTime)
-                .ToListAsync();
-
-            // wishMatchingSellsに基づいてHomeDtoのリストを作成
-            var homeDtos = wishMatchingSells.Select(sell => new HomeDto
+            // 結果をHomeDtoに変換
+            var homeDtos = results.Select(r => new HomeDto
             {
-                SellId = sell.SellId,
-                SellTitle = sell.Title,
-                NumberOfBooks = sell.NumberOfBooks,
-                WishTitles = _context.WishList
-                    .Where(w => w.UserAccountId == sell.UserAccountId)
+                SellId = r.Sell.SellId,
+                SellTitle = r.Sell.Title,
+                NumberOfBooks = r.Sell.NumberOfBooks,
+                WishTitles = r.WishLists
                     .Select(w => new WishTitleInfo
                     {
                         Title = w.Title,
@@ -211,7 +209,7 @@ namespace Manga.Server.Controllers
                     })
                     .OrderByDescending(w => w.IsOwned)
                     .ToList(),
-                SellImage = sell.SellImages.OrderBy(si => si.Order).FirstOrDefault()?.ImageUrl
+                SellImage = r.SellImage,
             }).ToList();
 
             return homeDtos;
