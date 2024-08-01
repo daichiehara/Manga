@@ -34,6 +34,9 @@ namespace Manga.Server.Models
         [Display(Name = "削除済みリクエスト数")]
         public int DeletedRequestCount { get; set; }
 
+        [Display(Name = "検索用文字列")]
+        public string? UnifiedSearchText { get; set; }
+
         public string UserAccountId { get; set; }
         public virtual UserAccount UserAccount { get; set; }
 

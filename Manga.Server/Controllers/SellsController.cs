@@ -110,16 +110,19 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("SearchByWord")]
-        public async Task<ActionResult<List<HomeDto>>> SearchSellsAsync([FromQuery] string searchTerm)
+        public async Task<ActionResult<List<HomeDto>>> SearchSellsAsync([FromQuery] string search)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            if (string.IsNullOrWhiteSpace(search))
             {
                 return BadRequest("検索語が指定されていません。");
             }
 
             var userId = _userManager.GetUserId(User);
 
-            // 1. ユーザーのタイトルを一度に取得
+            // searchTermをカタカナに変換
+            var katakanaSearchTerm = JapaneseUtils.HiraganaToKatakana(search.ToLowerInvariant());
+
+            // ユーザーのタイトルを一度に取得
             var userTitlesQuery = _context.OwnedList
                 .Where(o => o.UserAccountId == userId)
                 .Select(o => o.Title)
@@ -127,14 +130,12 @@ namespace Manga.Server.Controllers
                     .Where(s => s.UserAccountId == userId)
                     .Select(s => s.Title));
 
-            // 2. メインクエリ：Sell、WishList、SellImagesを一度に取得
+            // メインクエリ：UnifiedSearchTextを使用
             var query = _context.Sell
                 .Include(s => s.SellImages)
                 .Include(s => s.UserAccount.WishLists)
                 .Where(s => (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established) &&
-                            (EF.Functions.ILike(s.Title, $"%{searchTerm}%") ||
-                             EF.Functions.ILike(s.SellMessage, $"%{searchTerm}%") ||
-                             s.UserAccount.WishLists.Any(w => EF.Functions.ILike(w.Title, $"%{searchTerm}%"))))
+                            EF.Functions.ILike(s.UnifiedSearchText, $"%{katakanaSearchTerm}%"))
                 .OrderByDescending(s => s.SellTime)
                 .Select(s => new
                 {
@@ -151,7 +152,6 @@ namespace Manga.Server.Controllers
                 SellId = r.Sell.SellId,
                 SellTitle = r.Sell.Title,
                 NumberOfBooks = r.Sell.NumberOfBooks,
-                //SellMessage = r.Sell.SellMessage, // SellMessageを追加
                 WishTitles = r.WishLists.Select(w => new WishTitleInfo
                 {
                     Title = w.Title,
@@ -426,19 +426,28 @@ namespace Manga.Server.Controllers
 
         private async Task<RequestButtonStatus> GetRequestStatus(string userId, int sellId, SellStatus sellStatus, string sellUserAccountId)
         {
-            if (sellStatus == SellStatus.Established)
-                return RequestButtonStatus.Matched;
-            if (sellUserAccountId == userId)
-                return RequestButtonStatus.OwnSell;
 
             var userRequest = await _context.Request
                 .Where(r => r.RequesterId == userId && r.ResponderSellId == sellId)
                 .Select(r => r.Status)
                 .FirstOrDefaultAsync();
 
-            if (userRequest == RequestStatus.Withdrawn || userRequest == null)
+            if (sellStatus == SellStatus.Established)
+            {
+                return RequestButtonStatus.Matched;
+            }
+            else if (sellUserAccountId == userId)
+            {
+                return RequestButtonStatus.OwnSell;
+            }
+            else if (userRequest == RequestStatus.Withdrawn)
+            {
+                return RequestButtonStatus.AlreadyRequested;
+            }
+            else
+            {
                 return RequestButtonStatus.CanRequest;
-            return RequestButtonStatus.AlreadyRequested;
+            }
         }
 
         private async Task<List<WishTitleInfo>> GetWishTitles(string userId, string sellUserAccountId)
