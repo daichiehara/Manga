@@ -62,35 +62,35 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<AxiosInterceptorProvider><AppLayout /></AxiosInterceptorProvider>}>
       <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
-      <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
-        <Route path="/" element={<MainSearch initialTab={1} />} />
-        <Route path="/item/new" element={<MainSearch initialTab={2} />} />
-        <Route path="/item/:sellId" element={<MangaDetail />} />
-        <Route path="/notification" element={<MainNotification />} /> {/* 通知ページのルート */}
-        <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
-        <Route path="/main-sell" element={<MSell />} />
-        <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
-        <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
-        <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
-        <Route path="/mypage/favolist" element={<MpFavoList />} /> {/* test */}
-        <Route path="/mypage/changeemailpassword" element={<MpChangeEmailPassword />} />
-        <Route path="/mypage/addressupdate" element={<MpAdressUpadate />} />
-        <Route path="/mypage/mysell" element={<MpMySell />} />
-        <Route path="/mypage/matchedsell" element={<MpMatchedSell />} />
-        <Route path="/mypage/verification" element={<MpIdVerification />} />
-        <Route path="/mypage/verification/camera" element={<IdCamera />} />
-        <Route path="/mypage/requestedsell" element={<MpRequestSell />} />
-        <Route path='/mypage/contact' element={<MpContact />} />
-        <Route path="/sell" element={<SellForm />} />
-        <Route path="/sell/:sellId" element={<SellForm />} />
-        <Route path="/sell/draft" element={<DraftList />} />
-        <Route path="/mypage/profile" element={<MpProfile />} />
-        <Route path="/email-confirmation" element={<EmailConfirmation />} />
-        <Route path="/item/:sellId/comment" element={<CommentPage />} />
-        <Route path="/login-page/signup" element={<SignupPage />} />
-        <Route path="/login-page/signup/Email" element={<SignupByEmail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/" element={<MainSearch initialTab={1} />} />
+      <Route path="/item/new" element={<MainSearch initialTab={2} />} />
+      <Route path="/search" element={<MainSearch initialTab={1} />} />
+      <Route path="/item/:sellId" element={<MangaDetail />} />
+      <Route path="/notification" element={<MainNotification />} /> {/* 通知ページのルート */}
+      <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
+      <Route path="/main-sell" element={<MSell />} />
+      <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
+      <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
+      <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
+      <Route path="/mypage/favolist" element={<MpFavoList />} /> {/* test */}
+      <Route path="/mypage/changeemailpassword" element={<MpChangeEmailPassword />} />
+      <Route path="/mypage/addressupdate" element={<MpAdressUpadate />} />
+      <Route path="/mypage/mysell" element={<MpMySell />} />
+      <Route path="/mypage/matchedsell" element={<MpMatchedSell />} />
+      <Route path="/mypage/verification" element={<MpIdVerification />} />
+      <Route path="/mypage/verification/camera" element={<IdCamera />} />
+      <Route path="/mypage/requestedsell" element={<MpRequestSell />} />
+      <Route path='/mypage/contact' element={<MpContact />} />
+      <Route path="/sell" element={<SellForm />} />
+      <Route path="/sell/:sellId" element={<SellForm />} />
+      <Route path="/sell/draft" element={<DraftList />} />
+      <Route path="/mypage/profile" element={<MpProfile />} />
+      <Route path="/email-confirmation" element={<EmailConfirmation />} />
+      <Route path="/item/:sellId/comment" element={<CommentPage />} />
+      <Route path="/login-page/signup" element={<SignupPage />} />
+      <Route path="/login-page/signup/Email" element={<SignupByEmail />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
     </Route>
   )
 );

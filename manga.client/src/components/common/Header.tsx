@@ -1,7 +1,9 @@
-import React, { useState, memo } from 'react';
-import { AppBar, Toolbar, InputBase, Paper, IconButton } from '@mui/material';
+import React, { useState, memo, useEffect } from 'react';
+import { AppBar, Toolbar, InputBase, Paper, IconButton, Box } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import TabsComponent from './TabsComponent';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 // 検索バーとタブを持つコンポーネントのPropsの型定義
 interface HeaderProps {
@@ -13,51 +15,85 @@ interface HeaderProps {
 // 検索バーとタブコンポーネントの実装
 const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange }) => {
   const [query, setQuery] = useState('');  // 検索クエリのローカルステート
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // 検索を実行するハンドラー
-  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();  // フォーム送信によるページ再読み込みを防止
-    onSearch(query);         // 検索クエリを親コンポーネントのハンドラーに渡す
+  const isSearchPage = location.pathname === '/search';
+  const showBackButton = isSearchPage || isSearchFocused;
+
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    onSearch(query);
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+  };
+
+  useEffect(() => {
+    if (!isSearchPage) {
+      setIsSearchFocused(false);
+    }
+  }, [isSearchPage]);
+
+  const handleSearchBlur = () => {
+    // オプション: ブラー時にフォーカス状態を解除する場合はコメントを外す
+    // setIsSearchFocused(false);
+  };
+  
   return (
-    // AppBar コンポーネントは検索バーを含むツールバーとタブを表示
     <AppBar position="fixed" sx={{
       pb: '0rem',
-      //background: 'linear-gradient(to right, #fce2c4, orange)',
-      background:'#53A422',
-      //background:'#759A5E',
-      boxShadow: 'none',  // 影を消去
+      background: '#53A422',
+      boxShadow: 'none',
       maxWidth: '640px',
       width: '100%',
       left: '50%',
-      transform: 'translateX(-50%)',  // 中央に配置
+      transform: 'translateX(-50%)',
     }}>
       <Toolbar disableGutters sx={{ width: 'auto', mt: '1rem', mb: 0, px: 1 }}>
-        {/* 検索フォーム */}
-        <Paper component="form" sx={{
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-          boxShadow: 'none',  // 軽い影を追加
-          margin: 'auto',
-          borderRadius: '5px'  // ラウンドした形状
-        }} onSubmit={handleSearch}>
-          {/* 検索アイコン */}
-          <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-            <SearchIcon />
-          </IconButton>
-          {/* 入力フィールド */}
-          <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="Tocaeru.comで検索"  // プレースホルダー
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}  // 入力値の変化に応じてステートを更新
-          />
-        </Paper>
+        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          {showBackButton && (
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleBack}
+              aria-label="back"
+              sx={{ mr: 1 }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
+          <Paper component="form" sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            boxShadow: 'none',
+            margin: 'auto',
+            borderRadius: '5px'
+          }} onSubmit={handleSearch}>
+            <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+              <SearchIcon />
+            </IconButton>
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="Tocaeru.comで検索"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={handleSearchFocus}
+              onBlur={handleSearchBlur}
+            />
+          </Paper>
+        </Box>
       </Toolbar>
-      {/* タブコンポーネント */}
-      <TabsComponent selectedTab={selectedTab} onTabChange={onTabChange} />
+      {!showBackButton && (
+        <TabsComponent selectedTab={selectedTab} onTabChange={onTabChange} />
+      )}
     </AppBar>
   );
 };
