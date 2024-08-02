@@ -89,8 +89,8 @@ const router = createBrowserRouter(
       <Route path="/mypage/profile" element={<MpProfile />} />
       <Route path="/email-confirmation" element={<EmailConfirmation />} />
       <Route path="/item/:sellId/comment" element={<CommentPage />} />
-      <Route path="/login-page/signup" element={<SignupPage />} />
-      <Route path="/login-page/signup/Email" element={<SignupByEmail />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signup/Email" element={<SignupByEmail />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/terms" element={<TermsOfService />} />

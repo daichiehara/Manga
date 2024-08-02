@@ -3,6 +3,7 @@ import { Box, Toolbar, Typography, IconButton } from '@mui/material';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useCustomNavigate } from '../../hooks/useCustomNavigate'; // パスは適宜調整してください
 import { useTheme } from '@mui/material/styles';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 type CustomTocaeruToolbarProps = {
   showBackButton?: boolean;
@@ -12,6 +13,7 @@ type CustomTocaeruToolbarProps = {
 
 const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackButton = false, showSubtitle= false, subtitle=null }) => {
   const customNavigate = useCustomNavigate();
+  const navigate = useNavigate();
   const theme = useTheme();
 
   return (
@@ -47,11 +49,12 @@ const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackBut
         <div style={{ width: 48, height: 48 }} /> // 空のスペーサー
       )}
       <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' , }}>
-        <img
-          src="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp"
-          alt="Tocaeru Logo"
-          style={{ width: '155px', }} // ロゴのサイズとマージンを調整
-        />
+      <img
+            src="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp"
+            alt="Tocaeru Logo"
+            style={{ width: '155px', cursor: 'pointer' }} // ロゴのサイズとマージンを調整
+            onClick={() => navigate('/')}
+          />
       </Box>
       <div style={{ width: 48, height: 48 }} />
     </Toolbar>

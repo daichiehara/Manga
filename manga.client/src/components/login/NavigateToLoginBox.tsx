@@ -20,7 +20,7 @@ interface NavigateToLoginBoxProps {
             <Typography variant='subtitle2' sx={{ textAlign: 'center', mb: `2rem`, color: '#404040' }}>
             会員登録またはログインを行うと、メルカリの様々な機能をご利用いただけます。
             </Typography>
-            <Link to="/login-page" style={{ textDecoration: 'none' }}>
+            <Link to="/signup" style={{ textDecoration: 'none' }}>
             <Button
                 variant="outlined"
                 sx={{
