@@ -7,6 +7,7 @@ import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
+import CustomLink from '../components/common/CustomLink';
 
 const SignupPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -116,8 +117,15 @@ const SignupPage: React.FC = () => {
         
         <Box sx={{pt:'1rem', px:'1rem'}}>
           <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
-            利用規約およびプライバシーポリシーに同意の上、登録又はログインへお進みください。
-          </Typography>
+          <CustomLink href="/terms" target="_blank" rel="noopener noreferrer">
+            利用規約
+          </CustomLink>
+          および
+          <CustomLink href="/privacy" target="_blank" rel="noopener noreferrer">
+            プライバシーポリシー
+          </CustomLink>
+          に同意の上、登録またはログインへお進みください。
+        </Typography>
         </Box>
         <Box sx={{py:'2rem', px:'1rem'}}>
           <Divider />

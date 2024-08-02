@@ -10,7 +10,7 @@ type CustomTocaeruToolbarProps = {
   subtitle?: string | null;
 };
 
-const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackButton = true, showSubtitle= false, subtitle=null }) => {
+const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackButton = false, showSubtitle= false, subtitle=null }) => {
   const customNavigate = useCustomNavigate();
   const theme = useTheme();
 
@@ -57,7 +57,7 @@ const CustomTocaeruToolbar: React.FC<CustomTocaeruToolbarProps> = ({ showBackBut
     </Toolbar>
     {showSubtitle && (
         <Box sx={{mt:'3.5rem',  pt:'1.2rem', display:'flex', justifyContent:'center'}}>
-            <Typography variant='body1' sx={{fontWeight:'bold', color:theme.palette.text.primary}} >
+            <Typography variant='h6' sx={{fontWeight:'bold', color:theme.palette.text.primary}} >
                 {subtitle}
             </Typography>
         </Box>

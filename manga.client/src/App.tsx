@@ -38,6 +38,8 @@ import SignupByEmail from './pages/SignupByEmail.tsx';
 import { AxiosInterceptorProvider } from './components/context/AxiosInterceptorProvider';
 import ForgotPassword from './pages/ForgotPassword.tsx';
 import ResetPassword from './pages/ResetPassword.tsx';
+import TermsOfService from './pages/TermsOfService.tsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
 
 import path from 'path';
 
@@ -91,6 +93,8 @@ const router = createBrowserRouter(
       <Route path="/login-page/signup/Email" element={<SignupByEmail />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
     </Route>
   )
 );

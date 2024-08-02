@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { TextField, Button, Box, Divider, Typography, Alert, CircularProgress, IconButton, InputAdornment } from '@mui/material';
+import { TextField, Button, Box, Divider, Typography, Alert, CircularProgress, IconButton, InputAdornment, IconButtonProps } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import { updateGlobalAuthState } from '../components/context/AuthContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import theme from '../theme/theme';
+import GooglePolicyText from '../components/common/GooglePolicyText';
+import CustomLink from '../components/common/CustomLink';
+
 
 type LoginFormInputs = {
   email: string;
@@ -31,10 +33,6 @@ const Login: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
-
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -131,9 +129,9 @@ const Login: React.FC = () => {
       <CustomTocaeruToolbar showSubtitle subtitle={'ログイン'} />
       <Box sx={{ px: `1.2rem`, pt:'0.5rem', pb:0 }}>
         <Box sx={{display:'flex', justifyContent:'right'}}>
-          <Button onClick={handleNavigateRegisterPage}>
+          <CustomLink href="/login-page/signup">
             会員登録はこちら
-          </Button>
+          </CustomLink>
         </Box>
         {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
         {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
@@ -181,19 +179,30 @@ const Login: React.FC = () => {
           </Button>
         </form>
         <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
-          利用規約およびプライバシーポリシーに同意の上、ログインへお進みください。
+          <CustomLink href="/terms" target="_blank" rel="noopener noreferrer">
+            利用規約
+          </CustomLink>および
+          <CustomLink href="/privacy" target="_blank" rel="noopener noreferrer">
+            プライバシーポリシー
+          </CustomLink>
+          に同意の上、ログインへお進みください。
         </Typography>
-        <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
-          このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
-        </Typography>
+        
+        <GooglePolicyText />
+        <Box sx={{pt:'1rem', display:'flex', justifyContent:'right'}}>
+          <CustomLink href="/forgot-password" sx={{ display: 'block', color: 'skyblue', mt: 2 }}>
+            パスワード忘れた方はこちら
+          </CustomLink>
+          
+        </Box>
+        <Box sx={{display:'flex', justifyContent:'right'}}>
+          
+          <CustomLink href="/reset-password" sx={{ display: 'block', mt: 2 }}>
+          仮置き リセットのページ
+        </CustomLink>
+        </Box>
 
-        <Button onClick={() => navigate('/forgot-password')} sx={{color:'skyblue'}}>
-        パスワード忘れた方はこちら
-      </Button>
-
-      <Button onClick={() => navigate('/reset-password')}>
-        仮置き リセットのページ
-      </Button>
+        
 
         <Divider sx={{py:1, color: theme.palette.text.secondary}}>
           または
