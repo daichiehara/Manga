@@ -110,7 +110,10 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("SearchByWord")]
-        public async Task<ActionResult<List<HomeDto>>> SearchSellsAsync([FromQuery] string search)
+        public async Task<ActionResult<List<HomeDto>>> SearchSellsAsync(
+            [FromQuery] string search,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             if (string.IsNullOrWhiteSpace(search))
             {
@@ -118,11 +121,8 @@ namespace Manga.Server.Controllers
             }
 
             var userId = _userManager.GetUserId(User);
-
-            // searchTermをカタカナに変換
             var katakanaSearchTerm = JapaneseUtils.HiraganaToKatakana(search.ToLowerInvariant());
 
-            // ユーザーのタイトルを一度に取得
             var userTitlesQuery = _context.OwnedList
                 .Where(o => o.UserAccountId == userId)
                 .Select(o => o.Title)
@@ -130,13 +130,14 @@ namespace Manga.Server.Controllers
                     .Where(s => s.UserAccountId == userId)
                     .Select(s => s.Title));
 
-            // メインクエリ：UnifiedSearchTextを使用
             var query = _context.Sell
                 .Include(s => s.SellImages)
                 .Include(s => s.UserAccount.WishLists)
                 .Where(s => (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established) &&
                             EF.Functions.ILike(s.UnifiedSearchText, $"%{katakanaSearchTerm}%"))
                 .OrderByDescending(s => s.SellTime)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(s => new
                 {
                     Sell = s,
@@ -164,11 +165,13 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("SearchByTitleForExchange")]
-        public async Task<ActionResult<List<HomeDto>>> SearchSellsByTitleForExchangeAsync([FromQuery] string title)
+        public async Task<ActionResult<List<HomeDto>>> SearchSellsByTitleForExchangeAsync(
+            [FromQuery] string title,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             var userId = _userManager.GetUserId(User);
 
-            // ユーザーの所有タイトルを取得
             var userTitles = await _context.OwnedList
                 .Where(o => o.UserAccountId == userId)
                 .Select(o => o.Title)
@@ -177,7 +180,6 @@ namespace Manga.Server.Controllers
                     .Select(s => s.Title))
                 .ToListAsync();
 
-            // メインクエリ
             var query = from sell in _context.Sell
                         join wishList in _context.WishList on sell.UserAccountId equals wishList.UserAccountId
                         where wishList.Title == title
@@ -193,9 +195,10 @@ namespace Manga.Server.Controllers
             var results = await query
                 .OrderByDescending(x => x.OwnedCount)
                 .ThenByDescending(x => x.Sell.SellTime)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            // 結果をHomeDtoに変換
             var homeDtos = results.Select(r => new HomeDto
             {
                 SellId = r.Sell.SellId,
