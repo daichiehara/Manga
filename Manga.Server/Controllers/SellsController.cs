@@ -166,7 +166,7 @@ namespace Manga.Server.Controllers
 
         [HttpGet("SearchByTitleForExchange")]
         public async Task<ActionResult<List<HomeDto>>> SearchSellsByTitleForExchangeAsync(
-            [FromQuery] string title,
+            [FromQuery] string search,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
@@ -182,7 +182,7 @@ namespace Manga.Server.Controllers
 
             var query = from sell in _context.Sell
                         join wishList in _context.WishList on sell.UserAccountId equals wishList.UserAccountId
-                        where wishList.Title == title
+                        where wishList.Title == search
                             && (sell.SellStatus == SellStatus.Recruiting || sell.SellStatus == SellStatus.Established)
                         select new
                         {
