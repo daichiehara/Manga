@@ -7,6 +7,7 @@ import { IconButton, InputAdornment } from '@mui/material';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import theme from '../theme/theme';
 import CheckModal from '../components/common/CheckModal';
+import GooglePolicyText from '../components/common/GooglePolicyText';
 
 const SignupByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -167,9 +168,7 @@ const SignupByEmail: React.FC = () => {
           >
             {loading ? <CircularProgress size={24} /> : '登録'}
           </Button>
-          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
-            このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
-          </Typography>
+          <GooglePolicyText />
         </Box>
       </Box>
       <CheckModal
