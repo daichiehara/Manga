@@ -113,7 +113,8 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<List<HomeDto>>> SearchSellsAsync(
             [FromQuery] string search,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromQuery] bool onlyRecruiting = false)
         {
             if (string.IsNullOrWhiteSpace(search))
             {
@@ -133,8 +134,9 @@ namespace Manga.Server.Controllers
             var query = _context.Sell
                 .Include(s => s.SellImages)
                 .Include(s => s.UserAccount.WishLists)
-                .Where(s => (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established) &&
-                            EF.Functions.ILike(s.UnifiedSearchText, $"%{katakanaSearchTerm}%"))
+                .Where(s => (onlyRecruiting ? s.SellStatus == SellStatus.Recruiting :
+                    (s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)) &&
+                    EF.Functions.ILike(s.UnifiedSearchText, $"%{katakanaSearchTerm}%"))
                 .OrderByDescending(s => s.SellTime)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -168,7 +170,8 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<List<HomeDto>>> SearchSellsByTitleForExchangeAsync(
             [FromQuery] string search,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromQuery] bool onlyRecruiting = false)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -183,7 +186,8 @@ namespace Manga.Server.Controllers
             var query = from sell in _context.Sell
                         join wishList in _context.WishList on sell.UserAccountId equals wishList.UserAccountId
                         where wishList.Title == search
-                            && (sell.SellStatus == SellStatus.Recruiting || sell.SellStatus == SellStatus.Established)
+                            && (onlyRecruiting ? sell.SellStatus == SellStatus.Recruiting :
+                            (sell.SellStatus == SellStatus.Recruiting || sell.SellStatus == SellStatus.Established))
                         select new
                         {
                             Sell = sell,
