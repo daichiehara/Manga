@@ -64,9 +64,9 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<AxiosInterceptorProvider><AppLayout /></AxiosInterceptorProvider>}>
       <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
-      <Route path="/" element={<MainSearch initialTab={1} />} />
+      <Route path="/" element={<MainSearch />} />
       <Route path="/item/new" element={<MainSearch initialTab={2} />} />
-      <Route path="/search" element={<MainSearch initialTab={1} />} />
+      <Route path="/search" element={<MainSearch />} />
       <Route path="/item/:sellId" element={<MangaDetail />} />
       <Route path="/notification" element={<MainNotification />} /> {/* 通知ページのルート */}
       <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}

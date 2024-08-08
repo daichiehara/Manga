@@ -58,7 +58,10 @@ const MenuBar = memo(() => {
       setValue(newValue);
       switch (newValue) {
         case 0:
-          navigate('/');
+          // タブの状態を保持しながら遷移
+          const currentTab = sessionStorage.getItem('selectedTab') || '1';
+          const paths = ['item/favorite', '', 'item/new'];
+          navigate(`/${paths[parseInt(currentTab)]}`);
           break;
         case 1:
           navigate('/notification');

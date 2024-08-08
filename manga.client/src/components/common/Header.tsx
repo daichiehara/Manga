@@ -5,22 +5,22 @@ import TabsComponent from './TabsComponent';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-// 検索バーとタブを持つコンポーネントのPropsの型定義
 interface HeaderProps {
   onSearch: (query: string) => void;
   selectedTab: number;
   onTabChange: (event: React.SyntheticEvent, newValue: number) => void;
+  initialSearchQuery: string;
+  onClearSearch: () => void;
+  onSearchStateChange: (isSearchActive: boolean) => void;
 }
 
-// 検索バーとタブコンポーネントの実装
-const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange }) => {
-  const [query, setQuery] = useState('');  // 検索クエリのローカルステート
+const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange, initialSearchQuery, onClearSearch, onSearchStateChange }) => {
+  const [query, setQuery] = useState(initialSearchQuery);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const isSearchPage = location.pathname === '/search';
-  const showBackButton = isSearchPage || isSearchFocused;
 
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
@@ -28,23 +28,32 @@ const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange }) =
   };
 
   const handleBack = () => {
-    navigate(-1);
+    if (isSearchPage || location.pathname !== '/') {
+      sessionStorage.removeItem('lastSearchQuery');
+      sessionStorage.removeItem('lastSearchResults');
+      sessionStorage.removeItem('lastSearchPage');
+      sessionStorage.removeItem('isExchangeMode');
+
+      navigate(-1);
+      onClearSearch();  // 検索結果をクリア
+    }
   };
 
   const handleSearchFocus = () => {
     setIsSearchFocused(true);
   };
+  
+  const handleSearchBlur = () => {
+    setIsSearchFocused(false);
+  };
 
   useEffect(() => {
-    if (!isSearchPage) {
-      setIsSearchFocused(false);
-    }
-  }, [isSearchPage]);
+    setQuery(initialSearchQuery);
+  }, [initialSearchQuery]);
 
-  const handleSearchBlur = () => {
-    // オプション: ブラー時にフォーカス状態を解除する場合はコメントを外す
-    // setIsSearchFocused(false);
-  };
+  useEffect(() => {
+    onSearchStateChange(isSearchPage || isSearchFocused);
+  }, [isSearchPage, isSearchFocused, onSearchStateChange]);
   
   return (
     <AppBar position="fixed" sx={{
@@ -58,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange }) =
     }}>
       <Toolbar disableGutters sx={{ width: 'auto', mt: '1rem', mb: 0, px: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          {showBackButton && (
+          {(isSearchPage || isSearchFocused) && (
             <IconButton
               edge="start"
               color="inherit"
@@ -91,12 +100,11 @@ const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange }) =
           </Paper>
         </Box>
       </Toolbar>
-      {!showBackButton && (
+      {!isSearchPage && !isSearchFocused && (
         <TabsComponent selectedTab={selectedTab} onTabChange={onTabChange} />
       )}
     </AppBar>
   );
 };
 
-// パフォーマンス最適化のためにReact.memoでコンポーネントをラップ
 export default memo(Header);

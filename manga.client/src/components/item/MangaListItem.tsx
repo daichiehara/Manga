@@ -10,6 +10,7 @@ interface MangaListItemProps {
   sellTitle: string;
   numberOfBooks: number;
   wishTitles: { title: string; isOwned: boolean }[];
+  onItemClick?: () => void;
 }
 
 // タイトルが15文字以上かどうかをチェックする関数
@@ -24,10 +25,15 @@ const isLongTitle3 = (sellTitle: string): boolean => {
 };
 
 // MangaListItemコンポーネントの定義
-const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles }) => {
-
+const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles, onItemClick }) => {
+  const handleClick = () => {
+    if (onItemClick) {
+      onItemClick();
+    }
+  };
+  
   return (
-    <Link to={`/item/${sellId}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/item/${sellId}`} style={{ textDecoration: 'none' }} onClick={handleClick}>
       <Card 
         sx={{ 
           display: 'flex', 
