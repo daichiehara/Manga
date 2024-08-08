@@ -209,14 +209,15 @@ namespace Manga.Server.Controllers
                 SellTitle = r.Sell.Title,
                 NumberOfBooks = r.Sell.NumberOfBooks,
                 WishTitles = r.WishLists
-                    .Select(w => new WishTitleInfo
-                    {
-                        Title = w.Title,
-                        IsOwned = userTitles.Contains(w.Title)
-                    })
-                    .OrderByDescending(w => w.IsOwned)
-                    .ToList(),
-                SellImage = r.SellImage,
+                .Select(w => new WishTitleInfo
+                {
+                    Title = w.Title,
+                    IsOwned = userTitles.Contains(w.Title)
+                })
+                .OrderByDescending(w => w.Title == search)  // 検索クエリと一致するものを最初に
+                .ThenByDescending(w => w.IsOwned)           // 次に所有しているものを優先
+                .ToList(),
+                        SellImage = r.SellImage,
             }).ToList();
 
             return homeDtos;
