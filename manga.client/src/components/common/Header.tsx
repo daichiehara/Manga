@@ -33,6 +33,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange, ini
       sessionStorage.removeItem('lastSearchResults');
       sessionStorage.removeItem('lastSearchPage');
       sessionStorage.removeItem('isExchangeMode');
+      sessionStorage.removeItem('onlyRecruiting');
 
       navigate(-1);
       onClearSearch();  // 検索結果をクリア
