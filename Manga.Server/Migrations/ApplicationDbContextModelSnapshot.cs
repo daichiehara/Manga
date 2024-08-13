@@ -49,7 +49,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("Contact");
+                    b.ToTable("Contact", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.MangaTitle", b =>
@@ -103,7 +103,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("RequestId");
 
-                    b.ToTable("Match");
+                    b.ToTable("Match", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.MyList", b =>
@@ -127,7 +127,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("MyList");
+                    b.ToTable("MyList", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.Notification", b =>
@@ -164,7 +164,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notification", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.OwnedList", b =>
@@ -187,7 +187,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("OwnedList");
+                    b.ToTable("OwnedList", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.Reply", b =>
@@ -222,7 +222,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("Reply");
+                    b.ToTable("Reply", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.Report", b =>
@@ -262,7 +262,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("Report");
+                    b.ToTable("Report", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.Request", b =>
@@ -303,7 +303,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("ResponderSellId");
 
-                    b.ToTable("Request");
+                    b.ToTable("Request", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.Sell", b =>
@@ -352,7 +352,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("Sell");
+                    b.ToTable("Sell", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.SellImage", b =>
@@ -377,7 +377,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("SellId");
 
-                    b.ToTable("SellImage");
+                    b.ToTable("SellImage", (string)null);
                 });
 
             modelBuilder.Entity("Manga.Server.Models.UserAccount", b =>
@@ -498,7 +498,7 @@ namespace Manga.Server.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("WishList");
+                    b.ToTable("WishList", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

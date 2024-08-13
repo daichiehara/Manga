@@ -19,6 +19,8 @@ using System.Xml.XPath;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Npgsql;
+using Amazon.Runtime.Internal.Transform;
 
 namespace Manga.Server.Controllers
 {
@@ -36,6 +38,7 @@ namespace Manga.Server.Controllers
             { "one piece", "ONE PIECE" },
             { "ワンピース", "ONE PIECE" },
             { "遊・戯・王ゼアル", "遊・戯・王ZEXAL" },
+            { "Dragon Ball", "ドラゴンボール" }
             // 他の特別な変換ルールをここに追加できます
         };
 
@@ -1183,6 +1186,90 @@ namespace Manga.Server.Controllers
             var normalizedTitles = NormalizeTitles(mangaTitles);
             return Ok(normalizedTitles);
         }
+
+        [HttpGet("All")]
+        public async Task<IActionResult> SearchAllMangaAndAuthor([FromQuery] string query)
+        {
+            var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
+            var searchResults = new List<Tuple<string, bool>>();  // 変更: bool を追加して著者の完全一致を示す
+            using (var command = _context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = @"
+                SELECT result, is_exact_author_match
+                FROM (
+                    SELECT DISTINCT ON (result) result, count, 
+                           CASE WHEN author_match THEN TRUE ELSE FALSE END as is_exact_author_match
+                    FROM (
+                        (SELECT author AS result, count, TRUE as author_match FROM manga_titles WHERE author ILIKE @p0 LIMIT 1)
+                        UNION ALL
+                        (SELECT main_title AS result, count, FALSE as author_match FROM manga_titles WHERE main_title =% @p1)
+                        UNION ALL
+                        (SELECT main_title AS result, count, FALSE as author_match FROM manga_titles WHERE yomi_title =% @p2)
+                        UNION ALL
+                        (SELECT main_title AS result, count, FALSE as author_match FROM manga_titles WHERE author ILIKE @p0 ORDER BY count DESC LIMIT 5)
+                    ) AS combined
+                    ORDER BY result, count DESC
+                ) AS distinct_results
+                ORDER BY is_exact_author_match DESC, count DESC
+                LIMIT 20";
+                command.Parameters.Add(new NpgsqlParameter("p0", $"%{query}%"));
+                command.Parameters.Add(new NpgsqlParameter("p1", query));
+                command.Parameters.Add(new NpgsqlParameter("p2", katakanaQuery));
+                await _context.Database.OpenConnectionAsync();
+                using (var result = await command.ExecuteReaderAsync())
+                {
+                    while (await result.ReadAsync())
+                    {
+                        searchResults.Add(new Tuple<string, bool>(result.GetString(0), result.GetBoolean(1)));
+                    }
+                }
+            }
+            var normalizedResults = NormalizeResults(searchResults, query);
+            return Ok(normalizedResults);
+        }
+
+        private List<string> NormalizeResults(List<Tuple<string, bool>> results, string query)
+        {
+            var normalizedResults = new List<(string Name, int Priority, bool IsExactAuthorMatch)>();
+            var seenResults = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            IEnumerable<string> ExtractNames(string input)
+            {
+                input = System.Text.RegularExpressions.Regex.Replace(input, @"\[.*?\]", "");
+                var parts = input.Split(',').Select(p => p.Trim());
+                return parts.Where(p => !string.IsNullOrEmpty(p));
+            }
+
+            foreach (var result in results)
+            {
+                var names = ExtractNames(result.Item1);
+                foreach (var name in names)
+                {
+                    var normalizedName = NormalizeTitle(name);
+                    if (!seenResults.Contains(normalizedName))
+                    {
+                        int priority = 0;
+                        if (normalizedName.Equals(query, StringComparison.OrdinalIgnoreCase))
+                            priority = 3;
+                        else if (normalizedName.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+                            priority = 2;
+                        else if (normalizedName.Contains(query, StringComparison.OrdinalIgnoreCase))
+                            priority = 1;
+
+                        normalizedResults.Add((normalizedName, priority, result.Item2));
+                        seenResults.Add(normalizedName);
+                    }
+                }
+            }
+
+            return normalizedResults
+                .OrderByDescending(x => x.Priority)
+                .ThenByDescending(x => x.IsExactAuthorMatch)
+                .Select(x => x.Name)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
         private static List<string> NormalizeTitles(List<string> titles)
         {
             var normalizedTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
