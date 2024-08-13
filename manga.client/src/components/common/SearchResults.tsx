@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
-import { Box, Typography, FormControlLabel, Switch, CircularProgress } from '@mui/material';
+import { Box, Typography, FormControlLabel, Switch, CircularProgress, IconButton } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import MangaListItem from '../item/MangaListItem';
-import LoadingComponent from './LoadingComponent';
 import { useInView } from 'react-intersection-observer';
 
 interface MainSearch {
@@ -29,18 +30,22 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
     const storedMode = sessionStorage.getItem('isExchangeMode');
     return storedMode ? JSON.parse(storedMode) : false;
   });
+  const [onlyRecruiting, setOnlyRecruiting] = useState(() => {
+    const storedOnlyRecruiting = sessionStorage.getItem('onlyRecruiting');
+    return storedOnlyRecruiting ? JSON.parse(storedOnlyRecruiting) : false;
+  });
   const [error, setError] = useState<string | null>(null);
   const [isChangeMode, setIsChangeMode] = useState(false);
   const [isNewSearch, setIsNewSearch] = useState(false);
   const shouldRestoreScroll = useRef(true);
   
-  const fetchResults = async (currentPage: number, exchangeMode: boolean) => {
+  const fetchResults = async (currentPage: number, exchangeMode: boolean, recruitingOnly: boolean) => {
     if (!query) return;
   
     setError(null);
     try {
       setIsLoading(true);
-      console.log(`Fetching results with isExchangeMode: ${exchangeMode}`);
+        console.log(`Fetching results with isExchangeMode: ${exchangeMode}, onlyRecruiting: ${recruitingOnly}`);
       const endpoint = exchangeMode
         ? 'https://localhost:7103/api/Sells/SearchByTitleForExchange'
         : 'https://localhost:7103/api/Sells/SearchByWord';
@@ -49,7 +54,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
         params: { 
           search: query, 
           page: currentPage, 
-          pageSize: 10 
+          pageSize: 10 ,
+          onlyRecruiting: recruitingOnly
         },
         withCredentials: true
       });
@@ -77,6 +83,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
     const storedQuery = sessionStorage.getItem('lastSearchQuery');
     const storedResults = sessionStorage.getItem('lastSearchResults');
     const storedPage = sessionStorage.getItem('lastSearchPage');
+    const currentOnlyRecruiting = JSON.parse(sessionStorage.getItem('onlyRecruiting') || 'false');
   
     if (query === storedQuery && !isChangeMode && storedResults) {
       setResults(JSON.parse(storedResults));
@@ -88,7 +95,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       setResults([]);
       setPage(1);
       setHasMore(true);
-      fetchResults(1, isExchangeMode);
+      fetchResults(1, isExchangeMode, currentOnlyRecruiting);
       setIsNewSearch(true);
     }
   }, [query]);
@@ -102,7 +109,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   useEffect(() => {
     if (inView && !isLoading && hasMore && results.length >= 4) {
       console.log('inView, fetching next page');
-      fetchResults(page, isExchangeMode);
+      fetchResults(page, isExchangeMode, onlyRecruiting);
     }
   }, [inView]);
 
@@ -119,7 +126,18 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
         setPage(1);
         setHasMore(true);
         sessionStorage.removeItem('lastSearchPage'); // ページ情報をリセット
-        fetchResults(1, newMode);
+        fetchResults(1, newMode, onlyRecruiting);
+    };
+
+    const handleOnlyRecruitingToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newMode = event.target.checked;
+        console.log(`newmode: ${newMode}`);
+        setOnlyRecruiting(newMode);
+        sessionStorage.setItem('onlyRecruiting', JSON.stringify(newMode));
+        setResults([]);
+        setPage(1);
+        setHasMore(true);
+        fetchResults(1, isExchangeMode, newMode);
     };
 
     useEffect(() => {
@@ -148,18 +166,34 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       }, []);
       
   return (
-    <Box sx={{ mt: 10, mb: 2 }}>
-      <FormControlLabel
+    <Box sx={{ pt: 10, mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 2 }}>
+        <FormControlLabel
         control={
-          <Switch
-            checked={isExchangeMode}
-            onChange={handleExchangeModeToggle}
-            name="exchangeMode"
+            <Switch
+            checked={onlyRecruiting}
+            onChange={handleOnlyRecruitingToggle}
+            name="onlyRecruiting"
             color="primary"
-          />
+            />
         }
-        label="検索ワードと交換希望"
-      />
+        label="出品中のみ"
+        />
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <IconButton size="small">
+                <SearchIcon />
+            </IconButton>
+            <Switch
+                checked={isExchangeMode}
+                onChange={handleExchangeModeToggle}
+                name="exchangeMode"
+                color="primary"
+            />
+            <IconButton size="small">
+                <AutoStoriesIcon />
+            </IconButton>
+        </Box>
+    </Box>
 
       {error && <Typography color="error">{error}</Typography>}
 
