@@ -160,6 +160,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
           shouldRestoreScroll.current = true;
         };
       }, []);
+
+      useEffect(() => {
+        console.log(`query: ${query}`)
+      }, [query]);
     
       const handleItemClick = useCallback(() => {
         sessionStorage.setItem('searchScrollPosition', window.scrollY.toString());
