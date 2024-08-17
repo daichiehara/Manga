@@ -37,10 +37,6 @@ namespace Manga.Server.Controllers
         {
             // 認証されたユーザーのIDを取得する
             var userId = _userManager.GetUserId(User); // UserManagerを使用してユーザーIDを取得
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
 
             var wishLists = await _context.WishList
                 .Where(w => w.UserAccountId == userId) // 特定のユーザーに紐付けられたWishListのみをフィルタリング

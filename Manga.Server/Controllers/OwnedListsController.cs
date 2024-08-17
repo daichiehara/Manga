@@ -36,10 +36,6 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<OwnedListDto>> GetUserLists()
         {
             var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
 
             var ownedLists = await _context.OwnedList
                                            .Where(o => o.UserAccountId == userId)
