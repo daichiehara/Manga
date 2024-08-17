@@ -27,7 +27,7 @@ export const AxiosInterceptorProvider: React.FC<{ children: React.ReactNode }> =
           if (error.response.status === 401) {
             console.log('H3_401エラー。ログインページに遷移します。');
             updateAuthState({ isAuthenticated: false });
-            navigate('/login-page/signup');
+            navigate('/signup');
             return Promise.reject(error);
           }
           // 他のエラー処理をここに追加
