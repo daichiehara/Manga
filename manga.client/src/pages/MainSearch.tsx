@@ -158,7 +158,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab}) => {
                       sellTitle={item.sellTitle} 
                       numberOfBooks={item.numberOfBooks}
                       wishTitles={item.wishTitles}
-                      isSold={true}
+                      sellStatus={item.sellStatus}
                     />
                   ))
                 )}

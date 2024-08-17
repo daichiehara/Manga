@@ -2,7 +2,14 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Grid, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import WishListDisplay from './WishListDisplay';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
+// SellStatusの定義
+enum SellStatus {
+  Recruiting = 1,
+  Suspended = 2,
+  Establish = 3,
+  Draft = 4,
+}
 
 interface MangaListItemProps {
   sellId: number;
@@ -10,17 +17,85 @@ interface MangaListItemProps {
   sellTitle: string;
   numberOfBooks: number;
   wishTitles: { title: string; isOwned: boolean }[];
+  sellStatus: SellStatus;  // 売り状態のプロップを追加
   onItemClick?: () => void;
-  isSold: boolean;  // SOLD状態を管理するための新しいプロップ
 }
 
-const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles, onItemClick, isSold }) => {
+const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles, sellStatus, onItemClick }) => {
   const handleClick = () => {
     if (onItemClick) {
       onItemClick();
     }
   };
-  
+
+  // 売り状態に応じてタグを表示する関数
+  const renderStatusTag = () => {
+    if (sellStatus === SellStatus.Suspended) {
+      return (
+        <Box 
+          sx={{
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            width: '80px', 
+            height: '80px',
+            backgroundColor: 'rgba(255, 165, 0, 0.9)',  // オレンジ色の背景
+            color: 'white', 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.9rem',
+            fontWeight: 'bold',
+            clipPath: 'polygon(0 0, 100% 0, 0 100%)',  // 左上の直角三角形
+            zIndex: 100
+          }}
+        >
+          <Typography
+            sx={{
+              transform: 'rotate(-45deg)',  // 45度左に傾ける
+            }}
+          >
+            公開停止中
+          </Typography>
+        </Box>
+      );
+    } else if (sellStatus === SellStatus.Establish) {
+      return (
+        <Box 
+          sx={{
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            width: '80px', 
+            height: '80px',
+            backgroundColor: 'rgba(255, 0, 0, 0.9)',  // 赤色の背景
+            color: 'white', 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 'bold',
+            clipPath: 'polygon(0 0, 100% 0, 0 100%)',  // 左上の直角三角形
+            zIndex: 100  
+          }}
+        >
+          <Typography
+            sx={{
+              transform: 'rotate(-45deg)',  // 45度左に傾ける
+              position: 'relative',
+              top: '-10px',  // 文字を上にずらす
+              left: '-10px',  // 文字を左にずらす
+              fontWeight:'bold',
+              fontSize: '0.8rem',
+            }}
+          >
+            交換成立
+          </Typography>
+        </Box>
+      );
+    }
+    return null; // 他のステータスの場合は何も表示しない
+  };
+
   return (
     <Link to={`/item/${sellId}`} style={{ textDecoration: 'none' }} onClick={handleClick}>
       <Card 
@@ -29,7 +104,7 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
           margin: 0.9, 
           height: '13.5rem', 
           padding: 0,
-          position: 'relative',  // relative positioning to allow absolute positioning of the SOLD tag
+          position: 'relative',  // relative positioning to allow absolute positioning of the status tag
           border: '0.05px solid rgba(0, 0, 0, 0.1)', 
           borderRadius: '3px', 
           boxShadow: 'none' 
@@ -54,25 +129,8 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
             alt={`Cover of ${sellTitle}`}
           />
           
-          {/* SOLDタグをここに追加 */}
-          {isSold && (
-            <Box 
-              sx={{
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                backgroundColor: 'rgba(255, 0, 0, 0.8)', 
-                color: 'white', 
-                padding: '0.3rem 0.8rem', 
-                fontSize: '0.9rem',
-                fontWeight: 'bold',
-                borderRadius: '0 0.5rem 0.5rem 0',
-                zIndex: 10  // 画像の上に表示されるように
-              }}
-            >
-              SOLD
-            </Box>
-          )}
+          {/* 状態タグをここに表示 */}
+          {renderStatusTag()}
         </Box>
         <CardContent sx={{ 
           pt:0.8,

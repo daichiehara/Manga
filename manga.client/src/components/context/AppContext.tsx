@@ -2,10 +2,18 @@ import React, { createContext, useState, useEffect, useContext, useCallback } fr
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
+enum SellStatus {
+  Recruiting = 1,
+  Suspended = 2,
+  Establish = 3,
+  Draft = 4,
+}
 interface MainSearch {
     sellId: number;
     sellTitle: string;
     numberOfBooks: number;
+    sellStatus: SellStatus;
+    
     wishTitles: {
       title: string;
       isOwned: boolean;
