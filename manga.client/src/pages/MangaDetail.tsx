@@ -206,14 +206,15 @@ const MangaDetail = () => {
                   交換申請をキャンセルする
               </Button>
       case 4:
-        return <Button variant="contained" disabled
-                  sx={{ mx: 2, maxWidth: '640px', width: '100%', background: '#D83022',
+        return <Button variant="outlined"
+                  sx={{ mx: 2, maxWidth: '640px', width: '100%',
                   boxShadow: 'none',
-                  color: '#f5f5f5',
+                  
                   fontWeight:'bold'
                   }}
+                  onClick={() => navigate(`/sell/${sellId}`)}
               >
-                  自分の出品
+                  出品を編集する
               </Button>
       default:
         return null

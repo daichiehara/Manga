@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange, ini
     <>
       <AppBar position="fixed" sx={{
         pb: '0rem',
-        background: '#53A422',
+        background: '#E97032',
         boxShadow: 'none',
         maxWidth: '640px',
         width: '100%',
