@@ -1175,9 +1175,9 @@ namespace Manga.Server.Controllers
                     FROM (
                         SELECT DISTINCT ON (main_title) main_title, count
                         FROM (
-                            (SELECT main_title, count FROM manga_titles WHERE main_title =% {0})
+                            (SELECT main_title, count FROM manga_titles WHERE main_title =% {0} ORDER BY count DESC)
                             UNION ALL
-                            (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1})
+                            (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1} ORDER BY count DESC)
                             UNION ALL
                             (SELECT main_title, count FROM manga_titles WHERE author ILIKE {2} ORDER BY count DESC LIMIT 5)
                         ) AS combined
@@ -1306,6 +1306,20 @@ namespace Manga.Server.Controllers
             // その他の正規化ルールをここに追加
 
             return title;
+        }
+
+        [HttpGet("author")]
+        public async Task<ActionResult<string>> GetAuthor(string title)
+        {
+            var manga = await _context.MangaTitles
+                .FirstOrDefaultAsync(m => m.MainTitle == title);
+
+            if (manga == null)
+            {
+                return NotFound();
+            }
+
+            return manga.Author;
         }
 
         private bool SellExists(int id)
