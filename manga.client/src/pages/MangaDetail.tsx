@@ -32,7 +32,12 @@ import theme from '../theme/theme';
  * Props:
  *  None
  */
-
+enum SellStatus {
+  Recruiting = 1,
+  Suspended = 2,
+  Establish = 3,
+  Draft = 4,
+}
 interface MangaDetail {
     title: string;
     numberOfBooks: number;
@@ -42,6 +47,7 @@ interface MangaDetail {
     profileIcon: string;
     userName: string;
     sellMessage: string;
+    sellStatus: SellStatus;
     wishTitles: { title: string; isOwned: boolean }[];
     sendPrefecture: string;
     sendDay: string;
@@ -177,6 +183,64 @@ const MangaDetail = () => {
     return <><CustomToolbar title='詳細ページ'/><ErrorDisplay message={error} /></>;
   }
 
+  // タグの描画関数
+  const renderStatusTag = () => {
+    if (!mangaDetail) return null;
+
+    let tagText = '';
+    let bgColor = '';
+
+    switch (mangaDetail.sellStatus) {
+      case SellStatus.Suspended:
+        tagText = '公開停止中';
+        bgColor = 'rgba(125, 125, 125, 0.9)';  // 灰色
+        break;
+      case SellStatus.Establish:
+        tagText = '交換成立';
+        bgColor = 'rgba(255, 9, 0, 0.9)';  // 赤色
+        break;
+      case SellStatus.Draft:
+        tagText = '下書き';
+        bgColor = 'rgba(125, 125, 125, 0.9)';  // 灰色
+        break;
+      default:
+        return null;
+    }
+
+    return (
+      <Box 
+        sx={{
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          width: '150px', 
+          height: '150px',
+          backgroundColor: bgColor,  
+          color: 'white', 
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+          clipPath: 'polygon(0 0, 100% 0, 0 100%)',  // 左上の直角三角形
+          zIndex: 100  
+        }}
+      >
+        <Typography
+          sx={{
+            transform: 'rotate(-45deg)',  
+            position: 'relative',
+            top: '-15px',  
+            left: '-15px',  
+            fontWeight: 'bold',
+            fontSize: '1.3rem',
+          }}
+        >
+          {tagText}
+        </Typography>
+      </Box>
+    );
+  };
+
   // Handle the loading state
   if (!mangaDetail) {
     return <LoadingComponent />;
@@ -194,7 +258,7 @@ const MangaDetail = () => {
                   fontWeight:'bold'
                   }}
               >
-                  交換済み
+                  交換成立
               </Button>
       case 3:
         return <Button variant="contained" color='error' onClick={handleCancelRequest}
@@ -237,11 +301,16 @@ const MangaDetail = () => {
       <Box sx={{ flexGrow: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', minHeight: '100vh', pb: 10 }}>
         
             {/* Image Carousel Integration */}
-            <ImageCarousel 
-              imageUrls={mangaDetail.imageUrls} 
-              title={mangaDetail.title}
-              onImageClick={handleImageClick}
-            />
+            <Box sx={{ position: 'relative' }}>
+              {/* Image Carousel Integration */}
+              <ImageCarousel 
+                imageUrls={mangaDetail.imageUrls} 
+                title={mangaDetail.title}
+                onImageClick={handleImageClick}
+              />
+              {/* タグを画像の上に表示 */}
+              {renderStatusTag()}
+            </Box>
             <ImageModal
               isOpen={isModalOpen}
               images={mangaDetail.imageUrls}
