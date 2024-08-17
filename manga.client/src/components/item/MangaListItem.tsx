@@ -3,7 +3,7 @@ import { Card, CardMedia, CardContent, Typography, Grid, Box } from '@mui/materi
 import { Link } from 'react-router-dom';
 import WishListDisplay from './WishListDisplay';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-// MangaListItemPropsインターフェースの定義
+
 interface MangaListItemProps {
   sellId: number;
   sellImage: string;
@@ -11,21 +11,10 @@ interface MangaListItemProps {
   numberOfBooks: number;
   wishTitles: { title: string; isOwned: boolean }[];
   onItemClick?: () => void;
+  isSold: boolean;  // SOLD状態を管理するための新しいプロップ
 }
 
-// タイトルが15文字以上かどうかをチェックする関数
-const isLongTitle1 = (sellTitle: string): boolean => {
-  return sellTitle.length >= 13;
-};
-const isLongTitle2 = (sellTitle: string): boolean => {
-  return sellTitle.length >= 26;
-};
-const isLongTitle3 = (sellTitle: string): boolean => {
-  return sellTitle.length >= 39;
-};
-
-// MangaListItemコンポーネントの定義
-const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles, onItemClick }) => {
+const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellImage, sellTitle, numberOfBooks, wishTitles, onItemClick, isSold }) => {
   const handleClick = () => {
     if (onItemClick) {
       onItemClick();
@@ -40,51 +29,71 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
           margin: 0.9, 
           height: '13.5rem', 
           padding: 0,
-          border: '0.05px solid rgba(0, 0, 0, 0.1)', // 薄い灰色の境界線を追加
-          borderRadius: '3px', // 角の丸みを追加
-          boxShadow: 'none' // カードの影をなくす
+          position: 'relative',  // relative positioning to allow absolute positioning of the SOLD tag
+          border: '0.05px solid rgba(0, 0, 0, 0.1)', 
+          borderRadius: '3px', 
+          boxShadow: 'none' 
         }}
       >
         <Box sx={{
-          width: '45%',  // 左側の画像の領域を45%に設定
+          width: '45%',  
           height: '100%',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center', // 画像を中央に配置
-          background: '#F2F2F2' // 背景色を設定
+          justifyContent: 'center',
+          background: '#F2F2F2' 
         }}>
           <CardMedia
             component="img"
             sx={{ 
-              width: '98%',  // 画像をBoxの幅いっぱいに展開
-              height: '98%',  // 画像の高さを自動調整
-              objectFit: 'contain'  // アスペクト比を維持しつつ、全体が見えるように調整
+              width: '98%',  
+              height: '98%',  
+              objectFit: 'contain'  
             }}
             image={sellImage}
             alt={`Cover of ${sellTitle}`}
           />
+          
+          {/* SOLDタグをここに追加 */}
+          {isSold && (
+            <Box 
+              sx={{
+                position: 'absolute', 
+                top: 0, 
+                left: 0, 
+                backgroundColor: 'rgba(255, 0, 0, 0.8)', 
+                color: 'white', 
+                padding: '0.3rem 0.8rem', 
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                borderRadius: '0 0.5rem 0.5rem 0',
+                zIndex: 10  // 画像の上に表示されるように
+              }}
+            >
+              SOLD
+            </Box>
+          )}
         </Box>
         <CardContent sx={{ 
           pt:0.8,
           pl: 1.3,
           pr:0.5,
-          width: '55%',  // 右側のテキスト領域を55%に設定
+          width: '55%',  
           height: 'auto',
           display: 'flex', 
           flexDirection: 'column',
-          justifyContent: 'flex-start', // コンテンツを上詰めに配置
-          overflow: 'hidden' // コンテンツが溢れた場合にスクロール可能にする
+          justifyContent: 'flex-start',
+          overflow: 'hidden' 
         }}>
           <Grid container spacing={0} alignItems="center">
             <Typography 
               variant="body2" 
               sx={{ 
-                 
                 display: '-webkit-box',
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
-                WebkitLineClamp: 2,  // テキストを3行に制限
-                textOverflow: 'ellipsis' // テキストが溢れた場合に省略記号を表示
+                WebkitLineClamp: 2,  
+                textOverflow: 'ellipsis' 
               }}
             >
               {sellTitle}
@@ -104,7 +113,6 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
             </Typography>
             
           </Box>
-          {/* WishListDisplayにwishTitlesを渡す */}
           {wishTitles && <WishListDisplay wishTitles={wishTitles} shouldTruncate={true} />}
         </CardContent>
       </Card>
@@ -112,5 +120,4 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
   );
 });
 
-// MangaListItemコンポーネントをエクスポート
 export default MangaListItem;

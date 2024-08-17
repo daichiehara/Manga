@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box, Divider, Button, } from '@mui/material';
+import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box, Divider, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from 'react-transition-group';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -21,12 +21,16 @@ interface BookListOwnedProps {
 
 const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, onRemove, onRefreshOwnedList }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => {
     setIsOpen(false);
     onRefreshOwnedList();
   };
+
+  const handleOpenDialog = () => setIsDialogOpen(true);   // ダイアログを開く
+  const handleCloseDialog = () => setIsDialogOpen(false); // ダイアログを閉じる
 
   const handleSearch = useCallback((query: string) => {
     // 検索処理
@@ -41,8 +45,8 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
             {title}
           </Typography>
         </Box>
-        <IconButton>
-          <HelpOutlineIcon sx={{fontsize:'3rem', ml: 1, alignSelf: 'center', color: '#BFBFBF' }}/>
+        <IconButton onClick={handleOpenDialog}>  {/* ダイアログを開く */}
+          <HelpOutlineIcon sx={{ fontsize: '3rem', ml: 1, alignSelf: 'center', color: '#BFBFBF' }} />
         </IconButton>
       </Box>
       <Box  sx={{pt:2, display: 'flex', alignItems: 'center',}}>
@@ -77,6 +81,24 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
           ))}
         </TransitionGroup>
       </List>
+      {/* ダイアログ */}
+      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle variant="h6" sx={{fontWeight:'bold'}}>とりあえず登録とは？</DialogTitle>
+        <DialogContent>
+          <Typography>
+            あなたが全巻持っている漫画を登録しましょう
+          </Typography>
+          <Typography>
+            登録すると検索のとき、あなたの漫画を欲しい人が見つかりやすくなります。
+          </Typography>
+        </DialogContent>
+        <DialogActions >
+          <Button onClick={handleCloseDialog} color="primary">
+            閉じる
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </div>
   );
 });
