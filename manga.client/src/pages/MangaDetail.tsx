@@ -230,7 +230,9 @@ const MangaDetail = () => {
 
   return  (
     <Box sx={{ p: 0, margin:0 }}>
-      {/* 戻るボタン */}
+      {/* 戻るボタン */}      
+      <BackButton handleBack={handleBack} />
+      
       <Box sx={{ flexGrow: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', minHeight: '100vh', pb: 10 }}>
         
             {/* Image Carousel Integration */}
