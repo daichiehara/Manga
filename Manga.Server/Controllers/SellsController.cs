@@ -90,6 +90,7 @@ namespace Manga.Server.Controllers
                     SellId = s.SellId,
                     SellTitle = s.Title,
                     NumberOfBooks = s.NumberOfBooks,
+                    SellStatus = s.SellStatus,
                     WishTitles = s.UserAccount.WishLists
                         .Select(w => new WishTitleInfo
                         {
@@ -158,6 +159,7 @@ namespace Manga.Server.Controllers
                 SellId = r.Sell.SellId,
                 SellTitle = r.Sell.Title,
                 NumberOfBooks = r.Sell.NumberOfBooks,
+                SellStatus = r.Sell.SellStatus,
                 WishTitles = r.WishLists.Select(w => new WishTitleInfo
                 {
                     Title = w.Title,
@@ -211,6 +213,7 @@ namespace Manga.Server.Controllers
                 SellId = r.Sell.SellId,
                 SellTitle = r.Sell.Title,
                 NumberOfBooks = r.Sell.NumberOfBooks,
+                SellStatus = r.Sell.SellStatus,
                 WishTitles = r.WishLists
                 .Select(w => new WishTitleInfo
                 {
@@ -246,6 +249,7 @@ namespace Manga.Server.Controllers
                     SellId = s.SellId,
                     SellTitle = s.Title,
                     NumberOfBooks = s.NumberOfBooks,
+                    SellStatus = s.SellStatus,
                     WishTitles = s.UserAccount.WishLists
                         .Select(w => new WishTitleInfo
                         {
@@ -307,6 +311,7 @@ namespace Manga.Server.Controllers
                     SellId = s.SellId,
                     SellTitle = s.Title,
                     NumberOfBooks = s.NumberOfBooks,
+                    SellStatus = s.SellStatus,
                     WishTitles = s.UserAccount.WishLists
                         .Select(w => new WishTitleInfo
                         {
@@ -338,6 +343,7 @@ namespace Manga.Server.Controllers
                     SellId = s.SellId,
                     SellTitle = s.Title,
                     NumberOfBooks = s.NumberOfBooks,
+                    SellStatus = s.SellStatus,
                     WishTitles = s.UserAccount.WishLists
                         .Select(w => new WishTitleInfo
                         {
