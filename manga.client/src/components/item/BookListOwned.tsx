@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box, Divider, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { List, ListItem, ListItemText, IconButton, Chip, Collapse, Typography, Box, Divider, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from 'react-transition-group';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -83,14 +83,41 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
       </List>
       {/* ダイアログ */}
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle variant="h6" sx={{fontWeight:'bold'}}>とりあえず登録とは？</DialogTitle>
-        <DialogContent>
-          <Typography>
-            あなたが全巻持っている漫画を登録しましょう
-          </Typography>
-          <Typography>
-            登録すると検索のとき、あなたの漫画を欲しい人が見つかりやすくなります。
-          </Typography>
+        <Box sx={{py:'1rem', display:'flex', justifyContent:'center'}}>
+          <RocketLaunchIcon sx={{ fontsize:'1rem',mr: 1, alignSelf: 'center', color: '#EB4848' }}/>
+          <Box sx={{display: 'flex', flexDirection: 'column',}}>
+            <Typography variant="subtitle1" sx={{fontWeight: 'bold', color: '#757575'}}>
+              とりあえず登録
+            </Typography>
+          </Box>
+        </Box>
+        <DialogContent sx={{pt:0}}>
+          <Box sx={{py:'1rem'}}>
+            <Chip
+              sx={{
+                height: 'auto',
+                pl: 0,
+                '& .MuiChip-label': {
+                  display: 'block',
+                  whiteSpace: 'normal',
+                  padding: '0.5rem',
+                },
+              }}
+              label={
+                <Typography variant='subtitle2' sx={{}}>
+                  まずは何をすればいいんだろう？
+                </Typography>
+              }
+            />
+          </Box>
+          <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <Typography variant='subtitle1' sx={{color:'red', fontWeight:'bold'}}>
+              とりあえず登録をしましょう！！
+            </Typography>
+          </Box>
+            <Typography>
+              あなたが全巻持っている漫画をまずはマイ本棚に登録しましょう。検索時に、あなたの漫画とマッチしている出品が見つけやすくなります。
+            </Typography>
         </DialogContent>
         <DialogActions >
           <Button onClick={handleCloseDialog} color="primary">

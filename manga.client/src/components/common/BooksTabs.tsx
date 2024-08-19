@@ -40,6 +40,7 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
     console.log('owned_fetch叩かれた');
     setOwnedLists(data.ownedLists);
     setSells(data.sells);
+    console.log(sells);
     data.ownedLists.concat(data.sells).forEach((book: Book) => addBook({ itemId: book.itemId, title: book.title }));
   };
   

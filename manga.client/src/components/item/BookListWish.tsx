@@ -1,5 +1,5 @@
-import React from 'react';
-import { List, ListItem, ListItemText, IconButton, Collapse, Typography, Box, Button, Divider } from '@mui/material';
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { List, ListItem, ListItemText, IconButton, Collapse, Chip, Typography, Box, Button, Divider , Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { TransitionGroup } from 'react-transition-group';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -21,6 +21,10 @@ interface BookListWishProps {
 
 const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onRefreshWishList }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleOpenDialog = () => setIsDialogOpen(true);   // ダイアログを開く
+  const handleCloseDialog = () => setIsDialogOpen(false); // ダイアログを閉じる
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => {
@@ -37,7 +41,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
             {title}
           </Typography>
         </Box>
-        <IconButton>
+        <IconButton onClick={handleOpenDialog}>  {/* ダイアログを開く */}
           <HelpOutlineIcon sx={{ fontsize: '3rem', ml: 1, alignSelf: 'center', color: '#BFBFBF' }} />
         </IconButton>
       </Box>
@@ -74,6 +78,50 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
           ))}
         </TransitionGroup>
       </List>
+      {/* ダイアログ */}
+      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+        <Box sx={{py:'1rem', display:'flex', justifyContent:'center'}}>
+          <RocketLaunchIcon sx={{ fontsize:'1rem',mr: 1, alignSelf: 'center', color: '#0F9ED5' }}/>
+          <Box sx={{display: 'flex', flexDirection: 'column',}}>
+            <Typography variant="subtitle1" sx={{fontWeight: 'bold', color: '#757575'}}>
+              欲しい漫画を登録する
+            </Typography>
+          </Box>
+        </Box>
+        <DialogContent sx={{pt:0}}>
+          <Box sx={{py:'1rem'}}>
+            <Chip
+              sx={{
+                height: 'auto',
+                pl: 0,
+                '& .MuiChip-label': {
+                  display: 'block',
+                  whiteSpace: 'normal',
+                  padding: '0.5rem',
+                },
+              }}
+              label={
+                <Typography variant='subtitle2' sx={{}}>
+                  まずは何をすればいいんだろう？
+                </Typography>
+              }
+            />
+          </Box>
+          <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <Typography variant='subtitle1' sx={{color:'red', fontWeight:'bold'}}>
+              とりあえず登録をしましょう！！
+            </Typography>
+          </Box>
+            <Typography>
+              出品した時、あなたがどんな漫画が欲しいか表示されます。
+            </Typography>
+        </DialogContent>
+        <DialogActions >
+          <Button onClick={handleCloseDialog} color="primary">
+            閉じる
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
