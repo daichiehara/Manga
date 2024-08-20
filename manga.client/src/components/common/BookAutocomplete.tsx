@@ -91,15 +91,7 @@ const BookAutocomplete: React.FC<BookAutocompleteProps> = ({
       {...rest}
       options={options}
       popupIcon={false}
-      filterOptions={(options, params) => {
-        const filtered = options.filter(option => 
-          option.toLowerCase().includes(params.inputValue.toLowerCase())
-        );
-        if (params.inputValue !== '' && !filtered.includes(params.inputValue)) {
-          filtered.push(params.inputValue);
-        }
-        return filtered;
-      }}
+      filterOptions={(x) => x}
       getOptionLabel={(option) => option}
       renderOption={(props, option) => (
         <ListItem {...props} key={option}>

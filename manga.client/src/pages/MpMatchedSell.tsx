@@ -6,6 +6,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import LoadingComponent from '../components/common/LoadingComponent';
 
 
 interface MpMatchedSell {
@@ -22,7 +23,7 @@ const MpMatchedSellComponent: React.FC = () => {
   const navigate = useNavigate();
   const [mpmatchedSell, setMpMatchedSell] = useState<MpMatchedSell[]>([]);
   const { authState } = useContext(AuthContext); // 認証状態にアクセス
-  
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!authState.isAuthenticated) return; // ログインしていない場合はAPIコールをスキップ
@@ -30,6 +31,7 @@ const MpMatchedSellComponent: React.FC = () => {
     // APIから通知データを取得する関数
     const fetchMpMatchedSell = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get('https://localhost:7103/api/Requests/User', {
           withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
@@ -38,6 +40,8 @@ const MpMatchedSellComponent: React.FC = () => {
         setMpMatchedSell(response.data);
       } catch (error) {
         console.error('通知データの取得に失敗:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -57,9 +61,12 @@ const MpMatchedSellComponent: React.FC = () => {
     return date.toLocaleDateString('ja-JP', options);
   }
 
+    if (isLoading) {
+      <LoadingComponent />
+    }
 
     //通知がない場合の表示
-    if (mpmatchedSell.length === 0) {
+    if (!isLoading && mpmatchedSell.length === 0) {
       return (
         <>
           {/* 見出しのToolbar */}

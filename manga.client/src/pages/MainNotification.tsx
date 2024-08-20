@@ -167,7 +167,7 @@ const handleExchangeConfirmed = useCallback(() => {
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <CardMedia
                 component="img"
-                sx={{ width: 88, height: 70, margin: 2, borderRadius: '10px' }}
+                sx={{ width: 70, height: 70, margin: 2, borderRadius: '10px' }}
                 image={notification.sellImage}
               />
               <CardContent sx={{ flexGrow: 1, '&:last-child': { paddingBottom: '8px' }, padding: '4px' }}>

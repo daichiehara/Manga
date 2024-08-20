@@ -6,6 +6,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import LoadingComponent from '../components/common/LoadingComponent';
 
 
 interface MpMySell {
@@ -56,7 +57,7 @@ function getStatusStyle(sellStatus: number): StatusStyle {
     case 2:
       return { text: "公開停止中", color: "red" };
     case 3:
-      return { text: "マッチング！", color: "gray" };
+      return { text: "交換成立", color: "gray" };
     default:
       return { text: "", color: "inherit" }; // 不明なステータスの場合はデフォルト色
   }
@@ -68,6 +69,7 @@ const MpMySell: React.FC = () => {
   const navigate = useNavigate();
   const [mpmysell, setmpmysell] = useState<MpMySell[]>([]);
   const { authState } = useContext(AuthContext); // 認証状態にアクセス
+  const [isLoading, setIsLoading] = useState(false);
 
 
   useEffect(() => {
@@ -75,6 +77,7 @@ const MpMySell: React.FC = () => {
     // APIから通知データを取得する関数
     const fetchsetmpmysell = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get('https://localhost:7103/api/Sells/MySell',{
           withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
@@ -82,14 +85,20 @@ const MpMySell: React.FC = () => {
         setmpmysell(response.data);
       } catch (error) {
         console.error('通知データの取得に失敗:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchsetmpmysell();
   }, [authState.isAuthenticated]); // isAuthenticatedに依存しているため、この値が変わるとエフェクトが再実行されます
 
 
+  if (isLoading) {
+    <LoadingComponent />
+  }
+
   //通知がない場合の表示
-  if (mpmysell.length === 0) {
+  if (!isLoading && mpmysell.length === 0) {
     return (
       <>
         {/* 見出しのToolbar */}

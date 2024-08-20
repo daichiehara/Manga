@@ -3,7 +3,9 @@ import axios from 'axios';
 import { Box, Typography, FormControlLabel, Switch, CircularProgress, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import TuneIcon from '@mui/icons-material/Tune';
 import MangaListItem from '../item/MangaListItem';
+import MyBookModal from '../common/MyBookModal';
 import { useInView } from 'react-intersection-observer';
 
 interface MainSearch {
@@ -38,6 +40,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   const [isChangeMode, setIsChangeMode] = useState(false);
   const [isNewSearch, setIsNewSearch] = useState(false);
   const shouldRestoreScroll = useRef(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const fetchResults = async (currentPage: number, exchangeMode: boolean, recruitingOnly: boolean) => {
     if (!query) return;
@@ -140,6 +143,16 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
         fetchResults(1, isExchangeMode, newMode);
     };
 
+    const handleModalToggle = useCallback(() => {
+        setIsModalOpen(prev => !prev);
+      }, []);
+
+    const handleFilterClick = () => {
+        // TODO: 絞り込み機能の実装
+        handleModalToggle();
+        console.log('絞り込みボタンがクリックされました');
+      };
+
     useEffect(() => {
         const storedScrollPosition = sessionStorage.getItem('searchScrollPosition');
         if (storedScrollPosition && !isNewSearch && shouldRestoreScroll.current) {
@@ -170,34 +183,62 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       }, []);
       
   return (
-    <Box sx={{ pt: 10, mb: 2 }}>
+    <Box sx={{ pt: 11, mb: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 2 }}>
         <FormControlLabel
-        control={
+          control={
             <Switch
-            checked={onlyRecruiting}
-            onChange={handleOnlyRecruitingToggle}
-            name="onlyRecruiting"
-            color="primary"
+              checked={onlyRecruiting}
+              onChange={handleOnlyRecruitingToggle}
+              name="onlyRecruiting"
+              color="primary"
             />
-        }
-        label="出品中のみ"
+          }
+          label="出品中のみ"
         />
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <IconButton size="small">
-                <SearchIcon />
-            </IconButton>
-            <Switch
-                checked={isExchangeMode}
-                onChange={handleExchangeModeToggle}
-                name="exchangeMode"
-                color="primary"
-            />
-            <IconButton size="small">
-                <AutoStoriesIcon />
-            </IconButton>
+          <IconButton size="small">
+            <SearchIcon />
+          </IconButton>
+          <Switch
+            checked={isExchangeMode}
+            onChange={handleExchangeModeToggle}
+            name="exchangeMode"
+            color="primary"
+          />
+          <IconButton size="small">
+            <AutoStoriesIcon />
+          </IconButton>
+            <Box 
+                sx={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    ml: 2,
+                    cursor: 'pointer', // カーソルをポインターに変更
+                    '&:hover': {
+                    opacity: 0.7, // ホバー時の視覚的フィードバック
+                    },
+                }}
+                onClick={handleFilterClick} // 全体にクリックイベントを追加
+                >
+                <Box 
+                    sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: '50%',
+                    '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.04)', // ホバー時の背景色変更
+                    },
+                    }}
+                >
+                    <TuneIcon />
+                </Box>
+                <Typography variant="caption">絞り込み</Typography>
+            </Box>
         </Box>
-    </Box>
+      </Box>
 
       {error && <Typography color="error">{error}</Typography>}
 
@@ -228,6 +269,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
           <CircularProgress size={20} style={{ marginRight: '10px' }} />
         )}
       </div>
+
+      <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
     </Box>
   );
 };
