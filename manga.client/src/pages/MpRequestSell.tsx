@@ -4,10 +4,11 @@ import { Box, Typography, Grid, Card, CardActionArea, CardContent, CardMedia, Ch
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
-import PanToolIcon from '@mui/icons-material/PanTool';
+import ForwardToInboxRoundedIcon from '@mui/icons-material/ForwardToInboxRounded';
 import RequestedSellDrawer from '../components/common/RequestedSellDrawer';
 import LoadingComponent from '../components/common/LoadingComponent';
 import theme from '../theme/theme';
+
 
 enum RequestStatus {
   Pending = 1,
@@ -132,7 +133,7 @@ const RequestedSellList: React.FC = () => {
       <>
         <CustomToolbar title='交換申請した漫画' />
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pt: 9 }}>
-          <PanToolIcon sx={{ fontSize: 60, color: 'action.active', padding: 9 }} />
+          <ForwardToInboxRoundedIcon sx={{ fontSize: 60, color: 'action.active', padding: 9 }} />
           <Typography variant="subtitle1">
             交換申請中の漫画はありません
           </Typography>
