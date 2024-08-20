@@ -111,8 +111,11 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
             />
           </Box>
           <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <Typography variant='subtitle1' sx={{color:'red', fontWeight:'bold'}}>
-              とりあえず登録をしましょう！！
+            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
+              まずやってみよう！！
+            </Typography>
+            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
+              とりあえず登録
             </Typography>
           </Box>
             <Typography>

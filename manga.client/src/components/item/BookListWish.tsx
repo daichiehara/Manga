@@ -102,18 +102,38 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
               }}
               label={
                 <Typography variant='subtitle2' sx={{}}>
-                  まずは何をすればいいんだろう？
-                </Typography>
+                  よし！私はこの漫画「A」全巻を出品しよう！
+                </Typography>               
+              }
+            />
+            <Chip
+              sx={{
+                mt:'1rem',
+                height: 'auto',
+                pl: 0,
+                '& .MuiChip-label': {
+                  display: 'block',
+                  whiteSpace: 'normal',
+                  padding: '0.5rem',
+                },
+              }}
+              label={
+                <Typography variant='subtitle2' sx={{}}>
+                  できれは、今読みたい漫画「B」か「C」と交換したいなあ
+                </Typography>                
               }
             />
           </Box>
           <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <Typography variant='subtitle1' sx={{color:'red', fontWeight:'bold'}}>
-              とりあえず登録をしましょう！！
+            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
+              そんなときはマイ本棚に
+            </Typography>
+            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
+              欲しい漫画を登録しよう！
             </Typography>
           </Box>
             <Typography>
-              出品した時、あなたがどんな漫画が欲しいか表示されます。
+              出品画面にあなたの欲しい漫画が表示されて、マッチング率UP！！
             </Typography>
         </DialogContent>
         <DialogActions >

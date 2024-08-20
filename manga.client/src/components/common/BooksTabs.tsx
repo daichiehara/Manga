@@ -166,7 +166,7 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
       {tabIndex === 0 && (
         <>
           <BookListOwned  key="owned-lists" title="とりあえず登録"  books={ownedLists} onRemove={handleRemoveOwnedLists} onRefreshOwnedList={fetchBooksData} />
-          <BooksListSells key="sells" title="出品中の漫画" books={sells}/>
+          <BooksListSells key="sells" title="あなたが出品中の漫画" books={sells}/>
         </>
       )}
       {tabIndex === 1 && (
