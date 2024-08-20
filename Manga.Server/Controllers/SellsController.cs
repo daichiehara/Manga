@@ -455,7 +455,7 @@ namespace Manga.Server.Controllers
             {
                 return RequestButtonStatus.OwnSell;
             }
-            else if (userRequest == RequestStatus.Pending || userRequest == RequestStatus.Withdrawn)
+            else if (userRequest == RequestStatus.Pending)
             {
                 return RequestButtonStatus.AlreadyRequested;
             }
