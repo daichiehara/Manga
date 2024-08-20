@@ -47,7 +47,7 @@ interface FormData {
 
 
 const SellForm: React.FC = () => {
-  const { control, handleSubmit, setError, clearErrors, setValue } = useForm<FormData>();
+  const { control, handleSubmit, setError, clearErrors, setValue, watch } = useForm<FormData>();
   const [selectedBookState, setSelectedBookState] = useState<number | null>(null);
   const [selectedSendDay, setSelectedSendDay] = useState<number | null>(null);
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -63,6 +63,7 @@ const SellForm: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
   const [inputValue, setInputValue] = useState('');
+  const [author, setAuthor] = useState('');
   const [isPreSellDialogOpen, setIsPreSellDialogOpen] = useState(false);
 
   const handleCapturedImagesChange = (images: string[]) => {
@@ -242,6 +243,30 @@ const SellForm: React.FC = () => {
     }
   }, []);
 
+  const title = watch('title');
+  const sellMessage = watch('sellMessage');
+
+  const fetchAuthor = async (selectedTitle: string) => {
+    if (selectedTitle) {
+      try {
+        const response = await axios.get(`https://localhost:7103/api/Sells/author?title=${encodeURIComponent(selectedTitle)}`);
+        setAuthor(response.data);
+      } catch (error) {
+        console.error('Error fetching author:', error);
+        setAuthor('');
+      }
+    } else {
+      setAuthor('');
+    }
+  };
+
+  useEffect(() => {
+    if (author && !sellMessage) {
+      setValue('sellMessage', `\n\n${author}`);
+    }
+  }, [author, sellMessage, setValue]);
+
+
   useEffect(() => {
     if (isDraft) {
       setIsLoading(true);
@@ -392,6 +417,11 @@ const SellForm: React.FC = () => {
                   onChange={(_, newValue) => {
                     onChange(newValue);
                     setInputValue(newValue || '');
+                    if (newValue) {
+                      fetchAuthor(newValue);
+                    } else {
+                      setAuthor('');
+                    }
                   }}
                   error={!!error}
                   helperText={error?.message}
@@ -470,7 +500,7 @@ const SellForm: React.FC = () => {
               )}
             />
           </Grid>
-          <Grid item xs={12} mb={3}>
+          <Grid item xs={12} mb={2}>
             <Typography variant="body2" fontWeight={'bold'} color={'secondary'} mb={1}>
               商品の説明
             </Typography>
@@ -479,17 +509,15 @@ const SellForm: React.FC = () => {
               control={control}
               defaultValue=""
               render={({ field, fieldState: { error } }) => (
-                <>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    multiline
-                    rows={4}
-                    placeholder="例) 商品の説明です。"
-                    error={!!error}
-                    helperText={error ? error.message : ''}
-                  />
-                </>
+                <TextField
+                  {...field}
+                  fullWidth
+                  multiline
+                  rows={4}
+                  placeholder="商品の説明を入力してください。"
+                  error={!!error}
+                  helperText={error ? error.message : ''}
+                />
               )}
             />
           </Grid>

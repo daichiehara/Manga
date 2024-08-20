@@ -40,6 +40,7 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
     console.log('owned_fetch叩かれた');
     setOwnedLists(data.ownedLists);
     setSells(data.sells);
+    console.log(sells);
     data.ownedLists.concat(data.sells).forEach((book: Book) => addBook({ itemId: book.itemId, title: book.title }));
   };
   
@@ -165,7 +166,7 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
       {tabIndex === 0 && (
         <>
           <BookListOwned  key="owned-lists" title="とりあえず登録"  books={ownedLists} onRemove={handleRemoveOwnedLists} onRefreshOwnedList={fetchBooksData} />
-          <BooksListSells key="sells" title="出品中の漫画" books={sells}/>
+          <BooksListSells key="sells" title="あなたが出品中の漫画" books={sells}/>
         </>
       )}
       {tabIndex === 1 && (
