@@ -68,7 +68,7 @@ interface Reply {
 }
 
 
-const MangaDetail = () => {
+const MangaDetail: React.FC = () => {
   const { sellId } = useParams();
   const [mangaDetail, setMangaDetail] = useState<MangaDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -116,44 +116,27 @@ const MangaDetail = () => {
     navigate(`/item/${sellId}/comment`);
   }
 
+  const fetchMangaDetails = async () => {
+    try {
+      console.log('fetch: api Details');
+      const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
+        withCredentials: true
+      });
+      setMangaDetail(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        setError('該当する漫画は削除されています');
+      } else {
+        setError('漫画の詳細の読み込みに失敗しました。');
+      }
+      console.error('漫画の詳細情報の取得に失敗:', error);
+    }
+  };
   
 
   useEffect(() => {
-    const fetchMangaDetails = async () => {
-      try {
-        const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
-        withCredentials: true  // クロスオリジンリクエストにクッキーを含める
-      });
-        setMangaDetail(response.data);
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
-          setError('該当する漫画は削除されています');
-        } else {
-          setError('漫画の詳細の読み込みに失敗しました。');
-        }
-        console.error('漫画の詳細情報の取得に失敗:', error);
-      }
-    };
-    
     fetchMangaDetails();
   }, [sellId]);
-
-  useEffect(() => {
-    if (!drawerOpen) {
-        const fetchMangaDetails = async () => {
-            try {
-                const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
-                    withCredentials: true  // クロスオリジンリクエストにクッキーを含める
-                });
-                setMangaDetail(response.data);
-            } catch (error) {
-                console.error('漫画の詳細情報の取得に失敗:', error);
-            }
-        };
-
-        fetchMangaDetails();
-    }
-}, [drawerOpen]);
 
 
   const withdrawRequests = async () => {
@@ -162,17 +145,17 @@ const MangaDetail = () => {
         await axios.put(`https://localhost:7103/api/Requests/withdrawRequests/${sellId}`, null, {
             withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
-        const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
-                withCredentials: true  // クロスオリジンリクエストにクッキーを含める
-            }); // sell情報を再読み込み
-        setMangaDetail(response.data); // データの再取得
-        setCancelDrawerOpen(false); // ドロワー下げる。
-        showSnackbar("交換申請が取り消されました", 'success'); // 成功メッセージをセット
         // 必要に応じて他の状態を更新
     } catch (error) {
         showSnackbar("交換申請の取り消しに失敗しました", 'error'); // 失敗メッセージをセット
         console.error('交換申請の取り消しに失敗:', error);
       } finally {
+        const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
+          withCredentials: true  // クロスオリジンリクエストにクッキーを含める
+      }); // sell情報を再読み込み
+        setMangaDetail(response.data); // データの再取得
+        setCancelDrawerOpen(false); // ドロワー下げる。
+        showSnackbar("交換申請が取り消されました", 'success'); // 成功メッセージをセット
         setIsSubmitting(false);
     }
   };
@@ -404,7 +387,7 @@ const MangaDetail = () => {
       <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', }}>
         {renderActionButton()}
       </Box>
-      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} setMessage={showMessage} wishTitles={mangaDetail.wishTitles}/>
+      <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} setMessage={showMessage} wishTitles={mangaDetail.wishTitles} onExchangeRequest={fetchMangaDetails} />
       {message && (
           <Alert severity={severity} sx={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', zIndex: 9999 }}>
               {message}
