@@ -5,12 +5,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import NotificationsOutlined from '@mui/icons-material/NotificationsOutlined';
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
-import SellOutlined from '@mui/icons-material/SellOutlined';
+import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import PersonOutline from '@mui/icons-material/PersonOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import SellIcon from '@mui/icons-material/Sell';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import PersonIcon from '@mui/icons-material/Person';
 import MyBookModal from '../common/MyBookModal';
 import { NotificationContext } from '../context/NotificationContext';
@@ -199,7 +199,7 @@ const MenuBar = memo(() => {
         <BottomNavigationAction label="探す" icon={getIcon(0, <SearchOutlined sx={{fontSize:`1.4rem`}}/>, <SearchIcon sx={{fontSize:`1.4rem`}} />)} sx={actionStyle} />
         <BottomNavigationAction label="通知" icon={getIcon(1, <NotificationsOutlined sx={{fontSize:`1.4rem`}} />, <NotificationsIcon sx={{fontSize:`1.4rem`}} />)} sx={noticeStyle} />
         <BottomNavigationAction label="マイ本棚" icon={getIcon(2, <AutoStoriesOutlinedIcon sx={{fontSize:`1.4rem`}} />, <AutoStoriesIcon sx={{fontSize:`1.4rem`}} />)} sx={myBookshelfStyle} />
-        <BottomNavigationAction label="出品" icon={getIcon(3, <SellOutlined sx={{fontSize:`1.4rem`}}/>, <SellIcon sx={{fontSize:`1.4rem`}}/>)} sx={sellStyle} />
+        <BottomNavigationAction label="出品" icon={getIcon(3, <CameraAltOutlinedIcon sx={{fontSize:`1.4rem`}}/>, <CameraAltIcon sx={{fontSize:`1.4rem`}}/>)} sx={sellStyle} />
         <BottomNavigationAction label="マイページ" icon={getIcon(4, <PersonOutline sx={{fontSize:`1.4rem`}} />, <PersonIcon sx={{fontSize:`1.4rem`}}/>)} sx={searchStyle} />
       </BottomNavigation>
       <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />

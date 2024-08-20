@@ -1,182 +1,115 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Typography, Button, Avatar, Box, Stack, Grid, Snackbar, Alert } from '@mui/material';
-import MenuBar from '../components/menu/MenuBar';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { authService } from '../api/authService';
+import React, { useEffect } from 'react';
+import { Typography, Avatar, Box, Stack, Grid } from '@mui/material';
 import BeenhereRoundedIcon from '@mui/icons-material/BeenhereRounded';
 import BeenhereOutlinedIcon from '@mui/icons-material/BeenhereOutlined'; 
 import CustomToolbar from '../components/common/CustumToolbar';
 import LoopIcon from '@mui/icons-material/Loop';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import axios from 'axios';
-import SettingList from '../components/mypage/SettingList';
-import SellSettingList from '../components/mypage/SellSettingList';
-import PolicyList from '../components/mypage/PolicyList';
+import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../components/context/AuthContext';
 import { UserContext } from '../components/context/UserContext';
+import SellSettingList from '../components/mypage/SellSettingList';
+import SettingList from '../components/mypage/SettingList';
+import PolicyList from '../components/mypage/PolicyList';
 import LogoutList from '../components/mypage/LogoutList';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import { useSnackbar } from '../hooks/useSnackbar';
-import { LEFT } from 'react-swipeable';
 import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
-
-interface MainMyPage {
-  title: string; 
-  nickName: string;
-  profileIcon : string;
-  hasIdVerificationImage: boolean;
-
-}
+import MenuBar from '../components/menu/MenuBar';
+import { useSnackbar } from '../hooks/useSnackbar';
+import ForwardToInboxRoundedIcon from '@mui/icons-material/ForwardToInboxRounded';
 
 const MainMyPage: React.FC = () => {
   const { userInfo } = useContext(UserContext);
   const { authState } = useContext(AuthContext);
-
-  const navigate = useNavigate();
-
-  const location = useLocation();
   useSnackbar();
 
-  const handleLogout = useCallback(() => {
-    authService.logout()
-      .then(() => {
-        navigate('/');
-      })
-      .catch(error => {
-        console.error('ログアウトエラー', error);
-      });
-  }, [navigate]);
-
-  const handleMpFavoList = useCallback(() => {
-    navigate('/mpfavolist');
-  }, [navigate]);
-
-  // useEffectでのAPIコールは、コンポーネントがマウントされた時のみに行われる
   useEffect(() => {
     if (!authState.isAuthenticated) {
-      // ログインしていない場合は何もしない（あるいは、ここでログインページにリダイレクトさせるなど）
+      // ログインしていない場合の処理
       return;
     }
   }, [authState.isAuthenticated]);
 
-  
+  const renderMainIcon = (
+    to: string,
+    Icon: React.ElementType,
+    label: string,
+    bgColor: string = "grey.300"
+  ) => (
+    <Grid item xs={3} display="flex" alignItems="center" justifyContent="center" flexDirection="column" component={Link} to={to} sx={{ textDecoration: 'none' }}>
+      <Box
+        bgcolor={bgColor}
+        borderRadius="50%"
+        sx={{p:1, }}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Icon sx={{ fontSize: `2.5rem`, color: `#7F7F7F` }} />
+      </Box>
+      {/* 固定の高さを設定 */}
+      <Typography variant="body2" gutterBottom sx={{ pt: 2, pb: 1, fontWeight: 'bold', color: '#757575', minHeight: '3rem', textAlign: 'center' }}>
+        {label}
+      </Typography>
+    </Grid>
+  );
 
   return (
     <>
       <CustomToolbar title='マイページ' showBackButton={false} />
-      {/* ログイン状態に応じて表示を切り替える */}
       {authState.isAuthenticated ? (
-        // ログインしている場合の表示
         userInfo ? (
-          // myPageデータがある場合の表示
-          <Box px={{}}>
-          <Grid container direction="column" display="flex" alignItems="center" justifyContent="center" spacing={2} sx={{pt:15, pb:8}}>
-            <Box display="flex" alignItems="center" justifyContent="center">
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 1.8,}}>
-                <Avatar src={userInfo.profileIcon} alt={userInfo.nickName} sx={{width:`4rem`, height:`4rem`}}/>        
+          <Box px={2}>
+            {/* プロフィール部分 */}
+            <Grid container direction="column" alignItems="center" justifyContent="center" sx={{ pt: 15, pb: 8 }}>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 1.8 }}>
+                <Avatar src={userInfo.profileIcon} alt={userInfo.nickName} sx={{ width: '4rem', height: '4rem' }} />
               </Stack>
-            </Box>
-
-            <Box>
-                <Grid container direction="column" alignItems="center" >
-                    
-                    <Typography variant="subtitle1" sx={{pb:1, display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
-                        {userInfo.nickName}
+              <Typography variant="subtitle1" sx={{ pb: 1, fontWeight: 'bold' }}>
+                {userInfo.nickName}
+              </Typography>
+              <Grid container spacing={0.5} alignItems="center" justifyContent="center" sx={{ pt: 1 }}>
+                {userInfo.hasIdVerificationImage ? (
+                  <>
+                    <BeenhereRoundedIcon color="primary" />
+                    <Typography variant="body1" sx={{ pl: 1 }}>
+                      本人確認済
                     </Typography>
-                    {userInfo.hasIdVerificationImage ? (
-                        <Grid container spacing={0.5} alignItems="center"sx={{pt:1}}>
-                            <BeenhereRoundedIcon color="primary" sx={{display: 'flex', justifyContent: 'center', alignItems: `center` }} />
-                            <Typography variant="body1" sx={{pl:1, color: 'black'}}>
-                                {`本人確認済`}
-                            </Typography>
-                        </Grid>
-                    ) : (
-                        <Grid container spacing={0.5} alignItems="center">
-                            <BeenhereOutlinedIcon color="disabled" sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.5rem'}} />
-                            <Typography variant="body1" sx={{pl:1, color: 'black'}}>
-                                {`本人確認前`}
-                            </Typography>
-                        </Grid>
-                        
-                    )}
-                </Grid>
-            </Box>
-        </Grid>
-        <Grid container display="flex" alignItems="center" justifyContent="center" sx={{px:2,pb:3,}}>
-        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mypage/favolist' } sx={{textDecoration: 'none'}}>
-          <Box
-            bgcolor="grey.300" // グレーの背景色
-            borderRadius="50%" // 円形にする
-            p={1} // パディング
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            
-          >
-            <FavoriteBorderIcon sx={{fontSize:`2.5rem`, color:`#7F7F7F`}}/> {/* アイコン */}
-          </Box>
-          <Typography variant="body2" gutterBottom sx={{pt:2, pb:1, fontWeight:'bold', color: '#757575'}}>
-            {`いいね一覧`}
-          </Typography>
-        </Grid>
-        <Grid item xs={4}display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mypage/mysell' }sx={{textDecoration: 'none'}}>
-          <Box
-            bgcolor="#F2F2F2" // グレーの背景色
-            borderRadius="50%" // 円形にする
-            p={1} // パディング
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <MenuBookIcon sx={{fontSize:`2.5rem`, color:`#7F7F7F`}}/> {/* アイコン */}
-          </Box>
-          <Typography variant="body2" gutterBottom sx={{pt:2, pb:1, fontWeight:'bold', color: '#757575'}}>
-            {`出品した漫画`}
-          </Typography>
-        </Grid>
-        <Grid item xs={4} display="flex" alignItems="center" justifyContent="center"flexDirection="column" component={Link} to={'/mypage/matchedsell' }sx={{textDecoration: 'none'}}>
-          <Box
-            bgcolor="grey.300" // グレーの背景色
-            borderRadius="50%" // 円形にする
-            p={1} // パディング
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <LoopIcon sx={{fontSize:`2.5rem`, color:`#7F7F7F`}}/> {/* アイコン */}
-          </Box>
-          <Typography variant="body2" gutterBottom sx={{pt:2, pb:1, fontWeight:'bold', color: '#757575'}}>
-            {`交換した漫画`}
-          </Typography>
-        </Grid>
-      </Grid>
-      {/* 設定など */}
-      <SellSettingList />
-      <SettingList />
-      <PolicyList />
-      <LogoutList />
-      
+                  </>
+                ) : (
+                  <>
+                    <BeenhereOutlinedIcon color="disabled" />
+                    <Typography variant="body1" sx={{ pl: 1 }}>
+                      本人確認前
+                    </Typography>
+                  </>
+                )}
+              </Grid>
+            </Grid>
 
-      </Box>
+            {/* メインアイコン部分 */}
+            <Grid container spacing={2} sx={{ pb: 3 }}>
+              {renderMainIcon('/mypage/favolist', FavoriteBorderIcon, 'いいね一覧')}
+              {renderMainIcon('/mypage/mysell', MenuBookIcon, '出品した漫画')}
+              {renderMainIcon('/mypage/matchedsell', LoopIcon, '交換した漫画')}
+              {renderMainIcon('/mypage/requestedsell', ForwardToInboxRoundedIcon, '交換申請した漫画')}
+            </Grid>
 
-
+            {/* その他のリスト */}
+            <SellSettingList />
+            <SettingList />
+            <PolicyList />
+            <LogoutList />
+          </Box>
         ) : (
-          // myPageデータがまだない場合の表示
           <Typography variant="body1" align="center">
             データを取得中...
           </Typography>
         )
       ) : (
-        // ログインしていない場合の表示
-        <NavigateToLoginBox height='80vh'/>
+        <NavigateToLoginBox height='80vh' />
       )}
-
-      
-      
-      
-      {/* 以降の部分は変わらず共通のコンポーネントやUI要素を表示 */}
       <MenuBar />
     </>
   );
