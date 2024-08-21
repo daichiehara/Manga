@@ -20,6 +20,7 @@ interface ExchangeRequestModalProps {
     onClose: () => void;
     setMessage: (message: string | null, severity: 'success' | 'error') => void; // メッセージ表示用の関数を受け取る
     wishTitles: { title: string; isOwned: boolean }[];
+    onExchangeRequest: () => Promise<void>;
 }
 
 interface ChangeAddressDto {
@@ -41,7 +42,7 @@ interface MpMySell {
     sellStatus: number;
 }
 
-const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose, setMessage , wishTitles }) => {
+const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ isOpen, onClose, setMessage , wishTitles, onExchangeRequest }) => {
     const { sellId } = useParams();
     const { authState } = useContext(AuthContext);
     const [triggerFetch, setTriggerFetch] = useState(false);
@@ -62,28 +63,6 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     const { showSnackbar } = useContext(SnackbarContext);
 
 
-    const fetchAddress = async () => {
-        try {
-            const response = await axios.get<ChangeAddressDto>('https://localhost:7103/api/Users/GetAddress', {
-                withCredentials: true,
-            });
-            setAddress(response.data);
-        } catch (error) {
-            console.error('Error fetching address:', error);
-        }
-    };
-
-    const fetchMangaDetails = async () => {
-        try {
-            const response = await axios.get<MangaDetail>(`https://localhost:7103/api/Sells/${sellId}`, {
-                withCredentials: true  // クロスオリジンリクエストにクッキーを含める
-            });
-            setMangaDetail(response.data);
-        } catch (error) {
-            console.error('漫画の詳細情報の取得に失敗:', error);
-        }
-    };
-
     const fetchmpmysell = async () => {
         try {
             const response = await axios.get<MpMySell[]>('https://localhost:7103/api/Sells/MySell', {
@@ -98,13 +77,10 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     };
 
     useEffect(() => {
-        fetchMangaDetails();
-    }, [sellId]);
-
-    useEffect(() => {
         if (isOpen) {
             setTriggerFetch(true);
-            fetchAddress(); // モーダルが開いたときに住所を取得
+            console.log('fetch address');
+            //fetchAddress(); // モーダルが開いたときに住所を取得
             fetchmpmysell(); // モーダルが開いたときにマイセルを取得
         }
     }, [isOpen]);
@@ -156,6 +132,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 withCredentials: true
             });
             console.log('Exchange request sent:', response.data);
+            await onExchangeRequest();
             onClose(); // モーダルを閉じる
             handleFinalCheckModalClose();
             setToMainDetailMessage("交換申請が送られました");
