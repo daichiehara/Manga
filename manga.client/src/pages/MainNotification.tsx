@@ -10,7 +10,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { useNavigate } from 'react-router-dom';
 import { NotificationContext } from '../components/context/NotificationContext';
-
+import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
 
 interface Notification {
   sellId: number;
@@ -209,11 +209,7 @@ const handleExchangeConfirmed = useCallback(() => {
         {/* 見出しのToolbar */}
         <CustomToolbar title='お知らせ' showBackButton={false} />
         {/* ログイン促進メッセージ */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', paddingTop: '64px' /* Toolbarの高さを考慮 */ }}>
-          <Typography variant="h5">
-            ログインしてください
-          </Typography>
-        </Box>
+        <NavigateToLoginBox height='80vh'/>
         {/* ナビゲーションバー */}
         <MenuBar />
       </>
