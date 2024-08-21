@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Typography, Button, Grid,  } from '@mui/material';
+import { Box, Typography, Button, Grid, Divider, Stack } from '@mui/material';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
-import PublishIcon from '@mui/icons-material/Publish';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import MenuBar from '../components/menu/MenuBar';
 import CustomToolbar from '../components/common/CustumToolbar';
 import { Link } from 'react-router-dom';
@@ -47,203 +47,176 @@ const MSell: React.FC= () => {
 
       {/* メインコンテンツエリア */}
       {/* 見出し */}
-      <CustomToolbar title='出品' showBackButton={false} />
-        {/* 出品ボタン */}
-      <Box sx={{ml:4, mr:4, mb: 6,}}>
-      <Typography 
-        variant="h6" sx={{ 
-          pt:10,
-          color: '#707070',
-          fontWeight: '700',
-          mb:2
-          }} >
-        出品する
-      </Typography>
-      <Link to="/sell">
+      <CustomToolbar title="出品" showBackButton={false} />
+      {/* メインボタンエリア */}
+      <Box sx={{ mt: '3rem', pt: '4rem', ml: 4, mr: 4, mb: 6 }}>
+        {/* 出品するボタン */}
         <Button
-          variant="outlined" sx={{ 
-            borderWidth:`1px`,
-            borderColor: (theme) => theme.palette.primary.main, 
-            width: '100%', 
-            height: 70, 
-            fontWeight: '700',
-            fontSize: '1.1rem',
-          }}
-        >
-          <CameraAltOutlinedIcon sx={{pr:`0.6rem`, fontSize: '1.5rem' }} />
-          漫画全巻を出品する
-        </Button>
-      </Link>
-
-      <Link to="/sell/draft">
-        <Button
-          variant="outlined" 
-          size='small'
-          sx={{ 
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/sell"
+          onClick={onClick}
+          sx={{
             width: '100%',
-            mt: 2
+            height: 70,
+            backgroundColor: '#EB4848',
+            fontWeight: 'bold',
+            fontSize: '1.2rem',
+            borderRadius: '8px',
+            boxShadow: 'none',
+            '&:hover': {
+              backgroundColor: '#D13C3C',
+            },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          <BorderColorIcon sx={{pr: '0.6rem'}} />
+          <CameraAltOutlinedIcon sx={{ fontSize: '2rem', mr: '0.5rem' }} />
+          出品する
+        </Button>
+
+        {/* 下書き一覧ボタン */}
+        <Button
+          variant="outlined"
+          component={Link}
+          to="/sell/draft"
+          sx={{
+            width: '100%',
+            height: 70,
+            mt: 2,
+            fontWeight: 'bold',
+            fontSize: '1.2rem',
+            color: '#EB4848',
+            borderColor: '#EB4848',
+            borderWidth: '2px',
+            borderRadius: '8px',
+            '&:hover': {
+              backgroundColor: 'rgba(235, 72, 72, 0.08)',
+              borderColor: '#D13C3C',
+            },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <BorderColorIcon sx={{ fontSize: '2rem', mr: '0.5rem' }} />
           下書き一覧
         </Button>
-      </Link>
       </Box>
+      <Divider variant="fullWidth" sx={{mx:4, my:3}}/>
 
       {/* 出品の流れの説明 */}
-    <Box sx={{ ml:4, mr:4, mb:1.5}}>
-    <Grid container alignItems="center" >
-      <Grid item xs={1}sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', // 横方向の中央揃え
-          alignItems: 'center', // 垂直方向の中央揃え
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-        <PublishIcon/>
-      </Grid>
-      <Grid item xs={11}>
-        <Typography 
-        variant="h6"sx={{ 
-          color: '#707070',
-          fontWeight: '700'
-          }}> 
-          出品の流れ
-        </Typography>
-      </Grid>
-    </Grid>
-    </Box>
-    <Box sx={{ ml:4, mr:4, mb:1}}>
-    <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
-      <Grid item xs={1}sx={{ 
-          fontSize: 15,
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-            1.
-      </Grid>
-      <Grid item xs={11}>
-        <Typography sx={{ 
-          color: '#707070',
-          fontWeight: '700'
-          }}> 
-          交換に出す漫画タイトルを登録します。
-        </Typography>
-      </Grid>
-    </Grid>
-    <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
-      <Grid item xs={1}sx={{ 
-          fontSize: 15,
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-            2.
-      </Grid>
-      <Grid item xs={11}>
-        <Typography sx={{ 
-          color: '#707070',
-          fontWeight: '700'
-          }}> 
-          交換申し込みを待ちます。（この間に他のユーザーに申し込む事もできます。）
-        </Typography>
-      </Grid>
-    </Grid>
-    <Grid container alignItems="center" sx={{ mb:6, alignItems: 'flex-start'}}>
-      <Grid item xs={1}sx={{ 
-          fontSize: 15,
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-            ※
-      </Grid>
-      <Grid item xs={11}>
-        <Typography sx={{ 
-          color: '#707070',
-          fontWeight: '700',
-          fontSize: 15,
-          }}> 
-      「欲しい漫画」はあなたがMy本棚で登録した漫画です。
-        </Typography>
-      </Grid>
-    </Grid>
-    </Box>
+      <Box sx={{ mx: 4, mb: 1.5 }}>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <CameraAltIcon sx={{ color: 'red' }} />
+          <Typography variant="h6" sx={{ color: '#404040', fontWeight: 'bold' }}>
+            出品の流れ
+          </Typography>
+        </Stack>
+      </Box>
 
-
-      {/* 申し込みが来た場合の説明 */}
-    <Box sx={{ ml:4, mr:4, mb:1.5}}>
-    <Grid container alignItems="center">
-      <Grid item xs={1}sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', // 横方向の中央揃え
-          alignItems: 'center', // 垂直方向の中央揃え
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-        <AssignmentTurnedInIcon/>
-      </Grid>
-      <Grid item xs={11}>
-        <Typography 
-        variant="h6"sx={{ 
-          color: '#707070',
-          fontWeight: '700'
-          }}> 
-          申し込みが来たら
-        </Typography>
-      </Grid>
-    </Grid>
-    </Box>
     <Box sx={{ ml:4, mr:4, mb:1}}>
-    <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
-      <Grid item xs={1}sx={{ 
-          fontSize: 15,
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-            1.
+      <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
+        <Grid item xs={1}sx={{ 
+            fontSize: 15,
+            color: '#707070',
+            fontWeight: '700'
+            }}>
+              1.
+        </Grid>
+        <Grid item xs={11}>
+          <Typography sx={{ 
+            color: '#707070',
+            fontWeight: '700'
+            }}> 
+            交換に出す漫画タイトルを登録します。写真や状態など必要な情報を入力して下さい。
+          </Typography>
+        </Grid>
       </Grid>
-      <Grid item xs={11}>
-        <Typography sx={{ 
-          color: '#707070',
-          fontWeight: '700'
-          }}> 
-          通知に交換申込が来ます。交換したい漫画タイトルを選択します。
-        </Typography>
+      <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
+        <Grid item xs={1}sx={{ 
+            fontSize: 15,
+            color: '#707070',
+            fontWeight: '700'
+            }}>
+              2.
+        </Grid>
+        <Grid item xs={11}>
+          <Typography sx={{ 
+            color: '#707070',
+            fontWeight: '700'
+            }}> 
+            交換申し込みを待ちます。（この間に他のユーザーに申し込む事もできます）
+          </Typography>
+        </Grid>
       </Grid>
-    </Grid>
-    <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
-      <Grid item xs={1}sx={{ 
-          fontSize: 15,
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-            2.
+      
+    </Box>
+    <Divider variant="fullWidth" sx={{mx:4, my:3}}/>
+
+    {/* 申し込みが来た場合の説明 */}
+    <Box sx={{ mx: 4, mb: 1.5 }}>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <AutoAwesomeRoundedIcon sx={{ color: '#0F9ED5' }} />
+          <Typography variant="h6" sx={{ color: '#404040', fontWeight: 'bold' }}>
+            申し込みが来たら
+          </Typography>
+        </Stack>
+      </Box>
+    <Box sx={{ ml:4, mr:4, mb:'4.5rem',pb:'1.6rem' }}>
+      <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
+        <Grid item xs={1}sx={{ 
+            fontSize: 15,
+            color: '#707070',
+            fontWeight: '700'
+            }}>
+              1.
+        </Grid>
+        <Grid item xs={11}>
+          <Typography sx={{ 
+            color: '#707070',
+            fontWeight: '700'
+            }}> 
+            通知に交換申込が来ます。交換したい漫画タイトルを選択します。
+          </Typography>
+        </Grid>
       </Grid>
-      <Grid item xs={11}>
-        <Typography sx={{ 
-          color: '#707070',
-          fontWeight: '700'
-          }}> 
-          おめでとうございます。交換成立です！
-        </Typography>
+      <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
+        <Grid item xs={1}sx={{ 
+            fontSize: 15,
+            color: '#707070',
+            fontWeight: '700'
+            }}>
+              2.
+        </Grid>
+        <Grid item xs={11}>
+          <Typography sx={{ 
+            color: '#707070',
+            fontWeight: '700'
+            }}> 
+            おめでとうございます。交換成立です！
+          </Typography>
+        </Grid>
       </Grid>
-    </Grid>
-    <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
-      <Grid item xs={1}sx={{ 
-          fontSize: 15,
-          color: '#707070',
-          fontWeight: '700'
-          }}>
-            3.
+      <Grid container alignItems="center" sx={{ mb:1, alignItems: 'flex-start'}}>
+        <Grid item xs={1}sx={{ 
+            fontSize: 15,
+            color: '#707070',
+            fontWeight: '700'
+            }}>
+              3.
+        </Grid>
+        <Grid item xs={11}>
+          <Typography sx={{ 
+            color: '#707070',
+            fontWeight: '700'
+            }}> 
+            漫画全巻の配送手続きを行ってください。
+          </Typography>
+        </Grid>
       </Grid>
-      <Grid item xs={11}>
-        <Typography sx={{ 
-          color: '#707070',
-          fontWeight: '700'
-          }}> 
-          漫画全巻の配送手続きを行ってください。
-        </Typography>
-      </Grid>
-    </Grid>
     </Box>
 
     <MenuBar /> {/* 画像のボトムのナビゲーションバーに対応するコンポーネント */}

@@ -138,7 +138,7 @@ const Login: React.FC = () => {
               メールアドレス
             </Typography>
             <TextField
-              placeholder='Tocaeru@email.com'
+              placeholder='tocaeru@email.com'
               variant="outlined"
               fullWidth
               {...register('email')}

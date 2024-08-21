@@ -42,21 +42,18 @@ const WishListDisplay: React.FC<WishListProps> = ({ wishTitles, shouldTruncate }
   const remainingCount = wishTitles.length - finalDisplayTitles.length;
 
   return (
-    <Box sx={{ pt:0.6 ,display: 'flex', flexWrap: 'wrap'}}>
+    <Box sx={{ pt:0.2 ,display: 'flex', flexWrap: 'wrap'}}>
       {finalDisplayTitles.map((wish, index) => (
         <Box
         key={index}
         sx={{
           m: 0.4,
           ml: 0, // 一番右端の隙間を作らないために
-          
-          color: wish.isOwned ? 'white' : 'inherit',
           borderRadius: '100px',
           border: '1px solid',
-          borderColor: wish.isOwned ? '#B12704' : 'rgba(0, 0, 0, 0.23)', // 透明な背景の場合の境界線
-          '&:hover': {
-            backgroundColor: wish.isOwned ? 'darkred' : 'inherit',
-          },
+          borderColor: wish.isOwned ? '#E97032' : 'rgba(0, 0, 0, 0.23)', // 透明な背景の場合の境界線
+          backgroundColor: wish.isOwned ? '#FFF0E6' : 'inherit',
+          //backgroundColor: wish.isOwned ? '#E97032' : 'inherit',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -68,7 +65,7 @@ const WishListDisplay: React.FC<WishListProps> = ({ wishTitles, shouldTruncate }
             px:1.3,
             py:0.4,
             fontSize: '0.75rem', 
-            color: wish.isOwned ? 'black' : '#909090',
+            color: wish.isOwned ? '#E97032' : '#909090',
             textOverflow: 'ellipsis',
             whiteSpace: shouldTruncate ? 'nowrap' : 'nomal'
           }}
