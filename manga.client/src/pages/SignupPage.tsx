@@ -30,12 +30,11 @@ const SignupPage: React.FC = () => {
     setSuccess(null);
 
     try {
-      const response = await axios.get('https://localhost:7103/api/Users/signin-google', {
-        headers: {
-          Authorization: `Bearer ${credentialResponse.credential}`,
-        },
-        withCredentials: true, // ここでwithCredentialsを追加
-      });
+        const response = await axios.post('https://localhost:7103/api/Users/auth/google', {
+            code: credentialResponse.credential
+        }, {
+            withCredentials: true,
+        });
 
       setSuccess('Googleアカウントでのサインインが成功しました。');
       setLoading(false);

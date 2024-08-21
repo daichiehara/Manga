@@ -130,13 +130,10 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultForbidScheme =
-    options.DefaultScheme =
-    options.DefaultSignInScheme =
-    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+    options.DefaultAuthenticateScheme = "JWT_OR_GOOGLE";
+    options.DefaultChallengeScheme = "JWT_OR_GOOGLE";
+})
+.AddJwtBearer("JWT", options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
@@ -160,11 +157,24 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
-
-}).AddGoogle(googleOptions =>
+})
+.AddGoogle("Google", googleOptions =>
 {
     googleOptions.ClientId = clientId;
     googleOptions.ClientSecret = clientSecret;
+    googleOptions.SaveTokens = true;
+})
+.AddPolicyScheme("JWT_OR_GOOGLE", "JWT or Google", options =>
+{
+    options.ForwardDefaultSelector = context =>
+    {
+        // Google認証用のパスを追加
+        if (context.Request.Path.StartsWithSegments("/api/Users/auth/google"))
+        {
+            return "Google";
+        }
+        return "JWT";
+    };
 });
 
 

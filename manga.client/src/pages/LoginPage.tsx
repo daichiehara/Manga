@@ -82,30 +82,31 @@ const Login: React.FC = () => {
     });
   };
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-    setIsLoading(true);
-    setError(null);
-    setSuccess(null);
+    const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+        setIsLoading(true);
+        setError(null);
+        setSuccess(null);
 
-    try {
-      const response = await axios.get('https://localhost:7103/api/Users/signin-google', {
-        headers: {
-          Authorization: `Bearer ${credentialResponse.credential}`,
-        },
-        withCredentials: true,
-      });
+        try {
+            // バックエンドにGoogle認証コードを送信
+            const response = await axios.post('https://localhost:7103/api/Users/auth/google', {
+                code: credentialResponse.credential
+            }, {
+                withCredentials: true,
+            });
 
-      setSuccess('Googleアカウントでのログインが成功しました。');
-      setIsLoading(false);
+            setSuccess('Googleアカウントでのログインが成功しました。');
+            updateGlobalAuthState({ isAuthenticated: true });
+            setIsLoading(false);
 
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-    } catch (err: any) {
-      setError('Google認証に失敗しました。');
-      setIsLoading(false);
-    }
-  };
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+        } catch (err: any) {
+            setError('Google認証に失敗しました。');
+            setIsLoading(false);
+        }
+    };
 
   const handleGoogleFailure = () => {
     setError('Google認証に失敗しました。');
