@@ -107,7 +107,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch, selectedTab, onTabChange, ini
               </IconButton>
               <InputBase
                 sx={{ ml: 1, flex: 1 }}
-                placeholder="Tocaeru.comで検索"
+                placeholder="tocaeru.comで検索"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={handleSearchFocus}
