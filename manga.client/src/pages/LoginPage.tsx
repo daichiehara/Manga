@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { TextField, Button, Box, Divider, Typography, Alert, CircularProgress, IconButton, InputAdornment, IconButtonProps } from '@mui/material';
+import { TextField, Button, Box, Divider, Typography, Alert, CircularProgress, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
@@ -81,10 +81,6 @@ const Login: React.FC = () => {
       setIsLoading(false);
     });
   };
-
-  const handleNavigateRegisterPage = () => {
-    navigate('/signup');
-  }
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setIsLoading(true);
@@ -196,14 +192,6 @@ const Login: React.FC = () => {
             </CustomLink>
             
           </Box>
-          <Box sx={{display:'flex', justifyContent:'right'}}>
-            
-            <CustomLink href="/reset-password" sx={{ display: 'block', mt: 2 }}>
-            仮置き。リセットのページを確認するため
-          </CustomLink>
-          </Box>
-
-          
 
           <Divider sx={{py:1, color: theme.palette.text.secondary}}>
             または

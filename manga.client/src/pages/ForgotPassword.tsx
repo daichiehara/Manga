@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Container, 
   Typography, 
   TextField, 
   Button, 
@@ -12,14 +11,6 @@ import axios from 'axios';
 import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
-
-// スタイルの定義
-const ContainerStyled = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(8),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
 
 const FormStyled = styled('form')(({ theme }) => ({
   width: '100%', // IE 11の問題を修正
