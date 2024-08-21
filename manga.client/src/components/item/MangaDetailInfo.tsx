@@ -74,20 +74,20 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
 
       {/* いいねとコメント数 */}
       <Box sx={{ display: 'flex', justifyContent: 'left', pt:1.5 }}>
-        <Typography variant="subtitle1" sx={{mr:1.4, pt: 0.5, pb: 0, color: '#757575' }}>
+        <Typography variant="subtitle1" sx={{mr:1.0, pt: 0.5, pb: 0, color: '#757575' }}>
           {`${formattedSellTime}に出品`}
         </Typography>
-        <Box sx={{display: 'flex', justifyContent: 'right', alignItems: 'center', borderColor: theme.palette.text.secondary, borderWidth: 1, borderStyle: 'solid', borderRadius:'5px', p:0.1, mr:1.5 }}>
-            <IconButton onClick={handleLike} sx={{ py:0.3, color: liked ? 'red' : 'default' }} disableRipple >
+        <Box sx={{display: 'flex', justifyContent: 'right', alignItems: 'center', borderColor: theme.palette.text.secondary, borderWidth: 1, borderStyle: 'solid', borderRadius:'5px', p:0.1, mr:0.7 }}>
+            <IconButton onClick={handleLike} sx={{ px:0.3, py:0.3, color: liked ? 'red' : 'default' }} disableRipple >
               {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             </IconButton>
-            <Typography variant='subtitle2' sx={{ mr:0.8, fontWeight:'bold' }}>
-              {(Number.isNaN(currentLikeCount) || currentLikeCount === 0) ? `いいね！` : currentLikeCount}
+            <Typography variant='subtitle2' sx={{ mr:0.3, fontWeight:'bold' }}>
+              {(Number.isNaN(currentLikeCount) || currentLikeCount === 0) ? `いいね` : currentLikeCount}
             </Typography>
         </Box>
         <Box sx={{display: 'flex', justifyContent: 'left', alignItems: 'center', borderColor: theme.palette.text.secondary, borderWidth: 1, borderStyle: 'solid', borderRadius:'5px' }}>
-          <ModeCommentOutlinedIcon sx={{ fontSize:'19px',color: theme.palette.text.secondary, px:0.8, py:0.3 }} />
-          <Typography variant='subtitle2' sx={{mr:0.8, fontWeight:'bold'}}>
+          <ModeCommentOutlinedIcon sx={{ fontSize:'19px',color: theme.palette.text.secondary, px:0.3, py:0.3 }} />
+          <Typography variant='subtitle2' sx={{ mr:0.3, fontWeight:'bold'}}>
             {replyCount ? replyCount : 'コメント'}
           </Typography>
         </Box>

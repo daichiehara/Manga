@@ -313,10 +313,9 @@ const MangaDetail: React.FC = () => {
               likeCount={mangaDetail.likeCount}
             />
 
-            <Paper elevation={0} sx={{ pt: 0.5, pb: 1, pl: 2.0, pr: 2.0, border: 'none' }}>
-              
-              <Typography variant="body1" sx={{pt:2, color: '#757575', fontWeight:'bold'}}>
-                この人が欲しい漫画
+            <Paper elevation={0} sx={{ pt: 3, pb: 1, pl: 2.0, pr: 2.0, border: 'none' }}>
+              <Typography variant="h6" component="span" sx={{pt:2, color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic' }}>
+                want<Box component="span" sx={{ color: 'orange' }}>!!</Box><Box component="span" sx={{pl:1.0, color: '#757575', fontSize:'16px', fontWeight:'bold', fontStyle:'normal'}}>この人が欲しい漫画</Box>
               </Typography>
               <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
               {mangaDetail.wishTitles.length > 0 ? (
@@ -325,6 +324,8 @@ const MangaDetail: React.FC = () => {
                 <Typography variant='subtitle2' sx={{color:theme.palette.text.secondary}}>欲しい漫画が設定されていせん</Typography>
               )
               }
+
+              {/* 出品者の説明 */}
               <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold'}}>
                 {`出品物の説明`}
               </Typography>
@@ -333,6 +334,7 @@ const MangaDetail: React.FC = () => {
                 {mangaDetail.sellMessage}
               </Typography>
               
+              {/* 出品者情報 */}
               <Grid container spacing={0.5} alignItems="center">
                 <Grid item xs={12}>
                   <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold' }}>
@@ -342,6 +344,8 @@ const MangaDetail: React.FC = () => {
                 </Grid>
               </Grid>
               <ShippingInfo sendPrefecture={mangaDetail.sendPrefecture} sendDay={mangaDetail.sendDay} />
+              
+              {/* 出品者アバター */}
               <Grid item xs={12}>
                   <Typography variant="body1" sx={{ pt:4, color: '#757575', fontWeight:'bold',  }}>
                     {`出品者`}
@@ -354,7 +358,7 @@ const MangaDetail: React.FC = () => {
                 hasIdVerificationImage={mangaDetail.hasIdVerificationImage} 
               />
 
-              {/* Add the Recent Comments section */}
+              {/* 最新コメント表示 */}
               <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold' }}>
                 コメント({mangaDetail.replyCount})
               </Typography>

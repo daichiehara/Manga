@@ -35,7 +35,10 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
   return (
     <div>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <RocketLaunchIcon sx={{ fontsize: '1rem', mr: 1, alignSelf: 'center', color: `#0F9ED5` }} />
+        <Typography variant="h6" component="span" sx={{ mr:'12px',color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic' }}>
+          want<Box component="span" sx={{ color: 'orange' }}>!!</Box>
+        </Typography>
+        {/* <RocketLaunchIcon sx={{ fontsize: '1rem', mr: 1, alignSelf: 'center', color: `#0F9ED5` }} /> */}
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#757575' }}>
             {title}
@@ -80,67 +83,75 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
       </List>
       {/* ダイアログ */}
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-        <Box sx={{py:'1rem', display:'flex', justifyContent:'center'}}>
-          <RocketLaunchIcon sx={{ fontsize:'1rem',mr: 1, alignSelf: 'center', color: '#0F9ED5' }}/>
-          <Box sx={{display: 'flex', flexDirection: 'column',}}>
-            <Typography variant="subtitle1" sx={{fontWeight: 'bold', color: '#757575'}}>
-              欲しい漫画を登録する
-            </Typography>
-          </Box>
+      <Box sx={{ py: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Typography
+          variant="h6"
+          component="span"
+          sx={{ mr: '12px', color: "#0F9ED5", fontWeight: 'bold', fontStyle: 'italic' }}
+        >
+          want
+          <Box component="span" sx={{ color: 'orange' }}>!!</Box>
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#757575' }}>
+            {title}
+          </Typography>
         </Box>
-        <DialogContent sx={{pt:0}}>
-          <Box sx={{py:'1rem'}}>
-            <Chip
-              sx={{
-                height: 'auto',
-                pl: 0,
-                '& .MuiChip-label': {
-                  display: 'block',
-                  whiteSpace: 'normal',
-                  padding: '0.5rem',
-                },
-              }}
-              label={
-                <Typography variant='subtitle2' sx={{}}>
-                  よし！私はこの漫画「A」全巻を出品しよう！
-                </Typography>               
-              }
-            />
-            <Chip
-              sx={{
-                mt:'1rem',
-                height: 'auto',
-                pl: 0,
-                '& .MuiChip-label': {
-                  display: 'block',
-                  whiteSpace: 'normal',
-                  padding: '0.5rem',
-                },
-              }}
-              label={
-                <Typography variant='subtitle2' sx={{}}>
-                  できれは、今読みたい漫画「B」か「C」と交換したいなあ
-                </Typography>                
-              }
-            />
-          </Box>
-          <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
-              そんなときはマイ本棚に
-            </Typography>
-            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
-              欲しい漫画を登録しよう！
-            </Typography>
-          </Box>
-            <Typography>
-              出品画面にあなたの欲しい漫画が表示されて、マッチング率UP！！
-            </Typography>
-        </DialogContent>
-        <DialogActions >
-          <Button onClick={handleCloseDialog} color="primary">
-            閉じる
-          </Button>
-        </DialogActions>
+      </Box>
+
+      <DialogContent sx={{pt:0}}>
+        <Box sx={{py:'1rem'}}>
+          <Chip
+            sx={{
+              height: 'auto',
+              pl: 0,
+              '& .MuiChip-label': {
+                display: 'block',
+                whiteSpace: 'normal',
+                padding: '0.5rem',
+              },
+            }}
+            label={
+              <Typography variant='subtitle2' sx={{}}>
+                よし！私はこの漫画「A」全巻を出品しよう！
+              </Typography>               
+            }
+          />
+          <Chip
+            sx={{
+              mt:'1rem',
+              height: 'auto',
+              pl: 0,
+              '& .MuiChip-label': {
+                display: 'block',
+                whiteSpace: 'normal',
+                padding: '0.5rem',
+              },
+            }}
+            label={
+              <Typography variant='subtitle2' sx={{}}>
+                できれは、今読みたい漫画「B」か「C」と交換したいなあ
+              </Typography>                
+            }
+          />
+        </Box>
+        <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <Typography variant='h6' sx={{color:'red', fontWeight:'bold'}}>
+            そんな時はマイ本棚に
+          </Typography>
+          <Typography variant='h6' sx={{color:'red', fontWeight:'bold'}}>
+            欲しい漫画を登録しよう！
+          </Typography>
+        </Box>
+          <Typography>
+            出品画面にあなたの欲しい漫画が表示されて、マッチング率UP！！
+          </Typography>
+      </DialogContent>
+      <DialogActions >
+        <Button onClick={handleCloseDialog} color="primary">
+          閉じる
+        </Button>
+      </DialogActions>
       </Dialog>
     </div>
   );

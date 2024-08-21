@@ -1,51 +1,47 @@
 import { Typography, Grid, Avatar, Stack } from '@mui/material';
-import BeenhereRoundedIcon from '@mui/icons-material/BeenhereRounded';
-import BeenhereOutlinedIcon from '@mui/icons-material/BeenhereOutlined'; 
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 
 interface SellerInfoProps {
-    profileIcon: string;
-    userName: string;
-    hasIdVerificationImage: boolean;
-  }
-  
-  const SellerInfo: React.FC<SellerInfoProps> = ({ profileIcon, userName, hasIdVerificationImage }) => {
-    return (
-        
-        <Grid container spacing={0.5} sx={{}}>
-            
-            <Grid item xs={2}>
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 1.8 }}>
-                    <Avatar src={profileIcon} alt={userName} />
-                    
-                </Stack>
-            </Grid>
-            <Grid item  sx={{pb:1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Grid container direction="column" alignItems="left">
-                    
-                    <Typography variant="subtitle1" sx={{pb:1, display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
-                        {userName}
-                    </Typography>
-                    {hasIdVerificationImage ? (
-                        <Grid container spacing={0.5} alignItems="center"sx={{pt:1}}>
-                            <BeenhereRoundedIcon color="primary" sx={{display: 'flex', justifyContent: 'center', alignItems: `center` }} />
-                            <Typography variant="body1" sx={{pl:1, color: 'black'}}>
-                                {`本人確認済`}
-                            </Typography>
-                        </Grid>
-                    ) : (
-                        <Grid container spacing={0.5} alignItems="center">
-                            <BeenhereOutlinedIcon color="disabled" sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.5rem'}} />
-                            <Typography variant="body1" sx={{pl:1, color: 'black'}}>
-                                {`本人確認前`}
-                            </Typography>
-                        </Grid>
-                        
-                    )}
-                </Grid>
-            </Grid>
-        </Grid>
-    );
-  };
-  
-  export default SellerInfo;
-  
+  profileIcon: string;
+  userName: string;
+  hasIdVerificationImage: boolean;
+}
+
+const SellerInfo: React.FC<SellerInfoProps> = ({ profileIcon, userName, hasIdVerificationImage }) => {
+  return (
+    <Grid container alignItems="center"  sx={{ mt: 1 }}>
+      {/* Avatar とユーザー名と本人確認の縦並び */}
+      <Grid item>
+        <Stack direction="column" alignItems="center">
+          {/* Avatar とユーザー名の横並び */}
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Avatar src={profileIcon} alt={userName} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+              {userName}
+            </Typography>
+          </Stack>
+
+          {/* 本人確認アイコンとテキスト */}
+          {hasIdVerificationImage ? (
+            <Stack direction='row' alignItems="center" spacing={0}>
+              <VerifiedUserIcon color="primary" sx={{ fontSize: '1.2rem' , ml:'82px', mr:'4px'}} />
+              <Typography variant="body2" sx={{ color: 'black' }}>
+                本人確認済
+              </Typography>
+            </Stack>
+          ) : (
+            <Stack direction="row"  alignItems="center">
+              <VerifiedUserOutlinedIcon color="disabled" sx={{ fontSize: '1.2rem' , ml:'82px', mr:'4px'}} />
+              <Typography variant="body2" sx={{ color: 'black' }}>
+                本人確認前
+              </Typography>
+            </Stack>
+          )}
+        </Stack>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default SellerInfo;
