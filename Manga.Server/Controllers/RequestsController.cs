@@ -369,8 +369,10 @@ namespace Manga.Server.Controllers
                 if (createdRequests.Count > 0)
                 {
                     await _context.SaveChangesAsync();
-                    await SendConsolidatedExchangeRequestNotification(responderSell, createdRequests);
                     await transaction.CommitAsync();
+
+                    await SendConsolidatedExchangeRequestNotification(responderSell, createdRequests);
+                    
                     return Ok("交換申請が正常に作成されました。");
                 }
 
@@ -391,7 +393,7 @@ namespace Manga.Server.Controllers
 
             // 交換申請の件数を取得
             var exchangeRequestCount = await _context.Request
-                .CountAsync(r => r.ResponderSellId == responderSell.SellId && r.Status == RequestStatus.Pending || r.Status == RequestStatus.Withdrawn);
+                .CountAsync(r => r.ResponderSellId == responderSell.SellId && (r.Status == RequestStatus.Pending || r.Status == RequestStatus.Withdrawn));
 
             // 通知のメッセージを作成
             var message = $"あなたの出品「{responderSell.Title}」に {exchangeRequestCount} 件の交換申請があります。";
