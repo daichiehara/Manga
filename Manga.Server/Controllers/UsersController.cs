@@ -198,6 +198,11 @@ namespace Manga.Server.Controllers
                 return Ok(new { Token = token });
             }
 
+            if (!result.Succeeded)
+            {
+                return BadRequest($"Google認証に失敗しました。エラー: {result.Failure?.Message}");
+            }
+
             return BadRequest("Google認証に失敗しました。");
         }
 
