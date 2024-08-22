@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Grid, Paper, Box, IconButton } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -40,6 +40,11 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
   const [reportDialogOpen, setReportDialogOpen] = useState(false); // 通報ダイアログの状態
   const { sellId } = useParams();
+  const navigate = useNavigate();
+
+  const handleCommentNavigate = () => {
+    navigate(`/item/${sellId}/comment`);
+  }
 
   useEffect(() => {
     // 初期値を設定
@@ -102,7 +107,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
         </Box>
 
         {/* コメントボタン */}
-        <Box sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center', borderColor: theme.palette.text.secondary, borderWidth: 1, borderStyle: 'solid', borderRadius: '5px', p: 0.1, mr: 1.5 }}>
+        <Box onClick={handleCommentNavigate} sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center', borderColor: theme.palette.text.secondary, borderWidth: 1, borderStyle: 'solid', borderRadius: '5px', p: 0.1, mr: 1.5 }}>
           <ModeCommentOutlinedIcon sx={{ fontSize: '19px', color: theme.palette.text.secondary, px: 0.6, py: 0.1 }} />
           <Typography variant='subtitle2' sx={{ mr: 0.3, fontWeight: 'bold' }}>
             {replyCount ? replyCount : 'コメント'}
