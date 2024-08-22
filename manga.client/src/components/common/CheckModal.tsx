@@ -6,7 +6,7 @@ interface CheckModalProps {
   open: boolean;
   onClose: () => void;
   questionText: string;
-  agreeText: string;
+  agreeText: React.ReactNode; // React 要素も受け取れるように変更
   onAgree: () => void;
   children?: React.ReactNode; // childrenプロパティを追加
 }
@@ -41,7 +41,7 @@ const CheckModal: React.FC<CheckModalProps> = ({ open, onClose, questionText, ag
           onClick={onAgree}
           sx={{ width: '100%', marginTop: 2, fontWeight: 'bold', boxShadow: 'none' }}
         >
-          {agreeText}
+          {agreeText} {/* React 要素も表示可能 */}
         </Button>
         <Button
           variant="text"

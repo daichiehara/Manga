@@ -325,7 +325,7 @@ const MangaDetail: React.FC = () => {
               )
               }
 
-              {/* 出品者の説明 */}
+              {/* 出品物の説明 */}
               <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold'}}>
                 {`出品物の説明`}
               </Typography>
@@ -334,7 +334,7 @@ const MangaDetail: React.FC = () => {
                 {mangaDetail.sellMessage}
               </Typography>
               
-              {/* 出品者情報 */}
+              {/* 出品物の情報 */}
               <Grid container spacing={0.5} alignItems="center">
                 <Grid item xs={12}>
                   <Typography variant="body1" sx={{pt:4, color: '#757575', fontWeight:'bold' }}>
@@ -343,7 +343,7 @@ const MangaDetail: React.FC = () => {
                   <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
                 </Grid>
               </Grid>
-              <ShippingInfo sendPrefecture={mangaDetail.sendPrefecture} sendDay={mangaDetail.sendDay} />
+              <ShippingInfo sendPrefecture={mangaDetail.sendPrefecture} sendDay={mangaDetail.sendDay} sellTime={mangaDetail.sellTime} />
               
               {/* 出品者アバター */}
               <Grid item xs={12}>
