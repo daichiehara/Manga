@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Grid, Paper, Box, IconButton } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -10,6 +10,7 @@ import axios from 'axios';
 import theme from '../../theme/theme';
 import ReportDialog from '../common/ReportDialog';
 import { Sell } from '@mui/icons-material';
+import { AuthContext } from '../context/AuthContext';
 
 interface MangaDetailInfoProps {
   title: string;
@@ -39,6 +40,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   const [liked, setLiked] = useState(isLiked);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
   const [reportDialogOpen, setReportDialogOpen] = useState(false); // 通報ダイアログの状態
+  const { authState } = useContext(AuthContext);
   const { sellId } = useParams();
   const navigate = useNavigate();
 
@@ -67,8 +69,9 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   };
 
   const handleReportClick = () => {
-    setReportDialogOpen(true); // 通報ダイアログを開く
+    authState.isAuthenticated ? setReportDialogOpen(true) : navigate('/login-page');
   };
+  
 
   const handleReportDialogClose = () => {
     setReportDialogOpen(false); // 通報ダイアログを閉じる

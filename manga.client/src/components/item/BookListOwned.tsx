@@ -6,6 +6,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import AddIcon from '@mui/icons-material/Add';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import OwnedSearchModal from '../common/OwnedSearchModal';
+import OwnedBookRegistSteps from './OwnedBookRegistSteps';
 
 interface Book {
   itemId: number;  // 'id' was changed to 'itemId'
@@ -91,36 +92,39 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
             </Typography>
           </Box>
         </Box>
-        <DialogContent sx={{pt:0}}>
-          <Box sx={{py:'1rem'}}>
-            <Chip
-              sx={{
-                height: 'auto',
-                pl: 0,
-                '& .MuiChip-label': {
-                  display: 'block',
-                  whiteSpace: 'normal',
-                  padding: '0.5rem',
-                },
-              }}
-              label={
-                <Typography variant='subtitle2' sx={{}}>
-                  まずは何をすればいいんだろう？
-                </Typography>
-              }
-            />
-          </Box>
-          <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
-              まずやってみよう！！
-            </Typography>
-            <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
-              とりあえず登録
-            </Typography>
-          </Box>
+        <DialogContent sx={{pt:0, px:0}}>
+          <Box sx={{px:2}}>
+            <Box sx={{py:'1rem'}}>
+              <Chip
+                sx={{
+                  height: 'auto',
+                  pl: 0,
+                  '& .MuiChip-label': {
+                    display: 'block',
+                    whiteSpace: 'normal',
+                    padding: '0.5rem',
+                  },
+                }}
+                label={
+                  <Typography variant='subtitle2' sx={{}}>
+                    まずは何をすればいいんだろう？
+                  </Typography>
+                }
+              />
+            </Box>
+            <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <Typography variant='h5' sx={{color:'black', fontWeight:'bold'}}>
+                まずやってみよう！！
+              </Typography>
+              <Typography variant='h5' sx={{color:'red', fontWeight:'bold'}}>
+                とりあえず登録
+              </Typography>
+            </Box>
             <Typography>
               あなたが全巻持っている漫画をまずはマイ本棚に登録しましょう。検索時に、あなたの漫画とマッチしている出品が見つけやすくなります。
             </Typography>
+          </Box>
+          <OwnedBookRegistSteps />
         </DialogContent>
         <DialogActions >
           <Button onClick={handleCloseDialog} color="primary">

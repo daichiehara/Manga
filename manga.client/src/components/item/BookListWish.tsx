@@ -6,7 +6,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AddIcon from '@mui/icons-material/Add';
 import WishSearchModal from '../common/WishSearchModal';
-
+import WishBookRegistSteps from './WishBookRegistSteps';
 interface Book {
   itemId: number;
   title: string;
@@ -99,54 +99,59 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
         </Box>
       </Box>
 
-      <DialogContent sx={{pt:0}}>
-        <Box sx={{py:'1rem'}}>
-          <Chip
-            sx={{
-              height: 'auto',
-              pl: 0,
-              '& .MuiChip-label': {
-                display: 'block',
-                whiteSpace: 'normal',
-                padding: '0.5rem',
-              },
-            }}
-            label={
-              <Typography variant='subtitle2' sx={{}}>
-                よし！私はこの漫画「A」全巻を出品しよう！
-              </Typography>               
-            }
-          />
-          <Chip
-            sx={{
-              mt:'1rem',
-              height: 'auto',
-              pl: 0,
-              '& .MuiChip-label': {
-                display: 'block',
-                whiteSpace: 'normal',
-                padding: '0.5rem',
-              },
-            }}
-            label={
-              <Typography variant='subtitle2' sx={{}}>
-                できれは、今読みたい漫画「B」か「C」と交換したいなあ
-              </Typography>                
-            }
-          />
+      <DialogContent sx={{pt:0, px:0}}>
+        <Box sx={{px:2, }}>
+          <Box sx={{py:'1rem'}}>
+            <Chip
+              sx={{
+                height: 'auto',
+                pl: 0,
+                '& .MuiChip-label': {
+                  display: 'block',
+                  whiteSpace: 'normal',
+                  padding: '0.5rem',
+                },
+              }}
+              label={
+                <Typography variant='subtitle2' sx={{}}>
+                  よし！私はこの漫画「A」全巻を出品しよう！
+                </Typography>               
+              }
+            />
+            <Chip
+              sx={{
+                mt:'1rem',
+                height: 'auto',
+                pl: 0,
+                '& .MuiChip-label': {
+                  display: 'block',
+                  whiteSpace: 'normal',
+                  padding: '0.5rem',
+                },
+              }}
+              label={
+                <Typography variant='subtitle2' sx={{}}>
+                  できれは、今読みたい漫画「B」か「C」と交換したいなあ
+                </Typography>                
+              }
+            />
+          </Box>
+          <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <Typography variant='h6' sx={{color:'red', fontWeight:'bold'}}>
+              そんな時はマイ本棚に
+            </Typography>
+            <Typography variant='h6' sx={{color:'red', fontWeight:'bold'}}>
+              欲しい漫画を登録しよう！
+            </Typography>
+          </Box>
+            <Typography>
+              出品画面にあなたの欲しい漫画が表示されて、マッチング率UP！！
+            </Typography>
         </Box>
-        <Box sx={{py:'1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-          <Typography variant='h6' sx={{color:'red', fontWeight:'bold'}}>
-            そんな時はマイ本棚に
-          </Typography>
-          <Typography variant='h6' sx={{color:'red', fontWeight:'bold'}}>
-            欲しい漫画を登録しよう！
-          </Typography>
-        </Box>
-          <Typography>
-            出品画面にあなたの欲しい漫画が表示されて、マッチング率UP！！
-          </Typography>
+        <WishBookRegistSteps />
       </DialogContent>
+      
+      
       <DialogActions >
         <Button onClick={handleCloseDialog} color="primary">
           閉じる
