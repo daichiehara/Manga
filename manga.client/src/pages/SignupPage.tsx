@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, Divider, Typography, CircularProgress, Alert, ButtonBase } from '@mui/material';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
@@ -9,12 +9,16 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
 import CustomLink from '../components/common/CustomLink';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { SnackbarContext } from '../components/context/SnackbarContext';
 
 const SignupPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
+  const customNavigate = useCustomNavigate();
+  const { showSnackbar } = useContext(SnackbarContext);
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down('xs'));
   const isIse = useMediaQuery(theme.breakpoints.between('xs', 'ise'));
@@ -41,9 +45,10 @@ const SignupPage: React.FC = () => {
         updateGlobalAuthState({ isAuthenticated: true });
         setLoading(false);
 
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+        customNavigate();
+        const message = response.data.message;
+        showSnackbar(message, 'success');
+
     } catch (err: any) {
       setError('Google認証に失敗しました。');
       setLoading(false);
@@ -146,7 +151,7 @@ const SignupPage: React.FC = () => {
 
       <Box sx={{  display: 'flex', justifyContent: 'center', width: '100%' }}>
         <Button
-          onClick={() => navigate('/login-page')}
+          onClick={() => navigate('/login-page', {replace: true})}
           variant='outlined'
           sx={{ mt: '0.8rem', fontWeight: 'bold', color: 'red', borderColor: 'red', width: buttonWidth }}
         >

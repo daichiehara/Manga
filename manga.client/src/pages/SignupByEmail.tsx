@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, TextField, Typography, CircularProgress, Alert } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment } from '@mui/material';
@@ -9,6 +8,8 @@ import { updateGlobalAuthState } from '../components/context/AuthContext';
 import theme from '../theme/theme';
 import CheckModal from '../components/common/CheckModal';
 import GooglePolicyText from '../components/common/GooglePolicyText';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { SnackbarContext } from '../components/context/SnackbarContext';
 
 const SignupByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -19,7 +20,8 @@ const SignupByEmail: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
+  const customNavigate = useCustomNavigate(2);
+  const { showSnackbar } = useContext(SnackbarContext);
 
   const validatePassword = (password: string) => {
     if (/[！-～]/.test(password)) {
@@ -55,10 +57,10 @@ const SignupByEmail: React.FC = () => {
       setSuccess(response.data.Message);
       updateGlobalAuthState({ isAuthenticated: true });
       setLoading(false);
+      
+      customNavigate();
+      showSnackbar('会員登録が完了しました。', 'success');
 
-      setTimeout(() => {
-        navigate(-2);
-      }, 2000);
     } catch (err: any) {
       setError(err.response?.data?.Errors?.[0] || '登録に失敗しました');
       setLoading(false);

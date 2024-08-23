@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -11,6 +11,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import GooglePolicyText from '../components/common/GooglePolicyText';
 import CustomLink from '../components/common/CustomLink';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { SnackbarContext } from '../components/context/SnackbarContext';
 
 
 type LoginFormInputs = {
@@ -33,6 +35,8 @@ const Login: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
+  const customNavigate = useCustomNavigate();
+  const { showSnackbar } = useContext(SnackbarContext);
 
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -54,7 +58,8 @@ const Login: React.FC = () => {
     .then(response => {
       setIsLoginSuccessful(true);
       updateGlobalAuthState({ isAuthenticated: true });
-      navigate(-1);
+      customNavigate();
+      showSnackbar('ログインしました。', 'success');
     })
     .catch(error => {
       setIsLoginSuccessful(false);
@@ -99,9 +104,8 @@ const Login: React.FC = () => {
             updateGlobalAuthState({ isAuthenticated: true });
             setIsLoading(false);
 
-            setTimeout(() => {
-                navigate('/');
-            }, 2000);
+            customNavigate();
+            showSnackbar('ログインしました。', 'success');
         } catch (err: any) {
             setError('Google認証に失敗しました。');
             setIsLoading(false);
@@ -234,7 +238,7 @@ const Login: React.FC = () => {
       </Box>
         <Box sx={{mt:'0.8rem',px:'1rem', display:'flex', justifyContent:'center'}} >
           <Button
-          onClick={() => navigate('/signup')}
+          onClick={() => navigate('/signup', {replace: true})}
           variant='outlined'
           fullWidth
           sx={{fontWeight:'bold',color:'red', borderColor:'red', width:buttonWidth}}
