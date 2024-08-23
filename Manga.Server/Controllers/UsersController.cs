@@ -196,7 +196,7 @@ namespace Manga.Server.Controllers
 
                     await transaction.CommitAsync();
 
-                    return Ok(new { Message = isNewUser ? "新規ユーザーとしてGoogle認証成功" : "既存ユーザーとしてGoogle認証成功" });
+                    return Ok(new { Message = isNewUser ? "会員登録が完了しました。" : "既存ユーザーとしてログインしました。" });
                 }
                 catch (Exception ex)
                 {
