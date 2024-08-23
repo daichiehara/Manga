@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment } from '@mui/material';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
+import { updateGlobalAuthState } from '../components/context/AuthContext';
 import theme from '../theme/theme';
 import CheckModal from '../components/common/CheckModal';
 import GooglePolicyText from '../components/common/GooglePolicyText';
@@ -52,6 +53,7 @@ const SignupByEmail: React.FC = () => {
       }, { withCredentials: true });
 
       setSuccess(response.data.Message);
+      updateGlobalAuthState({ isAuthenticated: true });
       setLoading(false);
 
       setTimeout(() => {

@@ -47,4 +47,9 @@ namespace Manga.Server.Models
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<Contact> Contacts { get; set; }
     }
+
+    public class GoogleAuthRequest
+    {
+        public string Code { get; set; }
+    }
 }

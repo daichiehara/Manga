@@ -142,48 +142,6 @@ namespace Manga.Server.Controllers
             return Ok(new { AccessToken = token, RefreshToken = refreshToken });
         }
 
-        [HttpGet("signin-google")]
-        public async Task<IActionResult> SignInWithGoogle()
-        {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-            if (result.Succeeded)
-            {
-                var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-                var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-                var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-
-                // ユーザーの確認または作成
-                var user = await _userManager.FindByEmailAsync(email);
-                if (user == null)
-                {
-                    user = new UserAccount
-                    {
-                        Email = email,
-                        UserName = email,
-                        NickName = name
-                    };
-                    await _userManager.CreateAsync(user);
-                }
-
-                // Googleのアクセストークンとリフレッシュトークンを取得
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
-
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    return BadRequest("アクセストークンの取得に失敗しました。");
-                }
-
-                // トークンをCookieに保存
-                SetTokenCookie("GoogleAccessToken", accessToken, 60); // 1時間有効
-                SetTokenCookie("GoogleRefreshToken", refreshToken, 2592000); // 30日間有効
-
-                return Ok(new { Message = "Google認証成功" });
-            }
-
-            return BadRequest("Google認証に失敗しました。");
-        }
-
         [HttpPost("auth/google")]
         public async Task<IActionResult> AuthenticateGoogle([FromBody] GoogleAuthRequest request)
         {
@@ -192,71 +150,65 @@ namespace Manga.Server.Controllers
                 // Googleトークンの検証
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.Code, new GoogleJsonWebSignature.ValidationSettings());
 
-                // ユーザー情報の取得または作成
-                var user = await _userManager.FindByEmailAsync(payload.Email);
-                if (user == null)
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    // 新規ユーザーの作成ロジック
-                    user = new UserAccount
+                    // ユーザー情報の取得または作成
+                    var user = await _userManager.FindByEmailAsync(payload.Email);
+                    bool isNewUser = false;
+
+                    if (user == null)
                     {
-                        Email = payload.Email,
-                        UserName = payload.Email,
-                        NickName = payload.Name
-                    };
-                    await _userManager.CreateAsync(user);
+                        // 新規ユーザーの作成ロジック
+                        isNewUser = true;
+                        user = new UserAccount
+                        {
+                            Email = payload.Email,
+                            UserName = payload.Email,
+                            NickName = payload.Name,
+                            EmailConfirmed = true
+                        };
+                        var result = await _userManager.CreateAsync(user);
+                        if (!result.Succeeded)
+                        {
+                            throw new ApplicationException($"ユーザー作成に失敗しました: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                        }
+                    }
+                    else if (!user.EmailConfirmed)
+                    {
+                        // 既存ユーザーでメール未確認の場合、確認済みに更新
+                        user.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user);
+                    }
+
+                    // JWTトークンの生成
+                    var token = GenerateJwtToken(user);
+                    var refreshToken = GenerateRefreshToken();
+
+                    // ユーザーアカウントにリフレッシュトークンを保存
+                    user.RefreshToken = refreshToken;
+                    user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(180);
+                    await _userManager.UpdateAsync(user);
+
+                    // アクセストークンをHTTP Only Cookieにセット
+                    SetTokenCookie("accessToken", token, 30); // 30分間有効
+                    SetTokenCookie("RefreshToken", refreshToken, 259200); // 180日間有効
+
+                    await transaction.CommitAsync();
+
+                    return Ok(new { Message = isNewUser ? "新規ユーザーとしてGoogle認証成功" : "既存ユーザーとしてGoogle認証成功" });
                 }
-
-                // JWTトークンの生成
-                var token = GenerateJwtToken(user);
-
-                var refreshToken = GenerateRefreshToken();
-                // ユーザーアカウントにリフレッシュトークンを保存
-                user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(180);
-
-                // アクセストークンをHTTP Only Cookieにセット
-                SetTokenCookie("accessToken", token, 30); // 30分間有効
-                SetTokenCookie("RefreshToken", refreshToken, 259200); // 180日間有効
-
-                return Ok(new { Message = "Google認証成功" });
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new ApplicationException($"認証処理中にエラーが発生しました: {ex.Message}", ex);
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest($"Google認証に失敗しました: {ex.Message}");
             }
         }
-
-        public class GoogleAuthRequest
-        {
-            public string Code { get; set; }
-        }
-
-        [HttpGet("auth/google-callback")]
-        public async Task<IActionResult> GoogleCallback()
-        {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-            if (result.Succeeded)
-            {
-                // Google認証成功後の処理
-                // アクセストークンの取得など
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
-
-                // トークンの保存や、ユーザー情報の取得などの処理をここに追加
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    return BadRequest("アクセストークンの取得に失敗しました。");
-                }
-
-                // トークンをCookieに保存
-                SetTokenCookie("GoogleAccessToken", accessToken, 60); // 1時間有効
-                SetTokenCookie("GoogleRefreshToken", refreshToken, 2592000); // 30日間有効
-
-                return Ok(new { Message = "Google認証成功" });
-            }
-            return BadRequest("Google認証に失敗しました。");
-        }
-
 
         private string GenerateJwtToken(UserAccount user)
         {

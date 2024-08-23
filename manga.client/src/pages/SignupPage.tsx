@@ -4,6 +4,7 @@ import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oau
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
+import { updateGlobalAuthState } from '../components/context/AuthContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
@@ -36,8 +37,9 @@ const SignupPage: React.FC = () => {
             withCredentials: true,
         });
 
-      setSuccess('Googleアカウントでのサインインが成功しました。');
-      setLoading(false);
+        setSuccess('Googleアカウントでのサインインが成功しました。');
+        updateGlobalAuthState({ isAuthenticated: true });
+        setLoading(false);
 
       setTimeout(() => {
         navigate('/');
