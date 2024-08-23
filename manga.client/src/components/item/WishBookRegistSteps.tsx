@@ -19,7 +19,7 @@ const steps = [
   },
   {
     stepNumber: 4,
-    image: 'https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/ownedStep4.webp', // 仮の画像のパス
+    image: 'https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/wishStep4.webp', // 仮の画像のパス
     description: 'あなたの出品したすべての漫画に表示されるようになります',
   }
 ];

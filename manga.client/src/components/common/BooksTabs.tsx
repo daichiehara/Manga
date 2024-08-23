@@ -113,7 +113,7 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
     justifyContent: 'center',
     alignItems: 'center', // 追加: コンテンツを垂直方向の中心にも配置
     p: 0,
-    background: 'orange', 
+    background: '#E97032', 
     boxShadow: '0px -4px 5px -1px rgba(0,0,0,0.2)', 
     color: 'white',
     zIndex: 6000,
