@@ -21,6 +21,7 @@ import { SnackbarContext } from '../components/context/SnackbarContext';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomToolbar from '../components/common/CustumToolbar';
 import theme from '../theme/theme';
+import { replace } from 'lodash';
 
 
 /**
@@ -275,7 +276,7 @@ const MangaDetail: React.FC = () => {
                   
                   fontWeight:'bold'
                   }}
-                  onClick={() => navigate(`/sell/${sellId}`)}
+                  onClick={() => navigate(`/sell/${sellId}` ,{replace: true})}
               >
                   出品を編集する
               </Button>

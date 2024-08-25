@@ -31,6 +31,7 @@ interface AppContextType {
   error: string | null;
   fetchMoreData: (tabIndex: number) => Promise<void>;
   hasMore: { [key: number]: boolean };
+  refreshMyFavorite: () => Promise<void>;
 }
 
 export const AppContext = createContext<AppContextType>({
@@ -42,7 +43,8 @@ export const AppContext = createContext<AppContextType>({
   isLoadingRecommend: false,
   error: null,
   fetchMoreData: async () => {},
-  hasMore: { 0: false, 1: false, 2: false }
+  hasMore: { 0: false, 1: false, 2: false },
+  refreshMyFavorite: async () => {},
 });
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -141,6 +143,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [authState.isInitialized, authState.isAuthenticated]);
 
+  const refreshMyFavorite = useCallback(async () => {
+    setIsLoadingMyList(true);
+    try {
+      const response = await axios.get('https://localhost:7103/api/Sells/MyFavorite', {
+        params: { page: 1, pageSize: 10 },
+        withCredentials: true
+      });
+      setMyListData(response.data);
+      setHasMore(prev => ({ ...prev, 0: response.data.length === 10 }));
+      setPage(prev => ({ ...prev, 0: 2 }));
+    } catch (error) {
+      console.error('MyFavoriteの取得に失敗しました:', error);
+      setError('MyFavoriteのロードに失敗しました');
+    } finally {
+      setIsLoadingMyList(false);
+    }
+  }, []);
+
 
 
   return (
@@ -154,6 +174,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         error,
         fetchMoreData,
         hasMore,
+        refreshMyFavorite,
         }}>
       {children}
     </AppContext.Provider>

@@ -10,13 +10,20 @@ import { Box, Typography } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
+import LoadingComponent from '../components/common/LoadingComponent';
 
 
-
+enum SellStatus {
+  Recruiting = 1,
+  Suspended = 2,
+  Establish = 3,
+  Draft = 4,
+}
 interface MainMpFavoList {
   sellId: number;
   sellTitle: string;
   numberOfBooks: number;
+  sellStatus: SellStatus;
   wishTitles: {
     title: string;
     isOwned: boolean;
@@ -26,14 +33,10 @@ interface MainMpFavoList {
 }
 
 const MainMpFavoList: React.FC = () => {
-  const navigate = useNavigate();
   const [selectedTab] = useState(0);
   const [mangaData, setMangaData] = useState<MainMpFavoList[]>([]); 
   const [error, setError] = useState<string | null>(null);
-
-  const handleBack = () => {
-    navigate(-1); // 前のページに戻る
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
     // AuthContextから認証状態を安全に取得
     const authContext = useContext(AuthContext);
@@ -45,6 +48,7 @@ const MainMpFavoList: React.FC = () => {
   
       const fetchMangaData = async () => {
         try {
+          setIsLoading(true);
           console.log('APIリクエストを送信中...');
           const response = await axios.get('https://localhost:7103/api/Sells/MyFavorite', {
             withCredentials: true  // クロスオリジンリクエストにクッキーを含める
@@ -56,19 +60,27 @@ const MainMpFavoList: React.FC = () => {
         } catch (error) {
           console.error('データ取得に失敗しました:', error);
           setError('Failed to load data. Please try again later.');
+        } finally {
+          setIsLoading(false);
         }
       };
   
       fetchMangaData();
     }, [isAuthenticated]); // 空の依存配列を指定して、コンポーネントのマウント時にのみ実行
 
+    if (isLoading) {
+      return (
+        <>
+          <CustomToolbar title='いいね！一覧'/>
+          <LoadingComponent />
+        </>
+      );
+    }
 
   return (
     <>
       {/* 見出しのToolbar */}
-      <CustomToolbar title='いいね！一覧'/>    
-
-      {/* いいねした商品の表示（無い場合もテキストを表示する） */}
+      <CustomToolbar title='いいね！一覧'/>
       <Box sx={{ pt: 7, paddingBottom: 6 }}>
         {mangaData.length > 0 ? (
           mangaData.map((item, index) => (
@@ -79,6 +91,7 @@ const MainMpFavoList: React.FC = () => {
               sellTitle={item.sellTitle}
               numberOfBooks={item.numberOfBooks}
               wishTitles={item.wishTitles}
+              sellStatus={item.sellStatus}
             />
           ))
         ) : (

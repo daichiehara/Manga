@@ -11,6 +11,7 @@ import theme from '../../theme/theme';
 import ReportDialog from '../common/ReportDialog';
 import { Sell } from '@mui/icons-material';
 import { AuthContext } from '../context/AuthContext';
+import { AppContext } from '../context/AppContext';
 
 interface MangaDetailInfoProps {
   title: string;
@@ -43,6 +44,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   const { authState } = useContext(AuthContext);
   const { sellId } = useParams();
   const navigate = useNavigate();
+  const { refreshMyFavorite } = useContext(AppContext);
 
   const handleCommentNavigate = () => {
     navigate(`/item/${sellId}/comment`);
@@ -63,6 +65,8 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
       const updatedData = response.data;
       setLiked(updatedData.isLiked);
       setCurrentLikeCount(updatedData.likeCount);
+
+      await refreshMyFavorite();
     } catch (error) {
       console.error('Error liking the item', error);
     }

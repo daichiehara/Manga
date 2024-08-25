@@ -33,6 +33,7 @@ import WishListAccordion from '../components/common/WishListAccordion';
 import PreSellDialog from '../components/common/PreSellComfirmation';
 import { prefectures } from '../components/common/Prefectures';
 import { SnackbarContext } from '../components/context/SnackbarContext';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
 
 
 interface FormData {
@@ -69,6 +70,7 @@ const SellForm: React.FC = () => {
   const location = useLocation();
   const from = location.state?.from || '/main-sell';
   const { showSnackbar } = useContext(SnackbarContext);
+  const customNavigate = useCustomNavigate();
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -237,11 +239,11 @@ const SellForm: React.FC = () => {
           });
           showSnackbar('出品に成功しました。', 'success');
         } else {
-          navigate(-1);
+          customNavigate();
           showSnackbar('出品に成功しました。', 'success');
         }
       } else if (response.data.status === 2 || response.data.status === 4) {
-        navigate(-1);
+        customNavigate();
         showSnackbar(snackMessage, 'success');
       }
     } catch (error) {
@@ -384,7 +386,8 @@ const SellForm: React.FC = () => {
       } else {
         snackMessage = '出品を削除しました。'
       }
-      navigate('/main-sell', { state: { snackOpen: true, snackMessage } });
+      customNavigate();
+      showSnackbar(snackMessage, 'success');
     } catch (error) {
       console.error('Error deleting draft:', error);
     } finally {
