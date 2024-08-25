@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import CustomToolbar from '../components/common/CustumToolbar';
 import ImageList from '../components/common/SellImageList';
@@ -27,11 +27,12 @@ import {
   DialogActions,
 } from '@mui/material';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import LoadingComponent from '../components/common/LoadingComponent';
 import WishListAccordion from '../components/common/WishListAccordion';
 import PreSellDialog from '../components/common/PreSellComfirmation';
 import { prefectures } from '../components/common/Prefectures';
+import { SnackbarContext } from '../components/context/SnackbarContext';
 
 
 interface FormData {
@@ -65,6 +66,9 @@ const SellForm: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [author, setAuthor] = useState('');
   const [isPreSellDialogOpen, setIsPreSellDialogOpen] = useState(false);
+  const location = useLocation();
+  const from = location.state?.from || '/main-sell';
+  const { showSnackbar } = useContext(SnackbarContext);
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -224,9 +228,21 @@ const SellForm: React.FC = () => {
       }
     
       if (response.data.status === 1) {
-        navigate(`/item/${response.data.id}`, { state: { snackOpen: true, snackMessage: '出品に成功しました。', openWishlistDrawer: true } });
+        if (from === '/main-sell') {
+          navigate(`/item/${response.data.id}`, { 
+            state: { 
+              openWishlistDrawer: true 
+            },
+            replace: true
+          });
+          showSnackbar('出品に成功しました。', 'success');
+        } else {
+          navigate(-1);
+          showSnackbar('出品に成功しました。', 'success');
+        }
       } else if (response.data.status === 2 || response.data.status === 4) {
-        navigate('/main-sell', { state: { snackOpen: true, snackMessage } });
+        navigate(-1);
+        showSnackbar(snackMessage, 'success');
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

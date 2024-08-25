@@ -6,9 +6,10 @@ import BooksTabs from './BooksTabs';
 interface MyBookModalProps {
     isOpen: boolean;
     onClose: () => void;
+    openWishlistTab?: boolean;
 }
 
-const MyBookModal: React.FC<MyBookModalProps> = React.memo(({ isOpen, onClose }) => {
+const MyBookModal: React.FC<MyBookModalProps> = React.memo(({ isOpen, onClose, openWishlistTab }) => {
   // State to manage when to trigger data fetching in BooksTabs
   const [triggerFetch, setTriggerFetch] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -71,7 +72,7 @@ const MyBookModal: React.FC<MyBookModalProps> = React.memo(({ isOpen, onClose })
           role="presentation"
         >
           {/* Pass the triggerFetch state to BooksTabs */}
-          <BooksTabs triggerFetch={triggerFetch} />
+          <BooksTabs triggerFetch={triggerFetch} initialTab={openWishlistTab ? 1 : 0} />
         </Box>
       </SwipeableDrawer>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
@@ -61,6 +61,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     const handleFinalCheckModalOpen = () => setFinalCheckModalOpen(true);
     const handleFinalCheckModalClose = () => setFinalCheckModalOpen(false);
     const { showSnackbar } = useContext(SnackbarContext);
+    const location = useLocation();
 
 
     const fetchmpmysell = async () => {
@@ -192,7 +193,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', py:0.5}}>
                     <Box sx={{ flexGrow: 1 }}>
-                        <Link to="/sell" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                        <Link to="/sell" state={{ from: location.pathname }} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                             <AddIcon sx={{ color: '#0F9ED5' }} />
                             <Typography variant='subtitle1' sx={{ color: '#0F9ED5' }}>
                                 出品する

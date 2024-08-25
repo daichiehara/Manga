@@ -16,17 +16,22 @@ interface Book {
 
 interface BooksTabsProps {
   triggerFetch: boolean;  // New prop to control data fetching
+  initialTab?: number;
 }
 
 type BookId = number; // `bookId`は文字列型ですが、意味の明確化のために型エイリアスを使用しています。
 type WishList = Book[]; // WishListはBookの配列です
 
-const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch }) => {
+const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) => {
   const { addBook } = useBooks(); // Use the context method to add books globally
-  const [tabIndex, setTabIndex] = useState(0);
+  const [tabIndex, setTabIndex] = useState(initialTab);
   const [ownedLists, setOwnedLists] = useState<Book[]>([]);
   const [sells, setSells] = useState<Book[]>([]);
   const [wishLists, setWishLists] = useState<Book[]>([]);
+
+  useEffect(() => {
+    setTabIndex(initialTab);
+  }, [initialTab]);
 
   useEffect(() => {
     if (triggerFetch) {  // Fetch data only when triggerFetch is true
