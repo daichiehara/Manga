@@ -35,6 +35,7 @@ const MainMyPage: React.FC = () => {
     to: string,
     Icon: React.ElementType,
     label: string,
+    label2:string,
     bgColor: string = "grey.300"
   ) => (
     <Grid item xs={3} display="flex" alignItems="center" justifyContent="center" flexDirection="column" component={Link} to={to} sx={{ textDecoration: 'none' }}>
@@ -51,6 +52,8 @@ const MainMyPage: React.FC = () => {
       {/* 固定の高さを設定 */}
       <Typography variant="body2" gutterBottom sx={{ pt: 2, pb: 1, fontWeight: 'bold', color: '#757575', minHeight: '3rem', textAlign: 'center' }}>
         {label}
+        <br />
+        {label2}
       </Typography>
     </Grid>
   );
@@ -90,10 +93,10 @@ const MainMyPage: React.FC = () => {
 
             {/* メインアイコン部分 */}
             <Grid container spacing={2} sx={{ pb: 3 }}>
-              {renderMainIcon('/mypage/favolist', FavoriteBorderIcon, 'いいね一覧')}
-              {renderMainIcon('/mypage/mysell', MenuBookIcon, '出品した漫画')}
-              {renderMainIcon('/mypage/matchedsell', LoopIcon, '交換した漫画')}
-              {renderMainIcon('/mypage/requestedsell', ForwardToInboxRoundedIcon, '交換申請した漫画')}
+              {renderMainIcon('/mypage/favolist', FavoriteBorderIcon, 'いいね一覧', '')}
+              {renderMainIcon('/mypage/mysell', MenuBookIcon, '出品した', '漫画')}
+              {renderMainIcon('/mypage/matchedsell', LoopIcon, '交換した', '漫画')}
+              {renderMainIcon('/mypage/requestedsell', ForwardToInboxRoundedIcon, '交換申請' , 'した漫画')}
             </Grid>
 
             {/* その他のリスト */}
