@@ -131,7 +131,7 @@ const Login: React.FC = () => {
       <Box sx={{display:'flex', justifyContent:'center'}}>
         <Box sx={{ px: `1.2rem`, pt:'0.5rem', pb:0, width:buttonWidth }}>
           <Box sx={{display:'flex', justifyContent:'right'}}>
-            <CustomLink href="/signup">
+            <CustomLink onClick={() => navigate('/signup')}>
               会員登録はこちら
             </CustomLink>
           </Box>
@@ -192,7 +192,7 @@ const Login: React.FC = () => {
           
           <GooglePolicyText />
           <Box sx={{pt:'1rem', display:'flex', justifyContent:'right'}}>
-            <CustomLink href="/forgot-password" sx={{ display: 'block', color: 'skyblue', mt: 2 }}>
+            <CustomLink onClick={() => navigate('/forgot-password')} sx={{ display: 'block', color: 'skyblue', mt: 2 }}>
               パスワード忘れた方はこちら
             </CustomLink>
             
@@ -233,7 +233,7 @@ const Login: React.FC = () => {
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
         <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
-          アカウントをお持ちの方
+          アカウントをお持ちでない方
         </Typography>
       </Box>
         <Box sx={{mt:'0.8rem',px:'1rem', display:'flex', justifyContent:'center'}} >
