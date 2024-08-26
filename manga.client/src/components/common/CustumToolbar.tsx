@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toolbar, Typography, IconButton } from '@mui/material';
+import { Toolbar, Typography, IconButton, Box } from '@mui/material';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useCustomNavigate } from '../../hooks/useCustomNavigate'; // パスは適宜調整してください
 
@@ -31,14 +31,21 @@ const CustomToolbar: React.FC<CustomToolbarProps> = ({ title, showBackButton = t
       transform: 'translateX(-50%)',
     }}>
       {showBackButton ? (
-        <IconButton
-          edge="start"
-          aria-label="back"
-          onClick={() => customNavigate()}
-          sx={{ width: 48, height: 48, color: '#404040' }}
-        >
-          <ArrowBackIosNewRoundedIcon sx={{fontSize:24, pl: 0}} />
-        </IconButton>
+        <Box
+        onClick={() => customNavigate()}
+        sx={{ 
+          width: 48, 
+          height: 48, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          cursor: 'pointer', 
+          color: '#404040' 
+        }}
+      >
+        <ArrowBackIosNewRoundedIcon sx={{ fontSize: 24 }} />
+      </Box>
+      
       ) : (
         <div style={{ width: 48, height: 48 }} /> // 空のスペーサー
       )}

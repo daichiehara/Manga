@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, Chip, Avatar, IconButton } from '@mui/material';
 import FlagIcon from '@mui/icons-material/Flag';
-import ReportDialog from '../common/ReportDialog'; // ReportDialog のインポート
+import ReportDialog from '../common/ReportDialog'; 
 import useTimeSince from '../../hooks/useTimeSince';
 
 interface ReplyDto {
@@ -52,9 +52,10 @@ const Comment: React.FC<{ reply: ReplyDto }> = React.memo(({ reply }) => {
                   <Typography variant="caption" color="textSecondary">
                     {displayDate}
                   </Typography>
-                  <IconButton onClick={handleReportClick} sx={{ p: 0.5 }}>
-                    <FlagIcon fontSize="small" sx={{color:'#909090'}} />
-                  </IconButton>
+                  {/* Ensure no aria-hidden or focus-blocking properties */}
+                  <Box onClick={handleReportClick} sx={{ }} aria-label="Report">
+                    <FlagIcon fontSize="small" sx={{ color: '#909090' }} focusable="false" />
+                  </Box>
                 </Box>
               </Box>
             }
@@ -62,10 +63,10 @@ const Comment: React.FC<{ reply: ReplyDto }> = React.memo(({ reply }) => {
         </Box>
       </Box>
 
-      {/* 通報ダイアログ */}
+      {/* Report Dialog */}
       <ReportDialog
-        id={reply.replyId} // コメントのID
-        reportType={2} // コメントの通報としてReportType.Reply = 2
+        id={reply.replyId} 
+        reportType={2} 
         open={reportDialogOpen}
         onClose={handleReportDialogClose}
       />

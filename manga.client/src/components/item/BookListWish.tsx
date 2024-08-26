@@ -44,9 +44,9 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
             {title}
           </Typography>
         </Box>
-        <IconButton onClick={handleOpenDialog}>  {/* ダイアログを開く */}
+        <Box onClick={handleOpenDialog}>  {/* ダイアログを開く */}
           <HelpOutlineIcon sx={{ fontsize: '3rem', ml: 1, alignSelf: 'center', color: '#BFBFBF' }} />
-        </IconButton>
+        </Box>
       </Box>
       <Box sx={{ pt: 2, display: 'flex', alignItems: 'center' }}>
         <Button disableRipple onClick={handleOpen}>
@@ -82,7 +82,8 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
         </TransitionGroup>
       </List>
       {/* ダイアログ */}
-      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+      <Dialog open={isDialogOpen} onClose={handleCloseDialog} disableEnforceFocus
+  disableAutoFocus>
       <Box sx={{ py: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography
           variant="h6"
