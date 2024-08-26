@@ -519,7 +519,7 @@ const SellForm: React.FC = () => {
               )}
             />
           </Grid>
-          <Grid item xs={12} mb={2}>
+          <Grid item xs={12} >
             <Typography variant="body2" fontWeight={'bold'} color={'secondary'} mb={1}>
               商品の説明
             </Typography>
@@ -540,8 +540,8 @@ const SellForm: React.FC = () => {
               )}
             />
           </Grid>
-          <Grid item xs={12} mb={2}>
-            <Divider />
+          <Grid item xs={12} >
+            <Divider sx={{my:'30px'}}/>
           </Grid>
           <Grid item xs={12} mb={2}>
             <Typography fontWeight={'bold'} mb={2}>
@@ -568,7 +568,7 @@ const SellForm: React.FC = () => {
               )}
             />
           </Grid>
-          <Grid item xs={12} mb={2}>
+          <Grid item xs={12}>
             <Controller
               name="sendDay"
               control={control}
@@ -598,8 +598,8 @@ const SellForm: React.FC = () => {
               )}
             />
           </Grid>
-          <Grid item xs={12} mb={2}>
-            <Divider />
+          <Grid item xs={12} >
+            <Divider sx={{my:'30px'}}/>
           </Grid>
           <Grid item xs={12} mb={4}>
             <WishListAccordion />

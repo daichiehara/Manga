@@ -5,7 +5,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import MenuBar from '../components/menu/MenuBar';
 import CustomToolbar from '../components/common/CustumToolbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { useSnackbar } from '../hooks/useSnackbar';
 
@@ -14,6 +14,7 @@ interface MSell {
 }
 
 const MSell: React.FC= () => {
+  const navigate = useNavigate();
   const onClick = () => {
     console.log('Button clicked!');
     // Add your logic here
@@ -54,9 +55,7 @@ const MSell: React.FC= () => {
         <Button
           variant="contained"
           color="primary"
-          component={Link}
-          to="/sell"
-          onClick={onClick}
+          onClick={() => navigate('/sell')}
           sx={{
             width: '100%',
             height: 70,
@@ -80,8 +79,7 @@ const MSell: React.FC= () => {
         {/* 下書き一覧ボタン */}
         <Button
           variant="outlined"
-          component={Link}
-          to="/sell/draft"
+          onClick={() => navigate('/sell/draft')}
           sx={{
             width: '100%',
             height: 70,
