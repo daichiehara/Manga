@@ -8,6 +8,7 @@ import axios from 'axios';
 import { SnackbarContext } from '../context/SnackbarContext';
 import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
+import { AuthContext } from '../context/AuthContext';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -36,11 +37,19 @@ const famousTitles = [
 
 const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshList, apiEndpoint, placeholder, completeMessage, noSelectionMessage, message1, message2, message3, messageColor }) => {
   const { showSnackbar } = useContext(SnackbarContext);
+  const { authState } = useContext(AuthContext);
   const [query, setQuery] = useState('');
   const [options, setOptions] = useState<string[]>([]);
   const [selectedTitles, setSelectedTitles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
+
+  useEffect(() => {
+    if (!authState.isAuthenticated) {
+      const storedTitles = JSON.parse(localStorage.getItem('guestMangaList') || '[]');
+      setSelectedTitles(storedTitles);
+    }
+  }, [authState.isAuthenticated]);
 
   const fetchMangaTitles = useCallback(async (query: string) => {
     try {
@@ -96,12 +105,20 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
 
   const handleAddTitle = (title: string) => {
     if (!selectedTitles.includes(title)) {
-      setSelectedTitles([...selectedTitles, title]);
+      const newSelectedTitles = [...selectedTitles, title];
+      setSelectedTitles(newSelectedTitles);
+      if (!authState.isAuthenticated) {
+        localStorage.setItem('guestMangaList', JSON.stringify(newSelectedTitles));
+      }
     }
   };
 
   const handleRemoveTitle = (title: string) => {
-    setSelectedTitles(selectedTitles.filter(t => t !== title));
+    const newSelectedTitles = selectedTitles.filter(t => t !== title);
+    setSelectedTitles(newSelectedTitles);
+    if (!authState.isAuthenticated) {
+      localStorage.setItem('guestMangaList', JSON.stringify(newSelectedTitles));
+    }
   };
 
   const handleSubmit = async () => {
@@ -111,24 +128,36 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       return;
     }
 
-    try {
-      const response = await axios.post(
-        apiEndpoint,
-        selectedTitles,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true
-        }
-      );
-      console.log('Titles added:', response.data);
-      showSnackbar(completeMessage);
+    if (authState.isAuthenticated) {
+      try {
+        const response = await axios.post(
+          apiEndpoint,
+          selectedTitles,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            withCredentials: true
+          }
+        );
+        console.log('Titles added:', response.data);
+        showSnackbar(completeMessage);
+        onRefreshList();
+        onClose();
+      } catch (error) {
+        console.error('Error adding titles:', error);
+        showSnackbar('タイトルが追加されませんでした。', 'error');
+      }
+    } else {
+      // ゲストユーザーの場合、ローカルストレージに保存
+      const formattedTitles = selectedTitles.map((title, index) => ({
+        itemId: Date.now() + index, // 一意のIDを生成
+        title: title,
+      }));
+      localStorage.setItem('guestMangaList', JSON.stringify(formattedTitles));
+      showSnackbar('タイトルがローカルに保存されました。');
       onRefreshList();
       onClose();
-    } catch (error) {
-      console.error('Error adding titles:', error);
-      showSnackbar('タイトルが追加されませんでした。', 'error');
     }
   };
   return (

@@ -61,8 +61,8 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
       <OwnedSearchModal isOpen={isOpen} onClose={handleClose} onRefreshOwnedList={onRefreshOwnedList} />
       <List >
         <TransitionGroup>
-          {books.map((book) => (
-            <Collapse key={book.itemId}> 
+          {books.map((book, index) => (
+            <Collapse key={book.itemId || index}> 
               <ListItem
                 disableGutters secondaryAction={
                   <IconButton

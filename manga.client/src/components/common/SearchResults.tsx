@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
-import { Box, Typography, FormControlLabel, Switch, CircularProgress, IconButton } from '@mui/material';
+import { Box, Typography, FormControlLabel, Switch, CircularProgress, IconButton, Stack } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -8,10 +8,17 @@ import MangaListItem from '../item/MangaListItem';
 import MyBookModal from '../common/MyBookModal';
 import { useInView } from 'react-intersection-observer';
 
+enum SellStatus {
+  Recruiting = 1,
+  Suspended = 2,
+  Establish = 3,
+  Draft = 4,
+}
 interface MainSearch {
   sellId: number;
   sellTitle: string;
   numberOfBooks: number;
+  sellStatus: SellStatus;
   wishTitles: {
     title: string;
     isOwned: boolean;
@@ -194,21 +201,22 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
               color="primary"
             />
           }
-          label="出品中のみ"
+          label="出品中"
         />
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-          <IconButton size="small">
-            <SearchIcon />
-          </IconButton>
-          <Switch
-            checked={isExchangeMode}
-            onChange={handleExchangeModeToggle}
-            name="exchangeMode"
-            color="primary"
-          />
-          <IconButton size="small">
-            <AutoStoriesIcon />
-          </IconButton>
+        <Stack direction="row" alignItems="center">
+          <IconButton size="small" sx={{p: 0}}>
+              <SearchIcon />
+            </IconButton>
+            <Switch
+              checked={isExchangeMode}
+              onChange={handleExchangeModeToggle}
+              name="exchangeMode"
+              color="primary"
+            />
+            <IconButton size="small" sx={{p: 0}}>
+              <AutoStoriesIcon />
+            </IconButton>
+        </Stack>
             <Box 
                 sx={{ 
                     display: 'flex', 
@@ -237,7 +245,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
                 </Box>
                 <Typography variant="caption">絞り込み</Typography>
             </Box>
-        </Box>
       </Box>
 
       {error && <Typography color="error">{error}</Typography>}
@@ -259,6 +266,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
             sellTitle={item.sellTitle}
             numberOfBooks={item.numberOfBooks}
             wishTitles={item.wishTitles}
+            sellStatus={item.sellStatus}
             onItemClick={handleItemClick}
           />
         ))

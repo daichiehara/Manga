@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Tab, Tabs, Box, Typography } from '@mui/material';
 import axios from 'axios';
 import { useBooks } from '../context/BookContext';
@@ -6,6 +6,7 @@ import BookListWish from '../item/BookListWish';
 import AutoStoriesOutlined from '@mui/icons-material/AutoStoriesOutlined';
 import BooksListSells from '../item/BookListSells';
 import BookListOwned from '../item/BookListOwned';
+import { AuthContext } from '../context/AuthContext';
 
 const API_BASE_URL = 'https://localhost:7103/api';
 
@@ -24,6 +25,7 @@ type WishList = Book[]; // WishListはBookの配列です
 
 const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) => {
   const { addBook } = useBooks(); // Use the context method to add books globally
+  const { authState } = useContext(AuthContext);
   const [tabIndex, setTabIndex] = useState(initialTab);
   const [ownedLists, setOwnedLists] = useState<Book[]>([]);
   const [sells, setSells] = useState<Book[]>([]);
@@ -34,11 +36,17 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) =
   }, [initialTab]);
 
   useEffect(() => {
-    if (triggerFetch) {  // Fetch data only when triggerFetch is true
-      fetchBooksData();
-      fetchWishLists();
+    if (triggerFetch) {
+      if (authState.isAuthenticated) {
+        fetchBooksData();
+        fetchWishLists();
+      } else {
+        // ゲストユーザーの場合、ローカルストレージから所有リストを取得
+        const storedOwnedList = JSON.parse(localStorage.getItem('guestMangaList') || '[]');
+        setOwnedLists(storedOwnedList);
+      }
     }
-  }, [triggerFetch]);  // Depend on triggerFetch
+  }, [triggerFetch, authState.isAuthenticated]);
 
   const fetchBooksData = async () => {
     const { data } = await axios.get(`${API_BASE_URL}/OwnedLists`, { withCredentials: true });
@@ -57,12 +65,20 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) =
   };
   
   const removeOwnedLists = async (itemId: BookId) => {
-    try {
-      await axios.delete(`${API_BASE_URL}/OwnedLists/${itemId}`, { withCredentials: true });
-      console.log('Owned list book removed:', itemId);
-    } catch (error) {
-      handleError(error);
-      throw error;
+    if (authState.isAuthenticated) {
+      try {
+        await axios.delete(`${API_BASE_URL}/OwnedLists/${itemId}`, { withCredentials: true });
+        console.log('Owned list book removed:', itemId);
+      } catch (error) {
+        handleError(error);
+        throw error;
+      }
+    } else {
+      // ゲストユーザーの場合、ローカルストレージから削除
+      const storedOwnedList = JSON.parse(localStorage.getItem('guestMangaList') || '[]');
+      const updatedList = storedOwnedList.filter((book: Book) => book.itemId !== itemId);
+      localStorage.setItem('guestMangaList', JSON.stringify(updatedList));
+      console.log('Guest owned list book removed:', itemId);
     }
   };
   
@@ -170,7 +186,16 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) =
       
       {tabIndex === 0 && (
         <>
-          <BookListOwned  key="owned-lists" title="とりあえず登録"  books={ownedLists} onRemove={handleRemoveOwnedLists} onRefreshOwnedList={fetchBooksData} />
+          <BookListOwned  
+            key="owned-lists" 
+            title="とりあえず登録"  
+            books={ownedLists} 
+            onRemove={handleRemoveOwnedLists} 
+            onRefreshOwnedList={authState.isAuthenticated ? fetchBooksData : () => {
+                const storedOwnedList = JSON.parse(localStorage.getItem('guestMangaList') || '[]');
+                setOwnedLists(storedOwnedList);
+            }} 
+          />
           <BooksListSells key="sells" title="あなたが出品中の漫画" books={sells}/>
         </>
       )}
