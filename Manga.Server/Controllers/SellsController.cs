@@ -230,7 +230,7 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("MyFavorite")]
-        public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync(int page = 1, int pageSize = 10)
+        public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync([FromBody] HomeDataRequest request)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -274,8 +274,8 @@ namespace Manga.Server.Controllers
                 });
 
             var items = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
             return items;
