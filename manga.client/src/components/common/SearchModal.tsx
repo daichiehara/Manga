@@ -40,7 +40,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
   const { authState } = useContext(AuthContext);
   const [query, setQuery] = useState('');
   const [options, setOptions] = useState<string[]>([]);
-  const [selectedTitles, setSelectedTitles] = useState<string[]>([]);
+  const [selectedTitles, setSelectedTitles] = useState<{ itemId: number; title: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
 
@@ -104,21 +104,14 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
   };
 
   const handleAddTitle = (title: string) => {
-    if (!selectedTitles.includes(title)) {
-      const newSelectedTitles = [...selectedTitles, title];
-      setSelectedTitles(newSelectedTitles);
-      if (!authState.isAuthenticated) {
-        localStorage.setItem('guestMangaList', JSON.stringify(newSelectedTitles));
-      }
+    if (!selectedTitles.some(item => item.title === title)) {
+      const newTitle = { itemId: Date.now(), title };
+      setSelectedTitles(prev => [...prev, newTitle]);
     }
   };
 
   const handleRemoveTitle = (title: string) => {
-    const newSelectedTitles = selectedTitles.filter(t => t !== title);
-    setSelectedTitles(newSelectedTitles);
-    if (!authState.isAuthenticated) {
-      localStorage.setItem('guestMangaList', JSON.stringify(newSelectedTitles));
-    }
+    setSelectedTitles(prev => prev.filter(item => item.title !== title));
   };
 
   const handleSubmit = async () => {
@@ -132,33 +125,24 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       try {
         const response = await axios.post(
           apiEndpoint,
-          selectedTitles,
+          selectedTitles.map(item => item.title),
           {
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             withCredentials: true
           }
         );
         console.log('Titles added:', response.data);
         showSnackbar(completeMessage);
-        onRefreshList();
-        onClose();
       } catch (error) {
         console.error('Error adding titles:', error);
         showSnackbar('タイトルが追加されませんでした。', 'error');
       }
     } else {
-      // ゲストユーザーの場合、ローカルストレージに保存
-      const formattedTitles = selectedTitles.map((title, index) => ({
-        itemId: Date.now() + index, // 一意のIDを生成
-        title: title,
-      }));
-      localStorage.setItem('guestMangaList', JSON.stringify(formattedTitles));
+      localStorage.setItem('guestMangaList', JSON.stringify(selectedTitles));
       showSnackbar('タイトルがローカルに保存されました。');
-      onRefreshList();
-      onClose();
     }
+    onRefreshList();
+    onClose();
   };
   return (
     <SwipeableDrawer
@@ -239,9 +223,9 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
             <List>
               {options.map((option, index) => (
                 <ListItem key={`${option}-${index}`}>
-                  <ListItemText primary={option} />
+                  <ListItemText primary={option.toString()} />
                   <ListItemSecondaryAction>
-                    {selectedTitles.includes(option) ? (
+                    {selectedTitles.some(item => item.title === option) ? (
                       <IconButton edge="end" aria-label="remove" onClick={() => handleRemoveTitle(option)}>
                         <CheckIcon sx={{ color: '#0F9ED5' }} />
                       </IconButton>

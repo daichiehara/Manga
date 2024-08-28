@@ -34,6 +34,17 @@ interface AppContextType {
   refreshMyFavorite: () => Promise<void>;
 }
 
+interface GuestOwnedBook {
+  itemId: number;
+  title: string;
+}
+
+interface FetchParams {
+  page: number;
+  pageSize: number;
+  guestOwnedTitles?: string[];
+}
+
 export const AppContext = createContext<AppContextType>({
   mangaData: [],
   myListData: [],
@@ -83,13 +94,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLoading(tabIndex, true);
 
     try {
-      let url;
+      let url: string;
+    let params: FetchParams = { page: currentPage, pageSize: 10 };
+
       if (tabIndex === 0) url = 'https://localhost:7103/api/Sells/MyFavorite';
       else if (tabIndex === 1) url = 'https://localhost:7103/api/Sells/Recommend';
       else url = 'https://localhost:7103/api/Sells';
 
+      if (!authState.isAuthenticated && tabIndex !== 0) {
+        // ゲストユーザーの場合、ローカルストレージのデータを取得し、タイトルのみの配列に変換
+        const guestOwnedBooks: GuestOwnedBook[] = JSON.parse(localStorage.getItem('guestMangaList') || '[]');
+        const guestOwnedTitles = guestOwnedBooks.map(book => book.title);
+        params = { ...params, guestOwnedTitles };
+      }
+
       const response = await axios.get(url, {
-        params: { page: currentPage, pageSize: 10 },
+        params,
         withCredentials: true
       });
 

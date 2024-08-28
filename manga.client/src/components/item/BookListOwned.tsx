@@ -59,29 +59,30 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
         </Button>
       </Box>
       <OwnedSearchModal isOpen={isOpen} onClose={handleClose} onRefreshOwnedList={onRefreshOwnedList} />
-      <List >
-        <TransitionGroup>
-          {books.map((book, index) => (
-            <Collapse key={book.itemId || index}> 
-              <ListItem
-                disableGutters secondaryAction={
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    title="Delete"
-                    onClick={() => onRemove(book.itemId)}
-                  >
-                    <CancelIcon sx={{color:`#D9D9D9`}}/>
-                  </IconButton>
-                }
-              >
-                <ListItemText primary={book.title} />
-              </ListItem>
-              <Divider sx={{ width: '100%' }}/>
-            </Collapse>
-          ))}
-        </TransitionGroup>
-      </List>
+      <List>
+      <TransitionGroup>
+        {books.map((book) => (
+          <Collapse key={book.itemId}> 
+            <ListItem
+              disableGutters
+              secondaryAction={
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  title="Delete"
+                  onClick={() => onRemove(book.itemId)}
+                >
+                  <CancelIcon sx={{color:`#D9D9D9`}}/>
+                </IconButton>
+              }
+            >
+              <ListItemText primary={book.title.toString()} />
+            </ListItem>
+            <Divider sx={{ width: '100%' }}/>
+          </Collapse>
+        ))}
+      </TransitionGroup>
+    </List>
       {/* ダイアログ */}
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
         <Box sx={{py:'1rem', display:'flex', justifyContent:'center'}}>
