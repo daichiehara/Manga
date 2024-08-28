@@ -60,14 +60,14 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet]
-        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync([FromBody] HomeDataRequest request)
+        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync(int page = 1, int pageSize = 10, [FromQuery] string[]? guestOwnedTitles = null)
         {
             var userId = _userManager.GetUserId(User);
 
             if (string.IsNullOrEmpty(userId))
             {
                 // ログインしていないユーザーの場合、新着順で返す
-                return await GetLatestSellsAsync(request.Page, request.PageSize, request.GuestOwnedTitles);
+                return await GetLatestSellsAsync(page, pageSize, guestOwnedTitles);
             }
 
             var userSellAndOwnedTitles = await (from u in _context.Users
@@ -106,8 +106,8 @@ namespace Manga.Server.Controllers
 
             var totalItems = await query.CountAsync();
             var items = await query
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return items;
@@ -230,7 +230,7 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("MyFavorite")]
-        public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync([FromBody] HomeDataRequest request)
+        public async Task<ActionResult<List<HomeDto>>> GetMyListSellsAsync(int page = 1, int pageSize = 10)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -274,22 +274,22 @@ namespace Manga.Server.Controllers
                 });
 
             var items = await query
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return items;
         }
 
         [HttpGet("Recommend")]
-        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync([FromBody] HomeDataRequest request)
+        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync(int page = 1, int pageSize = 10, [FromQuery] string[]? guestOwnedTitles = null)
         {
             var userId = _userManager.GetUserId(User);
 
             if (string.IsNullOrEmpty(userId))
             {
                 // ログインしていないユーザーの場合、新着順で返す
-                return await GetLatestSellsAsync(request.Page, request.PageSize, request.GuestOwnedTitles);
+                return await GetLatestSellsAsync(page, pageSize, guestOwnedTitles);
             }
 
             // 1. ユーザーの所有タイトルとWishリストを一度のクエリで取得
@@ -333,14 +333,14 @@ namespace Manga.Server.Controllers
                         .OrderBy(si => si.Order)
                         .FirstOrDefault().ImageUrl
                 })
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return recommendedSells;
         }
 
-        private async Task<ActionResult<List<HomeDto>>> GetLatestSellsAsync(int page = 1, int pageSize = 10, List<string>? guestOwnedTitles = null)
+        private async Task<ActionResult<List<HomeDto>>> GetLatestSellsAsync(int page = 1, int pageSize = 10, string[]? guestOwnedTitles = null)
         {
             var query = _context.Sell
                 .Include(s => s.SellImages)
