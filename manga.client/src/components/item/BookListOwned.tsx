@@ -38,7 +38,7 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
   }, []);  // 依存配列が空なので、コンポーネントのライフタイムで一度だけ生成される
 
   return (
-    <div>
+    <>
       <Box sx={{display: 'flex', alignItems: 'center',}}>
         <RocketLaunchIcon sx={{ fontsize:'1rem',mr: 1, alignSelf: 'center', color: '#EB4848' }}/>
         <Box sx={{display: 'flex', flexDirection: 'column',}}>
@@ -84,7 +84,7 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
       </TransitionGroup>
     </List>
       {/* ダイアログ */}
-      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+      <Dialog open={isDialogOpen} onClose={handleCloseDialog} aria-hidden={!isDialogOpen} disableEnforceFocus>
         <Box sx={{py:'1rem', display:'flex', justifyContent:'center'}}>
           <RocketLaunchIcon sx={{ fontsize:'1rem',mr: 1, alignSelf: 'center', color: '#EB4848' }}/>
           <Box sx={{display: 'flex', flexDirection: 'column',}}>
@@ -134,7 +134,7 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
         </DialogActions>
       </Dialog>
 
-    </div>
+    </>
   );
 });
 
