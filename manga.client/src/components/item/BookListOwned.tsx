@@ -58,7 +58,7 @@ const BookListOwned: React.FC<BookListOwnedProps> = React.memo(({ title, books, 
         </Typography>
         </Button>
       </Box>
-      <OwnedSearchModal isOpen={isOpen} onClose={handleClose} onRefreshOwnedList={onRefreshOwnedList} />
+      <OwnedSearchModal isOpen={isOpen} onClose={handleClose} onRefreshOwnedList={onRefreshOwnedList} currentBooks={books} />
       <List>
       <TransitionGroup>
         {books.map((book) => (

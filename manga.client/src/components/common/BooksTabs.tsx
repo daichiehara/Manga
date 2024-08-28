@@ -74,17 +74,16 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) =
       } catch (error) {
         handleError(error);
         throw error;
-      } finally {
-        await refreshAllData();
-      }
+      } 
     } else {
       // ゲストユーザーの場合、ローカルストレージから削除
       const storedOwnedList = JSON.parse(localStorage.getItem('guestMangaList') || '[]');
       const updatedList = storedOwnedList.filter((book: Book) => book.itemId !== itemId);
       localStorage.setItem('guestMangaList', JSON.stringify(updatedList));
-      await refreshAllData();
       console.log('Guest owned list book removed:', itemId);
     }
+
+    await refreshAllData();
   };
   
   const removeWishLists = async (sellId: BookId) => {

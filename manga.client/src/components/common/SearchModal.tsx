@@ -23,6 +23,7 @@ interface SearchModalProps {
   message2: string;
   message3: string;
   messageColor: string;
+  currentList: { itemId: number; title: string }[];
 }
 
 const famousTitles = [
@@ -36,7 +37,7 @@ const famousTitles = [
   'キングダム'
 ];
 
-const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshList, apiEndpoint, placeholder, completeMessage, noSelectionMessage, message1, message2, message3, messageColor }) => {
+const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshList, apiEndpoint, placeholder, completeMessage, noSelectionMessage, message1, message2, message3, messageColor, currentList }) => {
   const { showSnackbar } = useContext(SnackbarContext);
   const { authState } = useContext(AuthContext);
   const [query, setQuery] = useState('');
@@ -52,6 +53,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       setSelectedTitles(storedTitles);
     }
   }, [authState.isAuthenticated]);
+
+  useEffect(() => {
+    setSelectedTitles(currentList);
+  }, [currentList]);
 
   const fetchMangaTitles = useCallback(async (query: string) => {
     try {
@@ -123,6 +128,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       return;
     }
 
+    onClose();
     if (authState.isAuthenticated) {
       try {
         const response = await axios.post(
@@ -134,7 +140,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
           }
         );
         console.log('Titles added:', response.data);
-        await refreshAllData();
         showSnackbar(completeMessage);
       } catch (error) {
         console.error('Error adding titles:', error);
@@ -142,11 +147,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       }
     } else {
       localStorage.setItem('guestMangaList', JSON.stringify(selectedTitles));
-      await refreshAllData();
       showSnackbar('タイトルがローカルに保存されました。');
     }
     onRefreshList();
-    onClose();
+    await refreshAllData();
   };
   return (
     <SwipeableDrawer
