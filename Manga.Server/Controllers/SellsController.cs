@@ -60,7 +60,7 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet]
-        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync(int page = 1, int pageSize = 10, [FromQuery] string[]? guestOwnedTitles = null)
+        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery(Name = "guestOwnedTitles[]")] string[]? guestOwnedTitles = null)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -282,7 +282,7 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("Recommend")]
-        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync(int page = 1, int pageSize = 10, [FromQuery] string[]? guestOwnedTitles = null)
+        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync(int page = 1, int pageSize = 10, [FromQuery(Name = "guestOwnedTitles[]")] string[]? guestOwnedTitles = null)
         {
             var userId = _userManager.GetUserId(User);
 
