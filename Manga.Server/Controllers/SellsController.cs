@@ -282,14 +282,14 @@ namespace Manga.Server.Controllers
         }
 
         [HttpGet("Recommend")]
-        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync(int page = 1, int pageSize = 10)
+        public async Task<ActionResult<List<HomeDto>>> GetRecommendedSellsAsync([FromBody] HomeDataRequest request)
         {
             var userId = _userManager.GetUserId(User);
 
             if (string.IsNullOrEmpty(userId))
             {
                 // ログインしていないユーザーの場合、新着順で返す
-                return await GetLatestSellsAsync(page, pageSize);
+                return await GetLatestSellsAsync(request.Page, request.PageSize, request.GuestOwnedTitles);
             }
 
             // 1. ユーザーの所有タイトルとWishリストを一度のクエリで取得
@@ -333,8 +333,8 @@ namespace Manga.Server.Controllers
                         .OrderBy(si => si.Order)
                         .FirstOrDefault().ImageUrl
                 })
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
             return recommendedSells;
