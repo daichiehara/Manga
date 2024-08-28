@@ -7,6 +7,7 @@ import AutoStoriesOutlined from '@mui/icons-material/AutoStoriesOutlined';
 import BooksListSells from '../item/BookListSells';
 import BookListOwned from '../item/BookListOwned';
 import { AuthContext } from '../context/AuthContext';
+import { AppContext } from '../context/AppContext';
 
 const API_BASE_URL = 'https://localhost:7103/api';
 
@@ -30,6 +31,7 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) =
   const [ownedLists, setOwnedLists] = useState<Book[]>([]);
   const [sells, setSells] = useState<Book[]>([]);
   const [wishLists, setWishLists] = useState<Book[]>([]);
+  const { refreshAllData } = useContext(AppContext);
 
   useEffect(() => {
     setTabIndex(initialTab);
@@ -72,12 +74,15 @@ const BooksTabs: React.FC<BooksTabsProps> = ({ triggerFetch, initialTab = 0 }) =
       } catch (error) {
         handleError(error);
         throw error;
+      } finally {
+        await refreshAllData();
       }
     } else {
       // ゲストユーザーの場合、ローカルストレージから削除
       const storedOwnedList = JSON.parse(localStorage.getItem('guestMangaList') || '[]');
       const updatedList = storedOwnedList.filter((book: Book) => book.itemId !== itemId);
       localStorage.setItem('guestMangaList', JSON.stringify(updatedList));
+      await refreshAllData();
       console.log('Guest owned list book removed:', itemId);
     }
   };

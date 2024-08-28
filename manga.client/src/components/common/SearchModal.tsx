@@ -9,6 +9,7 @@ import { SnackbarContext } from '../context/SnackbarContext';
 import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
 import { AuthContext } from '../context/AuthContext';
+import { AppContext } from '../context/AppContext';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
   const [selectedTitles, setSelectedTitles] = useState<{ itemId: number; title: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
+  const { refreshAllData } = useContext(AppContext);
 
   useEffect(() => {
     if (!authState.isAuthenticated) {
@@ -132,6 +134,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
           }
         );
         console.log('Titles added:', response.data);
+        await refreshAllData();
         showSnackbar(completeMessage);
       } catch (error) {
         console.error('Error adding titles:', error);
@@ -139,6 +142,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       }
     } else {
       localStorage.setItem('guestMangaList', JSON.stringify(selectedTitles));
+      await refreshAllData();
       showSnackbar('タイトルがローカルに保存されました。');
     }
     onRefreshList();
