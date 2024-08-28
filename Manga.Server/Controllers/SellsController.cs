@@ -60,14 +60,14 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet]
-        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync(int page = 1, int pageSize = 10)
+        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync(int page = 1, int pageSize = 10, [FromQuery] List<string>? guestOwnedTitles = null)
         {
             var userId = _userManager.GetUserId(User);
 
             if (string.IsNullOrEmpty(userId))
             {
                 // ログインしていないユーザーの場合、新着順で返す
-                return await GetLatestSellsAsync(page, pageSize);
+                return await GetLatestSellsAsync(page, pageSize, guestOwnedTitles);
             }
 
             var userSellAndOwnedTitles = await (from u in _context.Users
@@ -239,6 +239,16 @@ namespace Manga.Server.Controllers
                 return new List<HomeDto>();
             }
 
+            var userSellAndOwnedTitles = await (from u in _context.Users
+                                                where u.Id == userId
+                                                select new
+                                                {
+                                                    OwnedTitles = u.OwnedLists.Select(o => o.Title),
+                                                    SellTitles = u.Sells.Select(s => s.Title),
+                                                }).FirstOrDefaultAsync();
+
+            var userTitles = userSellAndOwnedTitles.OwnedTitles.Union(userSellAndOwnedTitles.SellTitles).ToHashSet();
+
             var query = _context.MyList
                 .Where(m => m.UserAccountId == userId)
                 .Select(m => m.Sell)
@@ -254,8 +264,7 @@ namespace Manga.Server.Controllers
                         .Select(w => new WishTitleInfo
                         {
                             Title = w.Title,
-                            IsOwned = s.UserAccount.OwnedLists.Any(o => o.Title == w.Title) ||
-                                      s.UserAccount.Sells.Any(sell => sell.Title == w.Title)
+                            IsOwned = userTitles.Contains(w.Title)
                         })
                         .OrderByDescending(w => w.IsOwned)
                         .ToList(),
@@ -331,13 +340,22 @@ namespace Manga.Server.Controllers
             return recommendedSells;
         }
 
-        private async Task<ActionResult<List<HomeDto>>> GetLatestSellsAsync(int page = 1, int pageSize = 10)
+        private async Task<ActionResult<List<HomeDto>>> GetLatestSellsAsync(int page = 1, int pageSize = 10, List<string>? guestOwnedTitles = null)
         {
-            var latestSells = await _context.Sell
+            var query = _context.Sell
                 .Include(s => s.SellImages)
-                .Include(s => s.UserAccount.WishLists)  // WishListsを含める
+                .Include(s => s.UserAccount.WishLists)
                 .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
-                .OrderByDescending(s => s.SellTime)
+                .OrderByDescending(s => s.SellTime);
+
+            if (guestOwnedTitles != null && guestOwnedTitles.Any())
+            {
+                var userTitles = new HashSet<string>(guestOwnedTitles);
+                query = query.OrderByDescending(s => s.UserAccount.WishLists.Any(w => userTitles.Contains(w.Title)))
+                             .ThenByDescending(s => s.SellTime);
+            }
+
+            var latestSells = await query
                 .Select(s => new HomeDto
                 {
                     SellId = s.SellId,
@@ -348,8 +366,9 @@ namespace Manga.Server.Controllers
                         .Select(w => new WishTitleInfo
                         {
                             Title = w.Title,
-                            IsOwned = false
+                            IsOwned = guestOwnedTitles != null ? guestOwnedTitles.Contains(w.Title) : false
                         })
+                        .OrderByDescending(w => guestOwnedTitles != null ? guestOwnedTitles.Contains(w.Title) : false)
                         .ToList(),
                     SellImage = s.SellImages
                         .OrderBy(si => si.Order)
