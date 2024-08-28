@@ -329,6 +329,7 @@ const MangaDetail: React.FC = () => {
                 replyCount={mangaDetail.replyCount}
                 isLiked={mangaDetail.isLiked}
                 likeCount={mangaDetail.likeCount}
+                imageUrl={mangaDetail.imageUrls[0]}
               />
 
               <Paper elevation={0} sx={{ pt: 3, pb: 1, pl: 2.0, pr: 2.0, border: 'none' }}>
