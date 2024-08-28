@@ -23,4 +23,11 @@
         public int Page { get; set; }
         public int PageSize { get; set; }
     }
+
+    public class HomeDataRequest
+    {
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public List<string> GuestOwnedTitles { get; set; } = new List<string>();
+    }
 }

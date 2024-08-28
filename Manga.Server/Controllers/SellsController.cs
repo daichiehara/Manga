@@ -60,14 +60,14 @@ namespace Manga.Server.Controllers
         }
         */
         [HttpGet]
-        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync(int page = 1, int pageSize = 10, [FromQuery] List<string>? guestOwnedTitles = null)
+        public async Task<ActionResult<List<HomeDto>>> GetHomeDataAsync([FromBody] HomeDataRequest request)
         {
             var userId = _userManager.GetUserId(User);
 
             if (string.IsNullOrEmpty(userId))
             {
                 // ログインしていないユーザーの場合、新着順で返す
-                return await GetLatestSellsAsync(page, pageSize, guestOwnedTitles);
+                return await GetLatestSellsAsync(request.Page, request.PageSize, request.GuestOwnedTitles);
             }
 
             var userSellAndOwnedTitles = await (from u in _context.Users
@@ -106,8 +106,8 @@ namespace Manga.Server.Controllers
 
             var totalItems = await query.CountAsync();
             var items = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
             return items;
