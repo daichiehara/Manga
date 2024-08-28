@@ -200,7 +200,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
           <Box sx={{mt:'20px', textAlign: 'center', width: '100%' }}>
             <Typography variant='subtitle1' sx={{fontWeight:'bold'}}>この出品を共有する</Typography>
             <Divider variant='middle' sx={{ mt: 1, mb: 2 }} />  {/* Dividerの上の余白を調整 */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-around', gap: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 4, ml:2 }}>  {/* 左寄せとギャップの調整 */}
               <IconButton onClick={copyToClipboard}>
                 <ContentCopyIcon sx={{ fontSize: '30px' }} />
               </IconButton>
@@ -211,14 +211,15 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
               >
                 <XIcon round size={50} />
               </TwitterShareButton>
-
+              
+              {/*　
               <FacebookShareButton 
                 url={window.location.href}
                 title={description}
               >
                 <FacebookIcon round size={50} />
               </FacebookShareButton>
-              {/*　Facebookは開発者用IDを取得する必要あり，詳しくはこちらhttps://tcd-theme.com/2018/01/facebook_app_id.html */}
+              Facebookは開発者用IDを取得する必要あり，詳しくはこちらhttps://tcd-theme.com/2018/01/facebook_app_id.html */}
 
               <LineShareButton 
                 url={window.location.href}
@@ -227,6 +228,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
                 <LineIcon round size={50} />
               </LineShareButton>
             </Box>
+
 
           </Box>
         </Drawer>
