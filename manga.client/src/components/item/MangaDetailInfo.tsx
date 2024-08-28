@@ -218,6 +218,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
               >
                 <FacebookIcon round size={50} />
               </FacebookShareButton>
+              {/*　Facebookは開発者用IDを取得する必要あり，詳しくはこちらhttps://tcd-theme.com/2018/01/facebook_app_id.html */}
 
               <LineShareButton 
                 url={window.location.href}
