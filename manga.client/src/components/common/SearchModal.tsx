@@ -9,6 +9,7 @@ import { SnackbarContext } from '../context/SnackbarContext';
 import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
 import { AuthContext } from '../context/AuthContext';
+import { AppContext } from '../context/AppContext';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface SearchModalProps {
   message2: string;
   message3: string;
   messageColor: string;
+  currentList: { itemId: number; title: string }[];
 }
 
 const famousTitles = [
@@ -35,7 +37,7 @@ const famousTitles = [
   'キングダム'
 ];
 
-const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshList, apiEndpoint, placeholder, completeMessage, noSelectionMessage, message1, message2, message3, messageColor }) => {
+const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshList, apiEndpoint, placeholder, completeMessage, noSelectionMessage, message1, message2, message3, messageColor, currentList }) => {
   const { showSnackbar } = useContext(SnackbarContext);
   const { authState } = useContext(AuthContext);
   const [query, setQuery] = useState('');
@@ -43,6 +45,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
   const [selectedTitles, setSelectedTitles] = useState<{ itemId: number; title: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [cancelTokenSource, setCancelTokenSource] = useState(axios.CancelToken.source());
+  const { refreshAllData } = useContext(AppContext);
 
   useEffect(() => {
     if (!authState.isAuthenticated) {
@@ -50,6 +53,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       setSelectedTitles(storedTitles);
     }
   }, [authState.isAuthenticated]);
+
+  useEffect(() => {
+    setSelectedTitles(currentList);
+  }, [currentList]);
 
   const fetchMangaTitles = useCallback(async (query: string) => {
     try {
@@ -121,6 +128,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       return;
     }
 
+    onClose();
     if (authState.isAuthenticated) {
       try {
         const response = await axios.post(
@@ -139,10 +147,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       }
     } else {
       localStorage.setItem('guestMangaList', JSON.stringify(selectedTitles));
-      showSnackbar('タイトルがローカルに保存されました。');
+      showSnackbar('タイトルが追加されました。');
     }
     onRefreshList();
-    onClose();
+    await refreshAllData();
   };
   return (
     <SwipeableDrawer

@@ -32,6 +32,7 @@ interface AppContextType {
   fetchMoreData: (tabIndex: number) => Promise<void>;
   hasMore: { [key: number]: boolean };
   refreshMyFavorite: () => Promise<void>;
+  refreshAllData: () => Promise<void>;
 }
 
 interface GuestOwnedBook {
@@ -56,6 +57,7 @@ export const AppContext = createContext<AppContextType>({
   fetchMoreData: async () => {},
   hasMore: { 0: false, 1: false, 2: false },
   refreshMyFavorite: async () => {},
+  refreshAllData: async () => {},
 });
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -95,7 +97,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     try {
       let url: string;
-    let params: FetchParams = { page: currentPage, pageSize: 10 };
+      let params: FetchParams = { page: currentPage, pageSize: 10 };
 
       if (tabIndex === 0) url = 'https://localhost:7103/api/Sells/MyFavorite';
       else if (tabIndex === 1) url = 'https://localhost:7103/api/Sells/Recommend';
@@ -181,6 +183,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
+  const refreshAllData = useCallback(async () => {
+    console.log('全データの更新を開始');
+    setIsLoadingManga(true);
+    setIsLoadingMyList(true);
+    setIsLoadingRecommend(true);
+
+    try {
+      await Promise.all([
+        fetchData(0, true, 1),  // MyFavorite
+        fetchData(1, true, 1),  // Recommend
+        fetchData(2, true, 1),  // Manga
+      ]);
+      console.log('全データの更新が完了しました');
+    } catch (error) {
+      console.error('データの更新中にエラーが発生しました:', error);
+      setError('データの更新に失敗しました');
+    } finally {
+      setIsLoadingManga(false);
+      setIsLoadingMyList(false);
+      setIsLoadingRecommend(false);
+    }
+  }, [fetchData]);
+
 
 
   return (
@@ -195,6 +220,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         fetchMoreData,
         hasMore,
         refreshMyFavorite,
+        refreshAllData,
         }}>
       {children}
     </AppContext.Provider>

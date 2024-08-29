@@ -36,7 +36,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
   };
 
   return (
-    <div>
+    <>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography variant="h6" component="span" sx={{ mr:'12px',color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic' }}>
           want<Box component="span" sx={{ color: 'orange' }}>!!</Box>
@@ -70,7 +70,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
       </Box>
       {authState.isAuthenticated && (
         <>
-          <WishSearchModal isOpen={isOpen} onClose={handleClose} onRefreshWishList={onRefreshWishList} />
+          <WishSearchModal isOpen={isOpen} onClose={handleClose} onRefreshWishList={onRefreshWishList} currentBooks={books} />
           <List>
             <TransitionGroup>
               {books.map((book) => (
@@ -98,7 +98,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
         </>
       )}
       {/* ダイアログ */}
-      <Dialog open={isDialogOpen} onClose={handleCloseDialog} disableEnforceFocus disableAutoFocus>
+      <Dialog open={isDialogOpen} onClose={handleCloseDialog} aria-hidden={!isDialogOpen} disableEnforceFocus>
       <Box sx={{ py: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography
           variant="h6"
@@ -174,7 +174,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
         </Button>
       </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

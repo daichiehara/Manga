@@ -11,6 +11,7 @@ import axios from 'axios';
 import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const FormStyled = styled('form')(({ theme }) => ({
   width: '100%', // IE 11の問題を修正
@@ -41,8 +42,22 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
+  const description = `[トカエル]このページでは、パスワードを忘れたユーザーが、パスワードをリセットするための案内をメールで受け取ることができます。`;
+
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>パスワードリセット</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content="パスワードリセット" />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="パスワードリセット" />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
       <CustomTocaeruToolbar showSubtitle subtitle={'パスワードを忘れた方'} />
       <Box sx={{ px: `1.2rem`, pt: '1rem', pb: '1rem' }}>
         <Typography component="h1" variant="subtitle2">
@@ -79,7 +94,7 @@ const ForgotPassword: React.FC = () => {
           このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
         </Typography>
       </Box>
-    </>
+    </HelmetProvider>
   );
 };
 

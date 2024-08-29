@@ -18,6 +18,7 @@ import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
 import MenuBar from '../components/menu/MenuBar';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ForwardToInboxRoundedIcon from '@mui/icons-material/ForwardToInboxRounded';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const MainMyPage: React.FC = () => {
   const { userInfo } = useContext(UserContext);
@@ -57,9 +58,22 @@ const MainMyPage: React.FC = () => {
       </Typography>
     </Grid>
   );
+  const description = `[トカエル]このページでは、ユーザーのプロフィールや出品・交換した漫画、設定などを管理できます。`;  
 
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>マイページ</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content="マイページ" />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="マイページ" />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
       <CustomToolbar title='マイページ' showBackButton={false} />
       {authState.isAuthenticated ? (
         userInfo ? (
@@ -114,7 +128,7 @@ const MainMyPage: React.FC = () => {
         <NavigateToLoginBox height='80vh' />
       )}
       <MenuBar />
-    </>
+    </HelmetProvider>
   );
 };
 
