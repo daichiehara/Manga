@@ -11,6 +11,8 @@ import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
 import CustomLink from '../components/common/CustomLink';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 const SignupPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -58,106 +60,120 @@ const SignupPage: React.FC = () => {
   const handleGoogleFailure = () => {
     setError('Google認証に失敗しました。');
   };
-
+  const description = `${SERVICE_NAME}会員登録ページです。会員登録して漫画交換を楽しみましょう！`;
   
 
   return (
     <GoogleOAuthProvider clientId="1013291515281-j5re58a4bjt9qk9dgp6sdoquick9mv8j.apps.googleusercontent.com">
-      <CustomTocaeruToolbar showSubtitle subtitle={'会員登録'} />
-      
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-        <ButtonBase
-          onClick={() => navigate('/signup/Email')}
-          sx={{
-            width: buttonWidth,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bgcolor: 'inherit',
-            color: theme.palette.text.secondary,
-            border: `1px solid ${theme.palette.text.secondary}`, 
-            mt: '1rem',
-            pl: '10px',
-            pr: '20px',
-            py: '8px',
-            borderRadius: 1,
-            '&:hover': {
-              bgcolor: 'dark',
-            },
-          }}
-        >
-          <MailOutlineOutlinedIcon sx={{ marginRight: 'auto' }} />
-          <Typography variant='subtitle2' sx={{ flexGrow: 1, textAlign: 'center', fontWeight: 'bold', color: theme.palette.text.secondary }}>
-            メールアドレスで登録
-          </Typography>
-        </ButtonBase>
+      <HelmetProvider>
+      <Helmet>
+        <title>{SERVICE_NAME} - 会員登録</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`${SERVICE_NAME} - 会員登録`} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${SERVICE_NAME} - 会員登録`} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
+        <CustomTocaeruToolbar showSubtitle subtitle={'会員登録'} />
+        
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <ButtonBase
+            onClick={() => navigate('/signup/Email')}
+            sx={{
+              width: buttonWidth,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor: 'inherit',
+              color: theme.palette.text.secondary,
+              border: `1px solid ${theme.palette.text.secondary}`, 
+              mt: '1rem',
+              pl: '10px',
+              pr: '20px',
+              py: '8px',
+              borderRadius: 1,
+              '&:hover': {
+                bgcolor: 'dark',
+              },
+            }}
+          >
+            <MailOutlineOutlinedIcon sx={{ marginRight: 'auto' }} />
+            <Typography variant='subtitle2' sx={{ flexGrow: 1, textAlign: 'center', fontWeight: 'bold', color: theme.palette.text.secondary }}>
+              メールアドレスで登録
+            </Typography>
+          </ButtonBase>
 
-        <Box sx={{ mt: '1rem' }}>
-          {loading ? (
-            <CircularProgress />
-          ) : (
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleFailure}
-              text='signup_with'
-              width={buttonWidth}
-              size='large'
-              logo_alignment='left'
-              theme='filled_blue'
-            />
+          <Box sx={{ mt: '1rem' }}>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleFailure}
+                text='signup_with'
+                width={buttonWidth}
+                size='large'
+                logo_alignment='left'
+                theme='filled_blue'
+              />
+            )}
+          </Box>
+
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              {success}
+            </Alert>
           )}
         </Box>
 
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" sx={{ mt: 2 }}>
-            {success}
-          </Alert>
-        )}
-      </Box>
-
-      <Box sx={{ pt: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-  <Box sx={{ textAlign: 'left', maxWidth: buttonWidth }}>
-    <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
-      <CustomLink href="/terms" target="_blank" rel="noopener noreferrer">
-        利用規約
-      </CustomLink>
-      および
-      <CustomLink href="/privacy" target="_blank" rel="noopener noreferrer">
-        プライバシーポリシー
-      </CustomLink>
-      に同意の上、登録またはログインへお進みください。
-    </Typography>
-  </Box>
-</Box>
-
-
-      
-
-      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
-        <Box sx={{ py: '2rem', px: '1rem', width: buttonWidth }}>
-          <Divider />
+        <Box sx={{ pt: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+        <Box sx={{ textAlign: 'left', maxWidth: buttonWidth }}>
+          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
+            <CustomLink href="/terms" target="_blank" rel="noopener noreferrer">
+              利用規約
+            </CustomLink>
+            および
+            <CustomLink href="/privacy" target="_blank" rel="noopener noreferrer">
+              プライバシーポリシー
+            </CustomLink>
+            に同意の上、登録またはログインへお進みください。
+          </Typography>
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
-        <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
-          アカウントをお持ちの方
-        </Typography>
-      </Box>
 
-      <Box sx={{  display: 'flex', justifyContent: 'center', width: '100%' }}>
-        <Button
-          onClick={() => navigate('/login-page', {replace: true})}
-          variant='outlined'
-          sx={{ mt: '0.8rem', fontWeight: 'bold', color: 'red', borderColor: 'red', width: buttonWidth }}
-        >
-          ログイン
-        </Button>
-      </Box>
+
+        
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
+          <Box sx={{ py: '2rem', px: '1rem', width: buttonWidth }}>
+            <Divider />
+          </Box>
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
+          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
+            アカウントをお持ちの方
+          </Typography>
+        </Box>
+
+        <Box sx={{  display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <Button
+            onClick={() => navigate('/login-page', {replace: true})}
+            variant='outlined'
+            sx={{ mt: '0.8rem', fontWeight: 'bold', color: 'red', borderColor: 'red', width: buttonWidth }}
+          >
+            ログイン
+          </Button>
+        </Box>
+      </HelmetProvider>
     </GoogleOAuthProvider>
   );
 };

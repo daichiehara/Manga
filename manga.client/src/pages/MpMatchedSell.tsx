@@ -7,7 +7,8 @@ import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import LoadingComponent from '../components/common/LoadingComponent';
-
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 interface MpMatchedSell {
   mySellId: number;
@@ -83,10 +84,22 @@ const MpMatchedSellComponent: React.FC = () => {
         </>
       );
     }
-
+    const description = `[${SERVICE_NAME}]ここでは、交換した漫画のリストを確認できます。過去に交換したアイテムを振り返って、次の取引に役立てましょう。`;
 
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>{SERVICE_NAME} - 交換した漫画</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`${SERVICE_NAME} - 交換した漫画`} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${SERVICE_NAME} - 交換した漫画`} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
       <CustomToolbar title="交換した漫画" />
       <Grid container sx={{ pt: { xs: '3.5rem', sm: '4rem', mb: 10  } }}>
       <Grid container>
@@ -172,7 +185,7 @@ const MpMatchedSellComponent: React.FC = () => {
           </Grid>
         ))}
       </Grid>
-    </>
+    </HelmetProvider>
   );
 };
 

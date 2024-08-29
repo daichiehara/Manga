@@ -7,6 +7,8 @@ import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { UserContext } from '../components/context/UserContext';
 import axios from 'axios';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 interface ProfileFormData {
   nickName: string | null;
@@ -101,9 +103,21 @@ const MpProfile: React.FC = () => {
       fileInputRef.current.click();
     }
   };
-
+  const description = `[${SERVICE_NAME}]プロフィール設定ページです。`;
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>{SERVICE_NAME} - プロフィール設定</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`${SERVICE_NAME} - プロフィール設定`} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${SERVICE_NAME} - プロフィール設定`} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+  </Helmet>
       <CustomToolbar title="プロフィール設定" />
       {loading && <LoadingComponent />}
       <Box sx={{ px: 2, pt: '5rem' }}>
@@ -153,7 +167,7 @@ const MpProfile: React.FC = () => {
           </Button>
         </form>
       </Box>
-    </>
+    </HelmetProvider>
   );
 };
 

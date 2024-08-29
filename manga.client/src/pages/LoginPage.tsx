@@ -14,7 +14,8 @@ import CustomLink from '../components/common/CustomLink';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 type LoginFormInputs = {
   email: string;
@@ -133,129 +134,144 @@ const Login: React.FC = () => {
   const isLg = useMediaQuery(theme.breakpoints.between('md', 'lg'));
 
   const buttonWidth = isXs ? '100%' : isIse ? '350px' : isSm ? '400px' : isMd ? '400px' : isLg ? '400px' : '400px';
-
+  const description = `${SERVICE_NAME}ログインページです。ログインして漫画交換を楽しみましょう！`;
   return (
+    
     <GoogleOAuthProvider clientId="1013291515281-j5re58a4bjt9qk9dgp6sdoquick9mv8j.apps.googleusercontent.com">
-      <CustomTocaeruToolbar showSubtitle subtitle={'ログイン'} />
-      <Box sx={{display:'flex', justifyContent:'center'}}>
-        <Box sx={{ px: `1.2rem`, pt:'0.5rem', pb:0, width:buttonWidth }}>
-          <Box sx={{display:'flex', justifyContent:'right'}}>
-            <CustomLink onClick={() => navigate('/signup')}>
-              会員登録はこちら
-            </CustomLink>
-          </Box>
-          {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
-          {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: theme.palette.text.secondary }}>
-              メールアドレス
+      <HelmetProvider>
+        <Helmet>
+          <title>{SERVICE_NAME} - ログイン</title>
+          <meta name="description" content={description} />
+          <meta property="og:title" content={`${SERVICE_NAME} - ログイン`} />
+          <meta property="og:description" content={description} />
+          <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+          <meta property="og:url" content={window.location.href} />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={`${SERVICE_NAME} - ログイン`} />
+          <meta name="twitter:description" content={description} />
+          <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        </Helmet>
+
+        <CustomTocaeruToolbar showSubtitle subtitle={'ログイン'} />
+        <Box sx={{display:'flex', justifyContent:'center'}}>
+          <Box sx={{ px: `1.2rem`, pt:'0.5rem', pb:0, width:buttonWidth }}>
+            <Box sx={{display:'flex', justifyContent:'right'}}>
+              <CustomLink onClick={() => navigate('/signup')}>
+                会員登録はこちら
+              </CustomLink>
+            </Box>
+            {isLoginSuccessful && <Alert severity="success">Login successful!</Alert>}
+            {apiErrors.message && <Alert severity="error">{apiErrors.message}</Alert>}
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: theme.palette.text.secondary }}>
+                メールアドレス
+              </Typography>
+              <TextField
+                placeholder='tocaeru@email.com'
+                variant="outlined"
+                fullWidth
+                {...register('email')}
+                error={!!apiErrors.email}
+                helperText={apiErrors.email}
+                sx={{ boxShadow: 'none' }}
+                autoComplete="email"
+              />
+              <Typography variant='subtitle1' sx={{pt:'1rem', fontWeight: 'bold', color: theme.palette.text.secondary }}>
+                パスワード
+              </Typography>
+              <TextField
+                autoComplete='current-password'             
+                placeholder="パスワード"
+                type={showPassword ? 'text' : 'password'}
+                variant="outlined"
+                fullWidth
+                {...register('password')}
+                error={!!apiErrors.password}
+                helperText={apiErrors.password}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: '2.5rem', mb:'1rem', background: 'red', fontWeight:'bold' }} disabled={isLoading}>
+                {isLoading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'ログイン'}
+              </Button>
+            </form>
+            <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
+              <CustomLink href="/terms" target="_blank" rel="noopener noreferrer">
+                利用規約
+              </CustomLink>および
+              <CustomLink href="/privacy" target="_blank" rel="noopener noreferrer">
+                プライバシーポリシー
+              </CustomLink>
+              に同意の上、ログインへお進みください。
             </Typography>
-            <TextField
-              placeholder='tocaeru@email.com'
-              variant="outlined"
-              fullWidth
-              {...register('email')}
-              error={!!apiErrors.email}
-              helperText={apiErrors.email}
-              sx={{ boxShadow: 'none' }}
-              autoComplete="email"
-            />
-            <Typography variant='subtitle1' sx={{pt:'1rem', fontWeight: 'bold', color: theme.palette.text.secondary }}>
-              パスワード
-            </Typography>
-            <TextField
-              autoComplete='current-password'             
-              placeholder="パスワード"
-              type={showPassword ? 'text' : 'password'}
-              variant="outlined"
-              fullWidth
-              {...register('password')}
-              error={!!apiErrors.password}
-              helperText={apiErrors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: '2.5rem', mb:'1rem', background: 'red', fontWeight:'bold' }} disabled={isLoading}>
-              {isLoading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'ログイン'}
-            </Button>
-          </form>
-          <Typography variant='body2' sx={{color: theme.palette.text.secondary}}>
-            <CustomLink href="/terms" target="_blank" rel="noopener noreferrer">
-              利用規約
-            </CustomLink>および
-            <CustomLink href="/privacy" target="_blank" rel="noopener noreferrer">
-              プライバシーポリシー
-            </CustomLink>
-            に同意の上、ログインへお進みください。
-          </Typography>
-          
-          <GooglePolicyText />
-          <Box sx={{pt:'1rem', display:'flex', justifyContent:'right'}}>
-            <CustomLink onClick={() => navigate('/forgot-password')} sx={{ display: 'block', color: 'skyblue', mt: 2 }}>
-              パスワード忘れた方はこちら
-            </CustomLink>
             
+            <GooglePolicyText />
+            <Box sx={{pt:'1rem', display:'flex', justifyContent:'right'}}>
+              <CustomLink onClick={() => navigate('/forgot-password')} sx={{ display: 'block', color: 'skyblue', mt: 2 }}>
+                パスワード忘れた方はこちら
+              </CustomLink>
+              
+            </Box>
+
+            <Divider sx={{py:1, color: theme.palette.text.secondary}}>
+              または
+            </Divider>
           </Box>
+        </Box>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleFailure}
+            width={buttonWidth}
+            text='signin_with'
+            theme='filled_blue'
+            shape='rectangular'
+          />
+        </Box>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" sx={{ mt: 2 }}>
+            {success}
+          </Alert>
+        )}
 
-          <Divider sx={{py:1, color: theme.palette.text.secondary}}>
-            または
-          </Divider>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
+          <Box sx={{ py: '2rem', px: '1rem', width: buttonWidth }}>
+            <Divider />
+          </Box>
         </Box>
-      </Box>
-      
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleFailure}
-          width={buttonWidth}
-          text='signin_with'
-          theme='filled_blue'
-          shape='rectangular'
-        />
-      </Box>
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
-      {success && (
-        <Alert severity="success" sx={{ mt: 2 }}>
-          {success}
-        </Alert>
-      )}
-
-      
-      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
-        <Box sx={{ py: '2rem', px: '1rem', width: buttonWidth }}>
-          <Divider />
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
+          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
+            アカウントをお持ちでない方
+          </Typography>
         </Box>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
-        <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
-          アカウントをお持ちでない方
-        </Typography>
-      </Box>
-        <Box sx={{mt:'0.8rem',px:'1rem', display:'flex', justifyContent:'center'}} >
-          <Button
-          onClick={() => navigate('/signup', {replace: true})}
-          variant='outlined'
-          fullWidth
-          sx={{fontWeight:'bold',color:'red', borderColor:'red', width:buttonWidth}}
-          >
-            会員登録
-          </Button>
-        </Box>
-      
+          <Box sx={{mt:'0.8rem',px:'1rem', display:'flex', justifyContent:'center'}} >
+            <Button
+            onClick={() => navigate('/signup', {replace: true})}
+            variant='outlined'
+            fullWidth
+            sx={{fontWeight:'bold',color:'red', borderColor:'red', width:buttonWidth}}
+            >
+              会員登録
+            </Button>
+          </Box>
+        </HelmetProvider>
     </GoogleOAuthProvider>
   );
 };
