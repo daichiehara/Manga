@@ -6,6 +6,7 @@ import { AuthContext } from '../components/context/AuthContext';
 import { Box, TextField, Button, Divider, Typography } from '@mui/material';
 import CommentList from '../components/comment/CommentList';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 // APIレスポンスの型定義
 interface ReplyDto {
@@ -84,7 +85,7 @@ const CommentPage: React.FC = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>コメントページ</title>
+        <title>コメントページ - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content="コメントページ" />
         <meta property="og:description" content={description} />

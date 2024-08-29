@@ -7,6 +7,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CustomToolbar from '../components/common/CustumToolbar';
 import MenuBar from '../components/menu/MenuBar';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 const theme = createTheme({
   palette: {
@@ -62,7 +63,7 @@ const EmailConfirmation: React.FC = () => {
   return (
     <HelmetProvider>
       <Helmet>
-      <title>メールアドレスの確認</title>
+      <title>メールアドレスの確認 - {SERVICE_NAME}</title>
       <meta name="description" content={description} />
       <meta property="og:title" content="メールアドレスの確認" />
       <meta property="og:description" content={description} />

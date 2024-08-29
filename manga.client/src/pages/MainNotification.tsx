@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { NotificationContext } from '../components/context/NotificationContext';
 import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
+
 interface Notification {
   sellId: number;
   message: string;
@@ -240,7 +242,7 @@ const handleExchangeConfirmed = useCallback(() => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>お知らせ</title>
+        <title>お知らせ - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content="お知らせ" />
         <meta property="og:description" content={description} />

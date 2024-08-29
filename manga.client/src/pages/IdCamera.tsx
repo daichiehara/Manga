@@ -11,6 +11,7 @@ import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { UserContext } from '../components/context/UserContext';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 const CameraPage: React.FC = () => {
   window.scrollTo({top:0, behavior: "instant"});
@@ -230,7 +231,7 @@ const CameraPage: React.FC = () => {
   return (
     <HelmetProvider>
         <Helmet>
-          <title>本人確認 - 撮影</title>
+          <title>本人確認 - 撮影 - {SERVICE_NAME}</title>
           <meta name="description" content={description} />
           <meta property="og:title" content="本人確認 - 撮影" />
           <meta property="og:description" content={description} />

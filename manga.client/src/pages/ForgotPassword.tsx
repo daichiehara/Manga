@@ -12,6 +12,7 @@ import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 const FormStyled = styled('form')(({ theme }) => ({
   width: '100%', // IE 11の問題を修正
@@ -47,7 +48,7 @@ const ForgotPassword: React.FC = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>パスワードリセット</title>
+        <title>パスワードリセット - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content="パスワードリセット" />
         <meta property="og:description" content={description} />

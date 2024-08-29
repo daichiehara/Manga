@@ -7,6 +7,8 @@ import TuneIcon from '@mui/icons-material/Tune';
 import MangaListItem from '../item/MangaListItem';
 import MyBookModal from '../common/MyBookModal';
 import { useInView } from 'react-intersection-observer';
+import { SERVICE_NAME } from '../../serviceName';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 enum SellStatus {
   Recruiting = 1,
@@ -188,98 +190,115 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       const handleItemClick = useCallback(() => {
         sessionStorage.setItem('searchScrollPosition', window.scrollY.toString());
       }, []);
+    
+      const description = `[${SERVICE_NAME}] "${query}" に関連する出品の検索結果です。出品をクリックして詳細を確認してみましょう！`;
       
   return (
-    <Box sx={{ pt: 11, mb: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 2 }}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={onlyRecruiting}
-              onChange={handleOnlyRecruitingToggle}
-              name="onlyRecruiting"
-              color="primary"
-            />
-          }
-          label="出品中"
-        />
-        <Stack direction="row" alignItems="center">
-          <IconButton size="small" sx={{p: 0}}>
-              <SearchIcon />
-            </IconButton>
-            <Switch
-              checked={isExchangeMode}
-              onChange={handleExchangeModeToggle}
-              name="exchangeMode"
-              color="primary"
-            />
-            <IconButton size="small" sx={{p: 0}}>
-              <AutoStoriesIcon />
-            </IconButton>
-        </Stack>
-            <Box 
-                sx={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    ml: 2,
-                    cursor: 'pointer', // カーソルをポインターに変更
-                    '&:hover': {
-                    opacity: 0.7, // ホバー時の視覚的フィードバック
-                    },
-                }}
-                onClick={handleFilterClick} // 全体にクリックイベントを追加
-                >
-                <Box 
-                    sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderRadius: '50%',
-                    '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.04)', // ホバー時の背景色変更
-                    },
-                    }}
-                >
-                    <TuneIcon />
-                </Box>
-                <Typography variant="caption">絞り込み</Typography>
-            </Box>
-      </Box>
+    <HelmetProvider>
+      <Helmet>
+        <title>検索結果 - {query} | {SERVICE_NAME}</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`検索結果 - ${query} | ${SERVICE_NAME}`} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`検索結果 - ${query} | ${SERVICE_NAME}`} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
 
-      {error && <Typography color="error">{error}</Typography>}
-
-      {results.length === 0 && !isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-          <Typography variant="h6">
-            {isExchangeMode 
-              ? `"${query}" に関連する交換可能な商品が見つかりませんでした。`
-              : `"${query}" に関連する商品が見つかりませんでした。`}
-          </Typography>
-        </Box>
-      ) : (
-        results.map((item, index) => (
-          <MangaListItem
-            key={`${isExchangeMode ? 'exchange' : 'search'}-${item.sellId}-${index}`}
-            sellId={item.sellId}
-            sellImage={item.sellImage}
-            sellTitle={item.sellTitle}
-            numberOfBooks={item.numberOfBooks}
-            wishTitles={item.wishTitles}
-            sellStatus={item.sellStatus}
-            onItemClick={handleItemClick}
+      <Box sx={{ pt: 11, mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 2 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={onlyRecruiting}
+                onChange={handleOnlyRecruitingToggle}
+                name="onlyRecruiting"
+                color="primary"
+              />
+            }
+            label="出品中"
           />
-        ))
-      )}
-      
-      <div ref={ref} style={{ height: '20px', margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        {isLoading && (
-          <CircularProgress size={20} style={{ marginRight: '10px' }} />
-        )}
-      </div>
+          <Stack direction="row" alignItems="center">
+            <IconButton size="small" sx={{p: 0}}>
+                <SearchIcon />
+              </IconButton>
+              <Switch
+                checked={isExchangeMode}
+                onChange={handleExchangeModeToggle}
+                name="exchangeMode"
+                color="primary"
+              />
+              <IconButton size="small" sx={{p: 0}}>
+                <AutoStoriesIcon />
+              </IconButton>
+          </Stack>
+              <Box 
+                  sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      ml: 2,
+                      cursor: 'pointer', // カーソルをポインターに変更
+                      '&:hover': {
+                      opacity: 0.7, // ホバー時の視覚的フィードバック
+                      },
+                  }}
+                  onClick={handleFilterClick} // 全体にクリックイベントを追加
+                  >
+                  <Box 
+                      sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: '50%',
+                      '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.04)', // ホバー時の背景色変更
+                      },
+                      }}
+                  >
+                      <TuneIcon />
+                  </Box>
+                  <Typography variant="caption">絞り込み</Typography>
+              </Box>
+        </Box>
 
-      <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
-    </Box>
+        {error && <Typography color="error">{error}</Typography>}
+
+        {results.length === 0 && !isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <Typography variant="h6">
+              {isExchangeMode 
+                ? `"${query}" に関連する交換可能な商品が見つかりませんでした。`
+                : `"${query}" に関連する商品が見つかりませんでした。`}
+            </Typography>
+          </Box>
+        ) : (
+          results.map((item, index) => (
+            <MangaListItem
+              key={`${isExchangeMode ? 'exchange' : 'search'}-${item.sellId}-${index}`}
+              sellId={item.sellId}
+              sellImage={item.sellImage}
+              sellTitle={item.sellTitle}
+              numberOfBooks={item.numberOfBooks}
+              wishTitles={item.wishTitles}
+              sellStatus={item.sellStatus}
+              onItemClick={handleItemClick}
+            />
+          ))
+        )}
+        
+        <div ref={ref} style={{ height: '20px', margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          {isLoading && (
+            <CircularProgress size={20} style={{ marginRight: '10px' }} />
+          )}
+        </div>
+
+        <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
+      </Box>
+    </HelmetProvider>
   );
 };
 

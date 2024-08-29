@@ -6,6 +6,7 @@ import axios from 'axios';
 import CustomToolbar from '../components/common/CustumToolbar';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 
 interface SellDraftDto {
@@ -43,7 +44,7 @@ const DraftList: React.FC = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>下書きリスト</title>
+        <title>下書きリスト - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content="下書きリスト" />
         <meta property="og:description" content={description} />

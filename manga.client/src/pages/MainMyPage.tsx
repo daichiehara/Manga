@@ -19,6 +19,7 @@ import MenuBar from '../components/menu/MenuBar';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ForwardToInboxRoundedIcon from '@mui/icons-material/ForwardToInboxRounded';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 const MainMyPage: React.FC = () => {
   const { userInfo } = useContext(UserContext);
@@ -63,7 +64,7 @@ const MainMyPage: React.FC = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>マイページ</title>
+        <title>マイページ - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content="マイページ" />
         <meta property="og:description" content={description} />
