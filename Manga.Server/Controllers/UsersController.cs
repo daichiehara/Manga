@@ -35,8 +35,9 @@ namespace Manga.Server.Controllers
         private readonly IEmailSender _emailSender;
         private readonly S3Service _s3Service;
         private readonly HttpClient _httpClient;
+        private readonly ReCaptchaService _reCaptchaService;
 
-        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender, S3Service s3Service, HttpClient httpClient)
+        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender, S3Service s3Service, HttpClient httpClient, ReCaptchaService reCaptchaService)
         {
             _context = context;
             _userManager = userManager;
@@ -45,11 +46,18 @@ namespace Manga.Server.Controllers
             _emailSender = emailSender;
             _s3Service = s3Service;
             _httpClient = httpClient;
+            _reCaptchaService = reCaptchaService;
         }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterDto model)
         {
+            var reCaptchaResult = await _reCaptchaService.VerifyTokenAsync(model.ReCaptchaToken);
+            if (!reCaptchaResult.Success || reCaptchaResult.Score < 0.5) // スコアのしきい値は調整可能
+            {
+                return BadRequest("reCAPTCHA verification failed");
+            }
+
             var user = new UserAccount
             {
                 Email = model.Email,
@@ -108,6 +116,12 @@ namespace Manga.Server.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
+            var reCaptchaResult = await _reCaptchaService.VerifyTokenAsync(model.ReCaptchaToken);
+            if (!reCaptchaResult.Success || reCaptchaResult.Score < 0.5) // スコアのしきい値は調整可能
+            {
+                return BadRequest("reCAPTCHA verification failed");
+            }
+
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {

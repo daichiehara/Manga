@@ -177,6 +177,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddHttpClient<ReCaptchaService>();
+builder.Services.AddScoped<ReCaptchaService>();
+
 
 builder.Services.AddHttpClient();
 

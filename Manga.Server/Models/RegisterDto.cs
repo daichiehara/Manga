@@ -12,5 +12,6 @@ namespace Manga.Server.Models
 
         [Required(ErrorMessage = "パスワードが入力されていません。")]
         public string Password { get; set; }
+        public string ReCaptchaToken { get; set; }
     }
 }
