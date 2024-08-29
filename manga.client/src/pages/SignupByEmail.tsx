@@ -10,6 +10,7 @@ import CheckModal from '../components/common/CheckModal';
 import GooglePolicyText from '../components/common/GooglePolicyText';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 const SignupByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -22,6 +23,7 @@ const SignupByEmail: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const customNavigate = useCustomNavigate(2);
   const { showSnackbar } = useContext(SnackbarContext);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const validatePassword = (password: string) => {
     if (/[！-～]/.test(password)) {
@@ -43,15 +45,24 @@ const SignupByEmail: React.FC = () => {
       return;
     }
 
+    if (!executeRecaptcha) {
+      console.log("reCAPTCHA has not been loaded");
+      setError("reCAPTCHA の読み込みに失敗しました。ページを再読み込みしてください。");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
+      const reCaptchaToken = await executeRecaptcha('signup');
+
       const response = await axios.post('https://localhost:7103/api/Users/Register', {
         email,
         password,
         nickName,
+        reCaptchaToken,
       }, { withCredentials: true });
 
       setSuccess(response.data.Message);
@@ -120,7 +131,7 @@ const SignupByEmail: React.FC = () => {
             name="password"
             type={showPassword ? 'text' : 'password'}
             id="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             sx={{ mb: 2 }}

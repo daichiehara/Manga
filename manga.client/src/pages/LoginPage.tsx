@@ -13,6 +13,7 @@ import GooglePolicyText from '../components/common/GooglePolicyText';
 import CustomLink from '../components/common/CustomLink';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 
 type LoginFormInputs = {
@@ -37,31 +38,40 @@ const Login: React.FC = () => {
   const { register, handleSubmit } = useForm<LoginFormInputs>();
   const customNavigate = useCustomNavigate();
   const { showSnackbar } = useContext(SnackbarContext);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const onSubmit = (data: LoginFormInputs) => {
+  const onSubmit = async (data: LoginFormInputs) => {
+    if (!executeRecaptcha) {
+      console.log('reCAPTCHA not yet available');
+      return;
+    }
+
     setApiErrors({});
     setIsLoading(true);
 
-    axios.post('https://localhost:7103/api/Users/Login', {
-      Email: data.email,
-      Password: data.password
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true
-    })
-    .then(response => {
+    try {
+      const reCaptchaToken = await executeRecaptcha('login');
+
+      const response = await axios.post('https://localhost:7103/api/Users/Login', {
+        Email: data.email,
+        Password: data.password,
+        ReCaptchaToken: reCaptchaToken
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+
       setIsLoginSuccessful(true);
       updateGlobalAuthState({ isAuthenticated: true });
       customNavigate();
       showSnackbar('ログインしました。', 'success');
-    })
-    .catch(error => {
+    } catch (error: any) {
       setIsLoginSuccessful(false);
       if (error.response && error.response.data) {
         let newErrors: ApiErrors = {};
@@ -81,10 +91,9 @@ const Login: React.FC = () => {
         console.log('API Errors:', newErrors);
         setApiErrors(newErrors);
       }
-    })
-    .finally(() => {
+    } finally {
       setIsLoading(false);
-    });
+    }
   };
 
     const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
@@ -149,13 +158,13 @@ const Login: React.FC = () => {
               error={!!apiErrors.email}
               helperText={apiErrors.email}
               sx={{ boxShadow: 'none' }}
+              autoComplete="email"
             />
             <Typography variant='subtitle1' sx={{pt:'1rem', fontWeight: 'bold', color: theme.palette.text.secondary }}>
               パスワード
             </Typography>
             <TextField
-              autoComplete='current-password'
-              
+              autoComplete='current-password'             
               placeholder="パスワード"
               type={showPassword ? 'text' : 'password'}
               variant="outlined"

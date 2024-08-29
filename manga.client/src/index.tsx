@@ -10,6 +10,7 @@ import { UserProvider } from './components/context/UserContext';
 import { AppProvider } from './components/context/AppContext';
 import { NotificationProvider } from './components/context/NotificationContext';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 const container = document.getElementById('root');
 
@@ -38,7 +39,9 @@ if (container) {
                 <NotificationProvider>
                   <BooksProvider>
                     <SnackbarProvider>
-                      <App />
+                      <GoogleReCaptchaProvider reCaptchaKey="6LdZuzEqAAAAAI41GSJIVRqDA4y8jiyQvM-WQVPw">
+                        <App />
+                      </GoogleReCaptchaProvider>
                     </SnackbarProvider>
                   </BooksProvider>
                 </NotificationProvider>
