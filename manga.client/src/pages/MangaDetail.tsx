@@ -23,6 +23,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CustomToolbar from '../components/common/CustumToolbar';
 import theme from '../theme/theme';
 import { replace } from 'lodash';
+import { SERVICE_NAME } from '../serviceName';
 
 
 /**
@@ -295,19 +296,19 @@ const MangaDetail: React.FC = () => {
 };
 
 // メタタグで使用する説明文を生成
-const description = `[トカエル]${mangaDetail.title}: 全${mangaDetail.numberOfBooks}巻  無料で漫画がよめるかも！？物々交換してみよう！！`;
+const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDetail?.numberOfBooks || 0}巻  無料で漫画がよめるかも！？物々交換してみよう！！`;
 
   return  (
     <HelmetProvider>
       <Helmet>
-        <title>{mangaDetail.title}</title>
+        <title>{mangaDetail.title} by トカエル</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={mangaDetail.title} />
+        <meta property="og:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={mangaDetail.imageUrls[0]} />
         <meta property="og:url" content={window.location.href} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={mangaDetail.title} />
+        <meta name="twitter:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={mangaDetail.imageUrls[0]} />
       </Helmet>

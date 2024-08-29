@@ -5,7 +5,8 @@ import { useForm, Controller } from 'react-hook-form';
 import CustomToolbar from '../components/common/CustumToolbar';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
-
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { SERVICE_NAME } from '../serviceName';
 
 type FormData = {
   email: string;
@@ -137,9 +138,24 @@ const MpChangeEmailPassword: React.FC = () => {
 
     setIsLoading(false);
   };
+
+  const description = `[${SERVICE_NAME}]メールアドレスおよびパスワードの更新を行います。`;
   
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>{SERVICE_NAME} - メール・パスワードの変更</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`${SERVICE_NAME} - メール・パスワードの変更`} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${SERVICE_NAME} - メール・パスワードの変更`} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
+
       {/* CustomToolbarはそのままにする */}
       <CustomToolbar title='メール・パスワード' />
       <Box pt={9} px={2}>
@@ -240,7 +256,7 @@ const MpChangeEmailPassword: React.FC = () => {
           </Button>
         </form>
       </Box>
-    </>
+    </HelmetProvider>
   );
 };
 
