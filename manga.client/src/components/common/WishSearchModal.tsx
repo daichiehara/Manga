@@ -5,9 +5,10 @@ interface WishSearchModalProps {
     isOpen: boolean;
     onClose: () => void;
     onRefreshWishList: () => void;  // ウィッシュリストをリフレッシュするためのコールバック関数
+    currentBooks: { itemId: number; title: string }[];
 }
 
-const WishSearchModal: React.FC<WishSearchModalProps> = ({ isOpen, onClose, onRefreshWishList }) => {
+const WishSearchModal: React.FC<WishSearchModalProps> = ({ isOpen, onClose, onRefreshWishList, currentBooks }) => {
     return (
         <SearchModal
             isOpen={isOpen}
@@ -21,6 +22,7 @@ const WishSearchModal: React.FC<WishSearchModalProps> = ({ isOpen, onClose, onRe
             message2='出品した漫画に対して、登録した漫画との'
             message3='交換リクエストが来ます。'
             messageColor='blue'
+            currentList={currentBooks}
         />
     );
 };

@@ -147,7 +147,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       }
     } else {
       localStorage.setItem('guestMangaList', JSON.stringify(selectedTitles));
-      showSnackbar('タイトルがローカルに保存されました。');
+      showSnackbar('タイトルが追加されました。');
     }
     onRefreshList();
     await refreshAllData();
