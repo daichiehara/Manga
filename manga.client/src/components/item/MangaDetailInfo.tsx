@@ -110,17 +110,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
     <HelmetProvider>
       <Paper elevation={0} sx={{ pt: 1, pb: 1, pl: 2.0, pr: 1, border: 'none' }}>
         {/* Helmetによるメタタグ設定 */}
-        <Helmet>
-          <title>{title}</title>
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="og:image" content={imageUrl} />
-          <meta property="og:url" content={window.location.href} />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={title} />
-          <meta name="twitter:description" content={description} />
-          <meta name="twitter:image" content={imageUrl} />
-        </Helmet>
+        
 
         <Grid container spacing={0} alignItems="center" sx={{ pt: 1 }}>
           <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>

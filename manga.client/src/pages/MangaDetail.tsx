@@ -17,6 +17,7 @@ import RecentCommentsDisplay from '../components/comment/RecentCommentsDisplay';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
 import axios from 'axios';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomToolbar from '../components/common/CustumToolbar';
@@ -293,8 +294,23 @@ const MangaDetail: React.FC = () => {
     }, 8000); // 3秒後にメッセージを消す
 };
 
+// メタタグで使用する説明文を生成
+const description = `[トカエル]${mangaDetail.title}: 全${mangaDetail.numberOfBooks}巻  無料で漫画がよめるかも！？物々交換してみよう！！`;
+
   return  (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>{mangaDetail.title}</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={mangaDetail.title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={mangaDetail.imageUrls[0]} />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={mangaDetail.title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={mangaDetail.imageUrls[0]} />
+      </Helmet>
       <Box sx={{ p: 0, margin:0 }}>
         {/* 戻るボタン */}      
         <BackButton handleBack={handleBack} />
@@ -478,7 +494,7 @@ const MangaDetail: React.FC = () => {
         onClose={() => setIsMyBookModalOpen(false)}
         openWishlistTab={openWishlistDrawer}
       />
-    </>
+    </HelmetProvider>
   );
 };
 

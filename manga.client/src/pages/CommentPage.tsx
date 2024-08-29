@@ -1,10 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import CustomToolbar from '../components/common/CustumToolbar';
-import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import { Box, TextField, Button, Divider, Typography } from '@mui/material';
 import CommentList from '../components/comment/CommentList';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 // APIレスポンスの型定義
 interface ReplyDto {
@@ -22,12 +23,6 @@ interface ReplyForSellDto {
 }
 
 const CommentPage: React.FC = () => {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate(-1); // 前のページに戻る
-  };
-
   // AuthContextから認証状態を安全に取得
   const authContext = useContext(AuthContext);
   const isAuthenticated = authContext ? authContext.authState.isAuthenticated : false;
@@ -83,8 +78,23 @@ const CommentPage: React.FC = () => {
     }
   }, [newReply, sellId, fetchReplies]);
 
+  const description = `[トカエル]このページでは、出品された漫画に対するコメントを閲覧・投稿できます。`;
+
+
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>コメントページ</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content="コメントページ" />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="コメントページ" />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
       {/* 見出しのToolbar */}
       <CustomToolbar title="コメント" />
       <Box sx={{ pt: '4rem' }}>
@@ -130,7 +140,7 @@ const CommentPage: React.FC = () => {
           )}
         </Box>
       </Box>
-    </>
+    </HelmetProvider>
   );
 };
 
