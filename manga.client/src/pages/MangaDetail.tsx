@@ -301,14 +301,14 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
   return  (
     <HelmetProvider>
       <Helmet>
-        <title>{mangaDetail.title} by トカエル</title>
+        <title>{mangaDetail.title} by {SERVICE_NAME}【漫画の物々交換サービス】</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}`} />
+        <meta property="og:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}【漫画の物々交換サービス】`} />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={mangaDetail.imageUrls[0]} />
         <meta property="og:url" content={window.location.href} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}`} />
+        <meta name="twitter:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}【漫画の物々交換サービス】`} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={mangaDetail.imageUrls[0]} />
       </Helmet>

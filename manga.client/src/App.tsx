@@ -13,12 +13,10 @@ import MangaDetail from './pages/MangaDetail';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme/theme';
 import MainNotification from './pages/MainNotification';
-import MainMyBook from './pages/MainMyBook';
 import MSell from './pages/MSell.tsx';
 import MainMyPage from './pages/MainMyPage';
 import LoginPage from './pages/LoginPage';
 import MpFavoList from './pages/MpFavoList.tsx';
-import TestRefreshToken from './pages/TestRefreshToken.tsx';
 import { authService } from './api/authService.ts';
 import MpChangeEmailPassword from './pages/MpChangeEmailPassword.tsx';
 import MpAdressUpadate from './pages/MpAdressUpdate.tsx';
@@ -69,10 +67,8 @@ const router = createBrowserRouter(
       <Route path="/search" element={<MainSearch />} />
       <Route path="/item/:sellId" element={<MangaDetail />} />
       <Route path="/notification" element={<MainNotification />} /> {/* 通知ページのルート */}
-      <Route path="/main-mybook" element={<MainMyBook />} /> {/* マイ本棚のルート */}
       <Route path="/main-sell" element={<MSell />} />
       <Route path="/login-page" element={<LoginPage />} /> {/* ログインページのルート */}
-      <Route path="/test" element={<TestRefreshToken />} /> {/* test */}
       <Route path="/mypage" element={<MainMyPage />} /> {/* マイページのルート */}
       <Route path="/mypage/favolist" element={<MpFavoList />} /> {/* test */}
       <Route path="/mypage/changeemailpassword" element={<MpChangeEmailPassword />} />
