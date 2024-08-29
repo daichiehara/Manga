@@ -5,9 +5,10 @@ interface OwnedSearchModalProps {
     isOpen: boolean;
     onClose: () => void;
     onRefreshOwnedList: () => void;  // 所有リストをリフレッシュするためのコールバック関数
+    currentBooks: { itemId: number; title: string }[];
 }
 
-const OwnedSearchModal: React.FC<OwnedSearchModalProps> = ({ isOpen, onClose, onRefreshOwnedList }) => {
+const OwnedSearchModal: React.FC<OwnedSearchModalProps> = ({ isOpen, onClose, onRefreshOwnedList, currentBooks }) => {
     return (
         <SearchModal
             isOpen={isOpen}
@@ -21,6 +22,7 @@ const OwnedSearchModal: React.FC<OwnedSearchModalProps> = ({ isOpen, onClose, on
             message2='検索であなたの漫画を欲しい人が'
             message3='見つかりやすくなります!'
             messageColor='red'
+            currentList={currentBooks}
         />
     );
 };

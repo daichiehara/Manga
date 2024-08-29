@@ -70,7 +70,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
       </Box>
       {authState.isAuthenticated && (
         <>
-          <WishSearchModal isOpen={isOpen} onClose={handleClose} onRefreshWishList={onRefreshWishList} />
+          <WishSearchModal isOpen={isOpen} onClose={handleClose} onRefreshWishList={onRefreshWishList} currentBooks={books} />
           <List>
             <TransitionGroup>
               {books.map((book) => (
