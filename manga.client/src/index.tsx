@@ -1,4 +1,3 @@
-// index.tsx
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@mui/material/styles';
@@ -10,21 +9,32 @@ import { SnackbarProvider } from './components/context/SnackbarContext';
 import { UserProvider } from './components/context/UserContext';
 import { AppProvider } from './components/context/AppContext';
 import { NotificationProvider } from './components/context/NotificationContext';
-//import './utils/http'
-
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 
 const container = document.getElementById('root');
 
-// containerがnullでないことを確認
 if (container) {
   const root = createRoot(container);
-  
+
   root.render(
     <React.StrictMode>
-      <ThemeProvider theme={theme}>
-        <AuthProvider>
-          <AppProvider>
-            <UserProvider>
+      <HelmetProvider>
+        <Helmet>
+          <title>トカエル -まじ受ける</title>
+          {/*  <meta name="description" content="トカエルは日本初の漫画の物々交換を簡単に楽しめるサービスです。" /> */}
+          <meta property="og:title" content="トカエル -日本初の漫画の物々交換サービス" />
+          <meta property="og:description" content="トカエルは日本初の漫画の物々交換を簡単に楽しめるサービスです。" /> 
+          <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+          <meta property="og:url" content="https://tocaeru.com" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="トカエル -日本初の漫画の物々交換サービス" />
+          <meta name="twitter:description" content="トカエルは日本初の漫画の物々交換を簡単に楽しめるサービスです。" />
+          <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        </Helmet>
+        <ThemeProvider theme={theme}>
+          <AuthProvider>
+            <AppProvider>
+              <UserProvider>
                 <NotificationProvider>
                   <BooksProvider>
                     <SnackbarProvider>
@@ -32,14 +42,13 @@ if (container) {
                     </SnackbarProvider>
                   </BooksProvider>
                 </NotificationProvider>
-            </UserProvider>
-          </AppProvider>
-        </AuthProvider>
-      </ThemeProvider>
+              </UserProvider>
+            </AppProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </HelmetProvider>
     </React.StrictMode>
   );
 } else {
   console.error('Failed to find the root element');
 }
-
-
