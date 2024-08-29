@@ -11,7 +11,7 @@ import LoadingComponent from '../components/common/LoadingComponent';
 import { useNavigate } from 'react-router-dom';
 import { NotificationContext } from '../components/context/NotificationContext';
 import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
-
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 interface Notification {
   sellId: number;
   message: string;
@@ -234,10 +234,24 @@ const handleExchangeConfirmed = useCallback(() => {
       </>
     );
   }
+  const description = `[トカエル]このページでは、コメントや交換申し込みなどの通知を確認できます。`;
 
 
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>お知らせ</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content="お知らせ" />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="お知らせ" />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+      </Helmet>
+        
       <CustomToolbar title='お知らせ' showBackButton={false} />
       
       <Box sx={{mt: 8, mb: 8}}>
@@ -257,7 +271,7 @@ const handleExchangeConfirmed = useCallback(() => {
       />
 
       <MenuBar />
-    </>
+    </HelmetProvider>
   );
 };
 
