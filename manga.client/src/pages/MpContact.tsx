@@ -13,6 +13,7 @@ import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import CustomToolbar from '../components/common/CustumToolbar';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 interface ContactFormData {
   name: string;
@@ -26,6 +27,7 @@ const ContactForm: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { showSnackbar } = useContext(SnackbarContext);
     const customNavigate = useCustomNavigate();
+    const { executeRecaptcha } = useGoogleReCaptcha();
 
   // Axiosインスタンスの作成
   const api = axios.create({
@@ -33,9 +35,18 @@ const ContactForm: React.FC = () => {
   });
 
   const onSubmit = async (data: ContactFormData) => {
+    if (!executeRecaptcha) {
+      console.log('reCAPTCHA not yet available');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await api.post('https://localhost:7103/api/Contacts', data);
+      const reCaptchaToken = await executeRecaptcha('contact_form');
+      await api.post('https://localhost:7103/api/Contacts', {
+        ...data,
+        reCaptchaToken
+      });
       reset(); // フォームをリセット
       customNavigate();
       showSnackbar('お問い合わせが正常に送信されました。', 'success');

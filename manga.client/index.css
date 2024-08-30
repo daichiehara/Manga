@@ -13,3 +13,6 @@ body, html {
     width: 100%; /* rootも全幅を使用し、上記の最大幅に従う */
 }
 
+.grecaptcha-badge {
+    visibility: hidden !important;
+  }
