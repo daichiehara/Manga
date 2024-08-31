@@ -36,8 +36,9 @@ namespace Manga.Server.Controllers
         private readonly S3Service _s3Service;
         private readonly HttpClient _httpClient;
         private readonly ReCaptchaService _reCaptchaService;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender, S3Service s3Service, HttpClient httpClient, ReCaptchaService reCaptchaService)
+        public UsersController(ApplicationDbContext context, UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager, IConfiguration configuration, IEmailSender emailSender, S3Service s3Service, HttpClient httpClient, ReCaptchaService reCaptchaService, ILogger<UsersController> logger)
         {
             _context = context;
             _userManager = userManager;
@@ -47,6 +48,7 @@ namespace Manga.Server.Controllers
             _s3Service = s3Service;
             _httpClient = httpClient;
             _reCaptchaService = reCaptchaService;
+            _logger = logger;
         }
 
         [HttpPost("Register")]
@@ -116,9 +118,14 @@ namespace Manga.Server.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
+            _logger.LogInformation($"Login attempt for email: {model.Email}");
+
             var reCaptchaResult = await _reCaptchaService.VerifyTokenAsync(model.ReCaptchaToken);
+            _logger.LogInformation($"reCAPTCHA result: Success={reCaptchaResult.Success}, Score={reCaptchaResult.Score}, Action={reCaptchaResult.Action}");
+
             if (!reCaptchaResult.Success || reCaptchaResult.Score < 0.5) // スコアのしきい値は調整可能
             {
+                _logger.LogWarning($"reCAPTCHA verification failed for email: {model.Email}. Success={reCaptchaResult.Success}, Score={reCaptchaResult.Score}");
                 return BadRequest("reCAPTCHA verification failed");
             }
 

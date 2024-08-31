@@ -26,13 +26,15 @@ namespace Manga.Server.Controllers
         private readonly UserManager<UserAccount> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly HtmlEncoder _htmlEncoder;
+        private readonly ReCaptchaService _reCaptchaService;
 
-        public ContactsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IEmailSender emailSender, HtmlEncoder htmlEncoder)
+        public ContactsController(ApplicationDbContext context, UserManager<UserAccount> userManager, IEmailSender emailSender, HtmlEncoder htmlEncoder, ReCaptchaService reCaptchaService)
         {
             _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
             _htmlEncoder = htmlEncoder;
+            _reCaptchaService = reCaptchaService;
         }
 
         // GET: api/Contacts
@@ -131,6 +133,12 @@ namespace Manga.Server.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            var reCaptchaResult = await _reCaptchaService.VerifyTokenAsync(contactDto.ReCaptchaToken);
+            if (!reCaptchaResult.Success || reCaptchaResult.Score < 0.5)
+            {
+                return BadRequest("reCAPTCHA verification failed");
             }
 
             var user = await _userManager.GetUserAsync(User);

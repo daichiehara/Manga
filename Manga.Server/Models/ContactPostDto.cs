@@ -12,5 +12,6 @@ namespace Manga.Server.Models
 
         [Required]
         public string Message { get; set; }
+        public string ReCaptchaToken { get; set; }
     }
 }
