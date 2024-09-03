@@ -12,6 +12,7 @@ import { SnackbarContext } from '../components/context/SnackbarContext';
 import { UserContext } from '../components/context/UserContext';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 const CameraPage: React.FC = () => {
   window.scrollTo({top:0, behavior: "instant"});
@@ -20,7 +21,6 @@ const CameraPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const theme = useTheme();
   const notLgMobile = useMediaQuery(theme.breakpoints.down('lg'));
-  const navigate = useNavigate();
   const [open, setOpen] = useState(true);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -196,14 +196,13 @@ const CameraPage: React.FC = () => {
           withCredentials: true,
         };
   
-        const result = await axios.post('https://localhost:7103/api/Users/uploadIdVerificationImage', formData, config);
+        const result = await axios.post(`${API_BASE_URL}/Users/uploadIdVerificationImage`, formData, config);
   
         if (result.status === 200) {
           await refreshUserInfo();
             // アップロード成功後の処理を追加
             customNavigate();
             showSnackbar('アップロード完了', 'success');
-            navigate('/main-page');
         } else {
             console.error('Failed to upload image');
             // アップロード失敗時の処理を追加

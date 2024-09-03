@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { updateGlobalAuthState, AuthContext } from '../components/context/AuthContext';
 import { addGlobalBook, removeGlobalBook } from '../components/context/BookContext';
+import { API_BASE_URL } from '../apiName';
 
 interface Book {
   id: number;  // オプショナルなプロパティとして定義
@@ -16,9 +17,6 @@ interface BooksApiResponse {
 
 type BookId = number;
 type WishList = Book[]; // WishListはBookの配列です
-
-
-const API_BASE_URL = 'https://localhost:7103/api';
 
 
 export const bookService = {

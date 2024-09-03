@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
+import { API_BASE_URL } from '../../apiName';
 
 interface MainMyPage {
   title: string;
@@ -27,7 +28,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!authState.isAuthenticated) return;
 
     try {
-      const response = await axios.get<MainMyPage>('https://localhost:7103/api/Users/MyPage', {
+      const response = await axios.get<MainMyPage>(`${API_BASE_URL}/Users/MyPage`, {
         withCredentials: true
       });
       setUserInfo(response.data);

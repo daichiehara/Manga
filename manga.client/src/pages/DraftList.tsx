@@ -7,7 +7,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
-
+import { API_BASE_URL } from '../apiName';
 
 interface SellDraftDto {
   sellId: number;
@@ -27,7 +27,7 @@ const DraftList: React.FC = () => {
   const fetchDrafts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get<SellDraftDto[]>('https://localhost:7103/api/Sells/Drafts', {
+      const response = await axios.get<SellDraftDto[]>(`${API_BASE_URL}/Sells/Drafts`, {
         withCredentials: true
       });
       setDrafts(response.data);

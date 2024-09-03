@@ -9,6 +9,8 @@ import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
+
 interface ChangeAddressDto {
   sei: string;
   mei: string;
@@ -54,7 +56,7 @@ const MpAdressUpdate: React.FC = () => {
   useEffect(() => {
     const fetchAddress = async () => {
       try {
-        const response = await axios.get<ChangeAddressDto>('https://localhost:7103/api/Users/GetAddress', {
+        const response = await axios.get<ChangeAddressDto>(`${API_BASE_URL}/Users/GetAddress`, {
           withCredentials: true,
         });
         const { sei, mei, postalCode, prefecture, address1, address2 } = response.data;
@@ -129,7 +131,7 @@ const MpAdressUpdate: React.FC = () => {
     ).replace(/[^0-9]/g, '');
 
     try {
-      await axios.put('https://localhost:7103/api/Users/UpdateAddress', {
+      await axios.put(`${API_BASE_URL}/Users/UpdateAddress`, {
         ...data,
         postalCode: formattedPostalCode,
       }, {

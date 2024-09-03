@@ -1,5 +1,6 @@
 import React from 'react';
 import SearchModal from './SearchModal';
+import { API_BASE_URL } from '../../apiName';
 
 interface OwnedSearchModalProps {
     isOpen: boolean;
@@ -14,7 +15,7 @@ const OwnedSearchModal: React.FC<OwnedSearchModalProps> = ({ isOpen, onClose, on
             isOpen={isOpen}
             onClose={onClose}
             onRefreshList={onRefreshOwnedList}
-            apiEndpoint="https://localhost:7103/api/OwnedLists"
+            apiEndpoint={`${API_BASE_URL}/OwnedLists`}
             placeholder="タイトルまたは作者で検索"
             completeMessage="タイトルが所有リストに追加されました。"
             noSelectionMessage="タイトルが選択されていません。"

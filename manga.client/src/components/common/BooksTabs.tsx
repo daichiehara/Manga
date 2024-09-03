@@ -8,8 +8,8 @@ import BooksListSells from '../item/BookListSells';
 import BookListOwned from '../item/BookListOwned';
 import { AuthContext } from '../context/AuthContext';
 import { AppContext } from '../context/AppContext';
+import { API_BASE_URL } from '../../apiName';
 
-const API_BASE_URL = 'https://localhost:7103/api';
 
 interface Book {
   itemId: number;  // `id` を `itemId` に変更

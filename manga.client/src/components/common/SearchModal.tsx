@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
 import { AuthContext } from '../context/AuthContext';
 import { AppContext } from '../context/AppContext';
+import { API_BASE_URL } from '../../apiName';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -68,7 +69,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onRefreshLis
       setCancelTokenSource(newCancelTokenSource);
 
       setIsLoading(true);
-      const response = await axios.get(`https://localhost:7103/api/Sells/Any?query=${encodeURIComponent(query)}`, {
+      const response = await axios.get(`${API_BASE_URL}/Sells/Any?query=${encodeURIComponent(query)}`, {
         cancelToken: newCancelTokenSource.token,
       });
 

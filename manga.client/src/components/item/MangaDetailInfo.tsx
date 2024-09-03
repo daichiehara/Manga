@@ -14,6 +14,7 @@ import ReportDialog from '../common/ReportDialog';
 import { AuthContext } from '../context/AuthContext';
 import { AppContext } from '../context/AppContext';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, LineShareButton, LineIcon, XIcon } from 'react-share';
+import { API_BASE_URL } from '../../apiName';
 
 interface MangaDetailInfoProps {
   title: string;
@@ -63,7 +64,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
 
   const handleLike = async () => {
     try {
-      const response = await axios.put(`https://localhost:7103/api/MyLists/${sellId}`, null, {
+      const response = await axios.put(`${API_BASE_URL}/MyLists/${sellId}`, null, {
         withCredentials: true,
       });
 
@@ -78,7 +79,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   };
 
   const handleReportClick = () => {
-    authState.isAuthenticated ? setReportDialogOpen(true) : navigate('/login-page');
+    authState.isAuthenticated ? setReportDialogOpen(true) : navigate('/signup');
   };
 
   const handleReportDialogClose = () => {

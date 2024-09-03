@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Box, Grid, Typography, Divider, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {useTheme} from '@mui/material/styles';
+import { API_BASE_URL } from '../../apiName';
 
 // 住所データの型定義
 interface ChangeAddressDto {
@@ -28,7 +29,7 @@ const AddressLink: React.FC<AddressLinkProps> = ({ onAddressFetch }) => {
 
     const fetchAddress = async () => {
         try {
-            const response = await axios.get<ChangeAddressDto>('https://localhost:7103/api/Users/GetAddress', {
+            const response = await axios.get<ChangeAddressDto>(`${API_BASE_URL}/Users/GetAddress`, {
                 withCredentials: true,
             });
             setAddress(response.data);

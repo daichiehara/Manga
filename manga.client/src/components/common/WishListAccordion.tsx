@@ -4,8 +4,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import BookListWish from '../item/BookListWish';
 import { useBooks } from '../context/BookContext';
 import axios from 'axios';
+import { API_BASE_URL } from '../../apiName';
 
-const API_BASE_URL = 'https://localhost:7103/api';
 
 interface Book {
   itemId: number;

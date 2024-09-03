@@ -9,6 +9,7 @@ import { useTheme } from '@mui/material/styles';
 import AddressLink from './AddressLink';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { SnackbarContext } from '../context/SnackbarContext';
+import { API_BASE_URL } from '../../apiName';
 
 interface RequestedGetDto {
   responderSellId: number;
@@ -166,7 +167,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
 
   const confirmExchange = async (responderSellId: number, requesterSellId: number) => {
     try {
-      const response = await axios.post('https://localhost:7103/api/Requests', {
+      const response = await axios.post(`${API_BASE_URL}/Requests`, {
         ResponderSellId: responderSellId,
         RequesterSellIds: [requesterSellId]
       }, {

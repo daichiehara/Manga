@@ -13,6 +13,7 @@ import { NotificationContext } from '../components/context/NotificationContext';
 import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 interface Notification {
   sellId: number;
@@ -119,7 +120,7 @@ const MainNotification: React.FC = () => {
 
   const fetchExchangeRequest = useCallback(async (id: number) => {
     try {
-      const response = await axios.get(`https://localhost:7103/api/Requests/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/Requests/${id}`, {
         withCredentials: true
       });
       return response.data;
@@ -167,11 +168,13 @@ const handleExchangeConfirmed = useCallback(() => {
         <Card elevation={0} sx={{ display: 'flex', alignItems: 'center'}}>
           <CardActionArea onClick={() => handleNotificationClick(notification)}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <CardMedia
-                component="img"
-                sx={{ width: 70, height: 70, margin: 2, borderRadius: '10px' }}
-                image={notification.sellImage}
-              />
+              <Box sx={{margin: 2}}>
+                <CardMedia
+                  component="img"
+                  sx={{ width: 70, height: 70, borderRadius: '10px', backgroundColor: 'grey.300', }}
+                  image={notification.sellImage}
+                />
+              </Box>
               <CardContent sx={{ flexGrow: 1, '&:last-child': { paddingBottom: '8px' }, padding: '4px' }}>
                 <Typography variant="body2" sx={{ fontWeight: '570'}}>
                   {notification.message}

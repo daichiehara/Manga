@@ -7,6 +7,7 @@ import { useTheme } from '@mui/material/styles';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 // スタイルの定義
 const ContainerStyled = styled(Container)(({ theme }) => ({
@@ -75,7 +76,7 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('https://localhost:7103/api/Users/ResetPassword', { userId, token, newPassword: password, confirmPassword: confirmPassword }, { withCredentials: true });
+      const response = await axios.post(`${API_BASE_URL}/Users/ResetPassword`, { userId, token, newPassword: password, confirmPassword: confirmPassword }, { withCredentials: true });
       setMessage(response.data.message);
       setError('');
       navigate('/login-page'); // リセット成功後にログインページにリダイレクト

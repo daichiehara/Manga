@@ -24,7 +24,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import theme from '../theme/theme';
 import { replace } from 'lodash';
 import { SERVICE_NAME } from '../serviceName';
-
+import { API_BASE_URL } from '../apiName';
 
 /**
  * MangaDetail コンポーネント
@@ -138,7 +138,7 @@ const MangaDetail: React.FC = () => {
   const fetchMangaDetails = async () => {
     try {
       console.log('fetch: api Details');
-      const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
+      const response = await axios.get(`${API_BASE_URL}/Sells/${sellId}`, {
         withCredentials: true
       });
       setMangaDetail(response.data);
@@ -161,7 +161,7 @@ const MangaDetail: React.FC = () => {
   const withdrawRequests = async () => {
     setIsSubmitting(true);
     try {
-        await axios.put(`https://localhost:7103/api/Requests/withdrawRequests/${sellId}`, null, {
+        await axios.put(`${API_BASE_URL}/Requests/withdrawRequests/${sellId}`, null, {
             withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
         // 必要に応じて他の状態を更新
@@ -169,7 +169,7 @@ const MangaDetail: React.FC = () => {
         showSnackbar("交換申請の取り消しに失敗しました", 'error'); // 失敗メッセージをセット
         console.error('交換申請の取り消しに失敗:', error);
       } finally {
-        const response = await axios.get(`https://localhost:7103/api/Sells/${sellId}`, {
+        const response = await axios.get(`${API_BASE_URL}/Sells/${sellId}`, {
           withCredentials: true  // クロスオリジンリクエストにクッキーを含める
       }); // sell情報を再読み込み
         setMangaDetail(response.data); // データの再取得

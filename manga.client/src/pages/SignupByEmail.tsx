@@ -13,6 +13,7 @@ import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 const SignupByEmail: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -60,7 +61,7 @@ const SignupByEmail: React.FC = () => {
     try {
       const reCaptchaToken = await executeRecaptcha('signup');
 
-      const response = await axios.post('https://localhost:7103/api/Users/Register', {
+      const response = await axios.post(`${API_BASE_URL}/Users/Register`, {
         email,
         password,
         nickName,

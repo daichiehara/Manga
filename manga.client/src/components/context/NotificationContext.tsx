@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
+import { SnackbarContext } from './SnackbarContext';
+import { API_BASE_URL } from '../../apiName';
 
 export interface Notification {
     sellId: number;
@@ -35,12 +37,13 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const [isInitialized, setIsInitialized] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { authState } = useContext(AuthContext);
+    const { showSnackbar } = useContext(SnackbarContext);
 
     const fetchNotifications = async () => {
         if (authState.isAuthenticated) {
             setIsLoading(true);
             try {
-                const response = await axios.get('https://localhost:7103/api/Notifications', {
+                const response = await axios.get(`${API_BASE_URL}/Notifications`, {
                     withCredentials: true
                 });
                 setNotifications(response.data);
@@ -55,7 +58,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const updateUnreadCount = async () => {
         if (authState.isAuthenticated) {
             try {
-                const response = await axios.get('https://localhost:7103/api/Notifications/unread-count', {
+                const response = await axios.get(`${API_BASE_URL}/Notifications/unread-count`, {
                     withCredentials: true
                 });
                 const newUnreadCount = response.data;
@@ -63,6 +66,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
                 
                 if (newUnreadCount !== unreadCount) {
                     setUnreadCount(newUnreadCount);
+                    showSnackbar(`${newUnreadCount}件の新着通知があります。`, 'info');
                     
                     // 未読カウントが増加した場合のみ通知を再取得
                     if (newUnreadCount > unreadCount) {
@@ -78,7 +82,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const markAllAsRead = async () => {
         if (authState.isAuthenticated) {
             try {
-                await axios.post('https://localhost:7103/api/Notifications/mark-all-as-read', null, {
+                await axios.post(`${API_BASE_URL}/Notifications/mark-all-as-read`, null, {
                     withCredentials: true
                 });
                 setUnreadCount(0);

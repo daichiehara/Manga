@@ -7,6 +7,7 @@ import { Box, TextField, Button, Divider, Typography } from '@mui/material';
 import CommentList from '../components/comment/CommentList';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 // APIレスポンスの型定義
 interface ReplyDto {
@@ -43,7 +44,7 @@ const CommentPage: React.FC = () => {
   // APIからコメントを取得する関数（useCallbackを使用して再生成を防ぐ）
   const fetchReplies = useCallback(async () => {
     try {
-      const response = await axios.get<ReplyForSellDto>(`https://localhost:7103/api/replies/${sellId}`, {
+      const response = await axios.get<ReplyForSellDto>(`${API_BASE_URL}/replies/${sellId}`, {
         withCredentials: true, // クロスオリジンリクエストにクッキーを含める
       });
       setReplies(response.data.replies || []); // 取得したデータが存在しない場合に空配列をセット
@@ -69,7 +70,7 @@ const CommentPage: React.FC = () => {
     }
 
     try {
-      await axios.post('https://localhost:7103/api/replies', { sellId: parsedSellId, message: newReply }, {
+      await axios.post(`${API_BASE_URL}/replies`, { sellId: parsedSellId, message: newReply }, {
         withCredentials: true, // クロスオリジンリクエストにクッキーを含める
       });
       setNewReply(''); // コメントを投稿した後に入力フィールドをリセット

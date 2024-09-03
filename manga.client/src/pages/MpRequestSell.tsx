@@ -10,6 +10,7 @@ import LoadingComponent from '../components/common/LoadingComponent';
 import theme from '../theme/theme';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 enum RequestStatus {
   Pending = 1,
@@ -88,7 +89,7 @@ const RequestedSellList: React.FC = () => {
     const fetchRequestedSells = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('https://localhost:7103/api/Sells/RequestedSell', {
+            const response = await axios.get(`${API_BASE_URL}/Sells/RequestedSell`, {
             withCredentials: true
             });
             setRequestedSells(response.data);
@@ -103,7 +104,7 @@ const RequestedSellList: React.FC = () => {
 
   const handleSellClick = async (sell: RequestedSell) => {
     try {
-      const response = await axios.get(`https://localhost:7103/api/Sells/RequestedSell/${sell.sellId}`, {
+      const response = await axios.get(`${API_BASE_URL}/Sells/RequestedSell/${sell.sellId}`, {
         withCredentials: true
       });
       setSelectedSell({

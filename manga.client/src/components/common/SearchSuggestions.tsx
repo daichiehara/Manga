@@ -4,6 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import axios from 'axios';
+import { API_BASE_URL } from '../../apiName';
 
 interface SearchSuggestionsProps {
   query: string;
@@ -33,7 +34,7 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({ query, onSuggesti
     console.log('Fetching suggestions for:', searchQuery);
 
     try {
-      const response = await axios.get('https://localhost:7103/api/Sells/All', {
+      const response = await axios.get(`${API_BASE_URL}/Sells/All`, {
         params: { query: searchQuery },
       });
       console.log('API response:', response.data);

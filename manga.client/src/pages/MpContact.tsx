@@ -6,7 +6,8 @@ import {
   Button, 
   Container, 
   Box, 
-  CircularProgress
+  CircularProgress,
+  Typography
 } from '@mui/material';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
@@ -14,6 +15,8 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import GooglePolicyText from '../components/common/GooglePolicyText';
+import { API_BASE_URL } from '../apiName';
 
 interface ContactFormData {
   name: string;
@@ -43,7 +46,7 @@ const ContactForm: React.FC = () => {
     setIsSubmitting(true);
     try {
       const reCaptchaToken = await executeRecaptcha('contact_form');
-      await api.post('https://localhost:7103/api/Contacts', {
+      await api.post(`${API_BASE_URL}/Contacts`, {
         ...data,
         reCaptchaToken
       });
@@ -116,6 +119,7 @@ const ContactForm: React.FC = () => {
                 />
               )}
             />
+            <Typography variant='body2' color='secondary' sx={{fontWeight: 'bold', mt: 3}}>お問い合わせ内容</Typography>
             <Controller
               name="message"
               control={control}
@@ -125,16 +129,23 @@ const ContactForm: React.FC = () => {
                 <TextField
                   {...field}
                   fullWidth
-                  label="メッセージ"
                   multiline
-                  rows={4}
+                  rows={8}
                   error={!!error}
                   helperText={error?.message}
                   margin="normal"
+                  placeholder=
+                  {`ご質問やご意見などをお聞かせください。
+例：
+・本の交換方法について詳しく知りたい
+・新しい機能の提案がある
+・使用中に問題が発生した
+・サービスに関する感想や改善点
+など、どんなことでもお気軽にお問い合わせください。`}
                 />
               )}
             />
-            <Box mt={2}>
+            <Box my={2}>
               <Button 
                 type="submit" 
                 variant="contained" 
@@ -147,6 +158,7 @@ const ContactForm: React.FC = () => {
               </Button>
             </Box>
           </form>
+          <GooglePolicyText />
         </Box>
       </Container>
     </HelmetProvider>

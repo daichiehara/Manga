@@ -2,7 +2,6 @@ import {  useNavigate } from 'react-router-dom';
 import BackButton from '../components/common/BackButton';
 import CustomToolbar from '../components/common/CustumToolbar';
 import React, { useState, useEffect, useContext } from 'react';
-import MenuBar from '../components/menu/MenuBar';
 import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import MangaListItem from '../components/item/MangaListItem';
@@ -13,6 +12,7 @@ import { Link } from 'react-router-dom';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 enum SellStatus {
   Recruiting = 1,
@@ -51,7 +51,7 @@ const MainMpFavoList: React.FC = () => {
         try {
           setIsLoading(true);
           console.log('APIリクエストを送信中...');
-          const response = await axios.get('https://localhost:7103/api/Sells/MyFavorite', {
+          const response = await axios.get(`${API_BASE_URL}/Sells/MyFavorite`, {
             withCredentials: true  // クロスオリジンリクエストにクッキーを含める
           });
           console.log('レスポンス受信:', response.status, response.statusText);
@@ -144,9 +144,6 @@ const MainMpFavoList: React.FC = () => {
         )}
         {selectedTab === 1 && <Box>MyList content goes here...</Box>}
       </Box>
-
-
-      <MenuBar />
     </HelmetProvider>
   );
 };

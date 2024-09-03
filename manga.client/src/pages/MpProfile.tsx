@@ -9,6 +9,7 @@ import { UserContext } from '../components/context/UserContext';
 import axios from 'axios';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 interface ProfileFormData {
   nickName: string | null;
@@ -34,7 +35,7 @@ const MpProfile: React.FC = () => {
   const fetchUserProfile = async () => {
     try {
         setLoading(true);
-      const response = await axios.get('https://localhost:7103/api/Users/GetUserProfile', { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/Users/GetUserProfile`, { withCredentials: true });
       const userProfile = response.data;
       setFormData({
         nickName: userProfile.nickName,
@@ -80,7 +81,7 @@ const MpProfile: React.FC = () => {
 
     try {
         setIsLoading(true);
-      const response = await axios.put('https://localhost:7103/api/Users/UpdateProfile', formDataToSend, { withCredentials: true });
+      const response = await axios.put(`${API_BASE_URL}/Users/UpdateProfile`, formDataToSend, { withCredentials: true });
 
       if (response.status === 200) {
         await refreshUserInfo();

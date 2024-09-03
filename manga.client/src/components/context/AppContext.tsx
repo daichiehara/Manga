@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
+import { API_BASE_URL } from '../../apiName';
 
 enum SellStatus {
   Recruiting = 1,
@@ -99,9 +100,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       let url: string;
       let params: FetchParams = { page: currentPage, pageSize: 10 };
 
-      if (tabIndex === 0) url = 'https://localhost:7103/api/Sells/MyFavorite';
-      else if (tabIndex === 1) url = 'https://localhost:7103/api/Sells/Recommend';
-      else url = 'https://localhost:7103/api/Sells';
+      if (tabIndex === 0) url = `${API_BASE_URL}/Sells/MyFavorite`;
+      else if (tabIndex === 1) url = `${API_BASE_URL}/Sells/Recommend`;
+      else url = `${API_BASE_URL}/Sells`;
 
       if (!authState.isAuthenticated && tabIndex !== 0) {
         // ゲストユーザーの場合、ローカルストレージのデータを取得し、タイトルのみの配列に変換
@@ -168,7 +169,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const refreshMyFavorite = useCallback(async () => {
     setIsLoadingMyList(true);
     try {
-      const response = await axios.get('https://localhost:7103/api/Sells/MyFavorite', {
+      const response = await axios.get(`${API_BASE_URL}/Sells/MyFavorite`, {
         params: { page: 1, pageSize: 10 },
         withCredentials: true
       });

@@ -9,6 +9,7 @@ import MyBookModal from '../common/MyBookModal';
 import { useInView } from 'react-intersection-observer';
 import { SERVICE_NAME } from '../../serviceName';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { API_BASE_URL } from '../../apiName';
 
 enum SellStatus {
   Recruiting = 1,
@@ -59,8 +60,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       setIsLoading(true);
         console.log(`Fetching results with isExchangeMode: ${exchangeMode}, onlyRecruiting: ${recruitingOnly}`);
       const endpoint = exchangeMode
-        ? 'https://localhost:7103/api/Sells/SearchByTitleForExchange'
-        : 'https://localhost:7103/api/Sells/SearchByWord';
+        ? `${API_BASE_URL}/Sells/SearchByTitleForExchange`
+        : `${API_BASE_URL}/Sells/SearchByWord`;
   
       const response = await axios.get(endpoint, {
         params: { 

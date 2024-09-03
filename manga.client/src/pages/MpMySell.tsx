@@ -9,6 +9,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 interface MpMySell {
   sellId: number;
@@ -79,7 +80,7 @@ const MpMySell: React.FC = () => {
     const fetchsetmpmysell = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get('https://localhost:7103/api/Sells/MySell',{
+        const response = await axios.get(`${API_BASE_URL}/Sells/MySell`,{
           withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
         // 取得したデータで状態を更新

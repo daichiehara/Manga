@@ -172,7 +172,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab}) => {
           )}
         </div>
       </Box>
-      <MenuBar />
+      { !searchQuery && <MenuBar /> }
     </>
   );
 };

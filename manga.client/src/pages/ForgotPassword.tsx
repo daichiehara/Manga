@@ -13,6 +13,9 @@ import { useTheme } from '@mui/material/styles';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import GooglePolicyText from '../components/common/GooglePolicyText';
+import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { API_BASE_URL } from '../apiName';
 
 const FormStyled = styled('form')(({ theme }) => ({
   width: '100%', // IE 11の問題を修正
@@ -28,15 +31,15 @@ const ForgotPassword: React.FC = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const theme = useTheme();
-  const navigate = useNavigate();
+  const customNavigate = useCustomNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await axios.post('https://localhost:7103/api/Users/ForgotPassword', { email }, { withCredentials: true });
+      const response = await axios.post(`${API_BASE_URL}/Users/ForgotPassword`, { email }, { withCredentials: true });
       setMessage(response.data.message);
       setError('');
-      navigate('/login-page');
+      customNavigate();
     } catch (err) {
       setError('パスワードリセットメールの送信に失敗しました。再度お試しください。');
       setMessage('');
@@ -59,7 +62,7 @@ const ForgotPassword: React.FC = () => {
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
-      <CustomTocaeruToolbar showSubtitle subtitle={'パスワードを忘れた方'} />
+      <CustomTocaeruToolbar showSubtitle showBackButton subtitle={'パスワードを忘れた方'} />
       <Box sx={{ px: `1.2rem`, pt: '1rem', pb: '1rem' }}>
         <Typography component="h1" variant="subtitle2">
           ご登録されたメールアドレスにパスワード再設定のご案内が送信されます。
@@ -91,9 +94,7 @@ const ForgotPassword: React.FC = () => {
             パスワードをリセットする
           </SubmitButtonStyled>
         </FormStyled>
-        <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
-          このサイトはreCAPTCHAで保護されており、Googleのプライバシーポリシーと利用規約が適用されます。
-        </Typography>
+        <GooglePolicyText />
       </Box>
     </HelmetProvider>
   );

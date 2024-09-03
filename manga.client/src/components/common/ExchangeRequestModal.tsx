@@ -14,6 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AddressLink from './AddressLink';
 import {useTheme} from '@mui/material/styles';
 import { SnackbarContext } from '../context/SnackbarContext';
+import { API_BASE_URL } from '../../apiName';
 
 interface ExchangeRequestModalProps {
     isOpen: boolean;
@@ -66,7 +67,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
 
     const fetchmpmysell = async () => {
         try {
-            const response = await axios.get<MpMySell[]>('https://localhost:7103/api/Sells/MySell', {
+            const response = await axios.get<MpMySell[]>(`${API_BASE_URL}/Sells/MySell`, {
                 withCredentials: true  // クロスオリジンリクエストにクッキーを含める
             });
             // 取得したデータで状態を更新
@@ -126,7 +127,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     const handleExchangeFinalRequest = async () => {
         setIsSubmitting(true);
         try {
-            const response = await axios.post('https://localhost:7103/api/Requests', {
+            const response = await axios.post(`${API_BASE_URL}/Requests`, {
                 responderSellId: sellId,
                 requesterSellIds: selectedSellIds,
             }, {

@@ -9,6 +9,7 @@ import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import LoadingComponent from '../components/common/LoadingComponent';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 interface MpMatchedSell {
   mySellId: number;
@@ -33,7 +34,7 @@ const MpMatchedSellComponent: React.FC = () => {
     const fetchMpMatchedSell = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get('https://localhost:7103/api/Requests/User', {
+        const response = await axios.get(`${API_BASE_URL}/Requests/User`, {
           withCredentials: true  // クロスオリジンリクエストにクッキーを含める
         });
         console.log('取得したデータ:', response.data); // デバッグ用にデータをログに出力

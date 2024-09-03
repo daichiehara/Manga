@@ -13,6 +13,7 @@ import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 const SignupPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -37,7 +38,7 @@ const SignupPage: React.FC = () => {
     setSuccess(null);
 
     try {
-        const response = await axios.post('https://localhost:7103/api/Users/auth/google', {
+        const response = await axios.post(`${API_BASE_URL}/Users/auth/google`, {
             code: credentialResponse.credential
         }, {
             withCredentials: true,

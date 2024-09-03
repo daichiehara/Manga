@@ -3,6 +3,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextFie
 import axios from 'axios';
 import { useSnackbar } from '../../hooks/useSnackbar';
 import CheckModal from './CheckModal';
+import { API_BASE_URL } from '../../apiName';
 
 enum ReportType {
   Sell = 1,
@@ -34,7 +35,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ id, reportType, open, onClo
   const handleConfirmReport = useCallback(async () => {
     setLoading(true); // ローディング状態を開始
     try {
-      const response = await axios.post('https://localhost:7103/api/Reports/Report', {
+      const response = await axios.post(`${API_BASE_URL}/Reports/Report`, {
         id,
         message,
         reportType,

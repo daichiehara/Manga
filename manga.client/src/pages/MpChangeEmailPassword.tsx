@@ -7,6 +7,7 @@ import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { BASE_URL, API_BASE_URL } from '../apiName';
 
 type FormData = {
   email: string;
@@ -39,7 +40,7 @@ const MpChangeEmailPassword: React.FC = () => {
   useEffect(() => {
     const fetchCurrentEmail = async () => {
       try {
-        const response = await axios.get('https://localhost:7103/manage/info', {
+        const response = await axios.get(`${BASE_URL}/manage/info`, {
           withCredentials: true,
         });
         setCurrentEmail(response.data.email);
@@ -88,7 +89,7 @@ const MpChangeEmailPassword: React.FC = () => {
 
     try {
       console.log('Sending API request...');
-      const response = await axios.post('https://localhost:7103/api/Users/UpdateAccount', {  
+      const response = await axios.post(`${API_BASE_URL}/Users/UpdateAccount`, {  
       newEmail: data.email,
         oldPassword: data.currentPassword,
         newPassword: data.newPassword,

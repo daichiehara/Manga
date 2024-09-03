@@ -1,5 +1,6 @@
 import React from 'react';
 import SearchModal from './SearchModal';
+import { API_BASE_URL } from '../../apiName';
 
 interface WishSearchModalProps {
     isOpen: boolean;
@@ -14,7 +15,7 @@ const WishSearchModal: React.FC<WishSearchModalProps> = ({ isOpen, onClose, onRe
             isOpen={isOpen}
             onClose={onClose}
             onRefreshList={onRefreshWishList}
-            apiEndpoint="https://localhost:7103/api/WishLists"
+            apiEndpoint={`${API_BASE_URL}/WishLists`}
             placeholder="タイトルまたは作者で検索"
             completeMessage="タイトルがウィッシュリストに追加されました。"
             noSelectionMessage="タイトルが選択されていません。"

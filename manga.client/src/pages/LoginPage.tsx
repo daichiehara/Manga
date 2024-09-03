@@ -16,6 +16,7 @@ import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 type LoginFormInputs = {
   email: string;
@@ -57,7 +58,7 @@ const Login: React.FC = () => {
     try {
       const reCaptchaToken = await executeRecaptcha('login');
 
-      const response = await axios.post('https://localhost:7103/api/Users/Login', {
+      const response = await axios.post(`${API_BASE_URL}/Users/Login`, {
         Email: data.email,
         Password: data.password,
         ReCaptchaToken: reCaptchaToken
@@ -104,7 +105,7 @@ const Login: React.FC = () => {
 
         try {
             // バックエンドにGoogle認証コードを送信
-            const response = await axios.post('https://localhost:7103/api/Users/auth/google', {
+            const response = await axios.post(`${API_BASE_URL}/Users/auth/google`, {
                 code: credentialResponse.credential
             }, {
                 withCredentials: true,

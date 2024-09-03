@@ -36,6 +36,7 @@ import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import { API_BASE_URL } from '../apiName';
 
 interface FormData {
   title: string;
@@ -201,8 +202,8 @@ const SellForm: React.FC = () => {
   
     try {
       const url = sellId
-        ? `https://localhost:7103/api/Sells/${sellId}`
-        : 'https://localhost:7103/api/Sells';
+        ? `${API_BASE_URL}/Sells/${sellId}`
+        : `${API_BASE_URL}/Sells`;
       const method = sellId ? 'put' : 'post';
 
       const response = await axios[method](url, formData, {
@@ -268,7 +269,7 @@ const SellForm: React.FC = () => {
   const fetchAuthor = async (selectedTitle: string) => {
     if (selectedTitle) {
       try {
-        const response = await axios.get(`https://localhost:7103/api/Sells/author?title=${encodeURIComponent(selectedTitle)}`);
+        const response = await axios.get(`${API_BASE_URL}/Sells/author?title=${encodeURIComponent(selectedTitle)}`);
         setAuthor(response.data);
       } catch (error) {
         console.error('Error fetching author:', error);
@@ -335,7 +336,7 @@ const SellForm: React.FC = () => {
   const fetchDraftData = async (sellId: number) => {
     try {
       setLoading(true);
-      const response = await axios.get(`https://localhost:7103/api/Sells/EditDraft/${sellId}`, {
+      const response = await axios.get(`${API_BASE_URL}/Sells/EditDraft/${sellId}`, {
         withCredentials: true,
       });
       const data = response.data;
@@ -376,7 +377,7 @@ const SellForm: React.FC = () => {
     setIsDialogOpen(false);
     try {
       setIsLoading(true);
-      await axios.delete(`https://localhost:7103/api/Sells/${sellId}`, {
+      await axios.delete(`${API_BASE_URL}/Sells/${sellId}`, {
         withCredentials: true,
       });
       console.log('Draft deleted successfully');
