@@ -4,7 +4,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import { VerifiedUser, CameraAlt } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 
 const MpIdVerification: React.FC = () => {
@@ -15,18 +15,15 @@ const MpIdVerification: React.FC = () => {
     const description = `[${SERVICE_NAME}]スマホでマイナンバーカードを撮影してかんたん本人確認を行いましょう。本人確認バッジが表示され、交換申請が来やすくなる可能性があります。`;
 
     return (
-        <HelmetProvider>
+        <>
             <Helmet>
-                <title>{SERVICE_NAME} - かんたん本人確認</title>
+                <title>かんたん本人確認 - {SERVICE_NAME}</title>
                 <meta name="description" content={description} />
-                <meta property="og:title" content={`${SERVICE_NAME} - かんたん本人確認`} />
+                <meta property="og:title" content={`かんたん本人確認 - ${SERVICE_NAME}`} />
                 <meta property="og:description" content={description} />
-                <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/IdVerification.jpg" />
                 <meta property="og:url" content={window.location.href} />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content={`${SERVICE_NAME} - かんたん本人確認`} />
+                <meta name="twitter:title" content={`かんたん本人確認 - ${SERVICE_NAME}`} />
                 <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/IdVerification.jpg" />
             </Helmet>
             <CustomToolbar title='かんたん本人確認' />
             <Box sx={{ pt: { xs: '3.5rem', sm: '4rem' }, pb: 2 }}>
@@ -109,7 +106,7 @@ const MpIdVerification: React.FC = () => {
                 </Link>
             </Box>
             <Box sx={{ mb: isMobile ? '3rem' : '10rem' }}></Box>
-        </HelmetProvider>
+        </>
       );
 };
 

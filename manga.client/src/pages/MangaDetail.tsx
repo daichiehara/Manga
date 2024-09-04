@@ -17,7 +17,7 @@ import RecentCommentsDisplay from '../components/comment/RecentCommentsDisplay';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ExchangeRequestModal from '../components/common/ExchangeRequestModal';
 import axios from 'axios';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomToolbar from '../components/common/CustumToolbar';
@@ -299,7 +299,7 @@ const MangaDetail: React.FC = () => {
 const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDetail?.numberOfBooks || 0}巻  無料で漫画がよめるかも！？物々交換してみよう！！`;
 
   return  (
-    <HelmetProvider>
+    <>
       <Helmet>
         <title>{mangaDetail.title} by {SERVICE_NAME}【漫画の物々交換サービス】</title>
         <meta name="description" content={description} />
@@ -307,7 +307,6 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
         <meta property="og:description" content={description} />
         <meta property="og:image" content={mangaDetail.imageUrls[0]} />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}【漫画の物々交換サービス】`} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={mangaDetail.imageUrls[0]} />
@@ -495,7 +494,7 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
         onClose={() => setIsMyBookModalOpen(false)}
         openWishlistTab={openWishlistDrawer}
       />
-    </HelmetProvider>
+    </>
   );
 };
 

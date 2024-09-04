@@ -5,7 +5,7 @@ import { styled } from '@mui/system';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
 
@@ -90,18 +90,15 @@ const ResetPassword: React.FC = () => {
 
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
-        <title>{SERVICE_NAME} - パスワードリセット</title>
+        <title>パスワードリセット - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={`${SERVICE_NAME} - パスワードリセット`} />
+        <meta property="og:title" content={`パスワードリセット - ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${SERVICE_NAME} - パスワードリセット`} />
+        <meta name="twitter:title" content={`パスワードリセット - ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
       <CustomTocaeruToolbar showBackButton={false} showSubtitle subtitle={'パスワードをリセットする'} />
       <Box sx={{ px: `1.2rem`, pt: '1rem', pb: '1rem' }}>
@@ -150,7 +147,7 @@ const ResetPassword: React.FC = () => {
           </SubmitButtonStyled>
         </FormStyled>
       </Box>
-    </HelmetProvider>
+    </>
   );
 };
 

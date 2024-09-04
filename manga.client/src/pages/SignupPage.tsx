@@ -11,7 +11,7 @@ import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
 import CustomLink from '../components/common/CustomLink';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
 
@@ -66,18 +66,15 @@ const SignupPage: React.FC = () => {
 
   return (
     <GoogleOAuthProvider clientId="1013291515281-j5re58a4bjt9qk9dgp6sdoquick9mv8j.apps.googleusercontent.com">
-      <HelmetProvider>
+      <>
       <Helmet>
-        <title>{SERVICE_NAME} - 会員登録</title>
+        <title>会員登録 - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={`${SERVICE_NAME} - 会員登録`} />
+        <meta property="og:title" content={`会員登録 - ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${SERVICE_NAME} - 会員登録`} />
+        <meta name="twitter:title" content={`会員登録 - ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
         <CustomTocaeruToolbar showSubtitle subtitle={'会員登録'} />
         
@@ -174,7 +171,7 @@ const SignupPage: React.FC = () => {
             ログイン
           </Button>
         </Box>
-      </HelmetProvider>
+      </>
     </GoogleOAuthProvider>
   );
 };

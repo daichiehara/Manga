@@ -14,7 +14,7 @@ import CustomLink from '../components/common/CustomLink';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
 
@@ -139,18 +139,15 @@ const Login: React.FC = () => {
   return (
     
     <GoogleOAuthProvider clientId="1013291515281-j5re58a4bjt9qk9dgp6sdoquick9mv8j.apps.googleusercontent.com">
-      <HelmetProvider>
+      <>
         <Helmet>
-          <title>{SERVICE_NAME} - ログイン</title>
+          <title>ログイン - {SERVICE_NAME}</title>
           <meta name="description" content={description} />
-          <meta property="og:title" content={`${SERVICE_NAME} - ログイン`} />
+          <meta property="og:title" content={`ログイン - ${SERVICE_NAME}`} />
           <meta property="og:description" content={description} />
-          <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
           <meta property="og:url" content={window.location.href} />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={`${SERVICE_NAME} - ログイン`} />
+          <meta name="twitter:title" content={`ログイン - ${SERVICE_NAME}`} />
           <meta name="twitter:description" content={description} />
-          <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         </Helmet>
 
         <CustomTocaeruToolbar showSubtitle subtitle={'ログイン'} />
@@ -272,7 +269,7 @@ const Login: React.FC = () => {
               会員登録
             </Button>
           </Box>
-        </HelmetProvider>
+        </>
     </GoogleOAuthProvider>
   );
 };

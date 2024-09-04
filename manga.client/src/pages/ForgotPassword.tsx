@@ -11,7 +11,7 @@ import axios from 'axios';
 import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
 import CustomTocaeruToolbar from '../components/common/CustomTocaeruToolBar';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import GooglePolicyText from '../components/common/GooglePolicyText';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
@@ -49,18 +49,15 @@ const ForgotPassword: React.FC = () => {
   const description = `[トカエル]このページでは、パスワードを忘れたユーザーが、パスワードをリセットするための案内をメールで受け取ることができます。`;
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
         <title>パスワードリセット - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content="パスワードリセット" />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="パスワードリセット" />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
       <CustomTocaeruToolbar showSubtitle showBackButton subtitle={'パスワードを忘れた方'} />
       <Box sx={{ px: `1.2rem`, pt: '1rem', pb: '1rem' }}>
@@ -96,7 +93,7 @@ const ForgotPassword: React.FC = () => {
         </FormStyled>
         <GooglePolicyText />
       </Box>
-    </HelmetProvider>
+    </>
   );
 };
 

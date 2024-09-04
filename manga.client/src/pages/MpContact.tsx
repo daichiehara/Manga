@@ -12,7 +12,7 @@ import {
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import CustomToolbar from '../components/common/CustumToolbar';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import GooglePolicyText from '../components/common/GooglePolicyText';
@@ -62,18 +62,15 @@ const ContactForm: React.FC = () => {
   const description = `[${SERVICE_NAME}]お問い合わせフォームにて、お名前、メールアドレス、メッセージを入力してご送信ください。`;
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
-        <title>{SERVICE_NAME} - お問い合わせ</title>
+        <title>お問い合わせ - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={`${SERVICE_NAME} - お問い合わせ`} />
+        <meta property="og:title" content={`お問い合わせ - ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${SERVICE_NAME} - お問い合わせ`} />
+        <meta name="twitter:title" content={`お問い合わせ - ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
 
       <Container maxWidth="sm">
@@ -161,7 +158,7 @@ const ContactForm: React.FC = () => {
           <GooglePolicyText />
         </Box>
       </Container>
-    </HelmetProvider>
+    </>
   );
 };
 

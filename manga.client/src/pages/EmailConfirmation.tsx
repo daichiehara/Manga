@@ -6,7 +6,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CustomToolbar from '../components/common/CustumToolbar';
 import MenuBar from '../components/menu/MenuBar';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 
 const theme = createTheme({
@@ -61,18 +61,15 @@ const EmailConfirmation: React.FC = () => {
   const description = `[トカエル]このページでは、メールアドレスの確認状況を表示しています。登録が完了したかどうかを確認してください。`;
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
       <title>メールアドレスの確認 - {SERVICE_NAME}</title>
       <meta name="description" content={description} />
       <meta property="og:title" content="メールアドレスの確認" />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       <meta property="og:url" content={window.location.href} />
-      <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="メールアドレスの確認" />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
     </Helmet>
       <ThemeProvider theme={theme}>
         <CustomToolbar title='メールアドレスの確認'/>
@@ -126,7 +123,7 @@ const EmailConfirmation: React.FC = () => {
         </Container>
         <MenuBar />
       </ThemeProvider>
-    </HelmetProvider>
+    </>
   );
 };
 

@@ -8,7 +8,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import { useNavigate } from 'react-router-dom';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { useSnackbar } from '../hooks/useSnackbar';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 
 interface MSell {
@@ -26,18 +26,15 @@ const MSell: React.FC= () => {
   const description = `[${SERVICE_NAME}]簡単な数ステップで漫画を出品できます。交換成立のために、まずは出品してみましょう！`;
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
         <title>{SERVICE_NAME}に出品する - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content={`${SERVICE_NAME}に出品する - ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${SERVICE_NAME}に出品する - ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
     
       {/*  
@@ -233,7 +230,7 @@ const MSell: React.FC= () => {
     </Box>
 
     <MenuBar /> {/* 画像のボトムのナビゲーションバーに対応するコンポーネント */}
-    </HelmetProvider>
+    </>
   );
 };
 

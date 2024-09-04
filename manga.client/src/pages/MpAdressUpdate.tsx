@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useForm, Controller } from 'react-hook-form';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
 
@@ -155,18 +155,15 @@ const MpAdressUpdate: React.FC = () => {
   const description = `[${SERVICE_NAME}] 住所の登録・更新を行います。`;
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
-        <title>{SERVICE_NAME} - 住所の登録・更新</title>
+        <title>住所の登録・更新 - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={`${SERVICE_NAME} - 住所の登録・更新`} />
+        <meta property="og:title" content={`住所の登録・更新 - ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${SERVICE_NAME} - 住所の登録・更新`} />
+        <meta name="twitter:title" content={`住所の登録・更新 - ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
       <CustomToolbar title='住所の登録・更新' />
       <Box pt={11} px={2}>
@@ -290,7 +287,7 @@ const MpAdressUpdate: React.FC = () => {
         </Button>
       </DialogActions>
     </Dialog>
-    </HelmetProvider>
+    </>
   );
 };
 

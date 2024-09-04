@@ -5,7 +5,7 @@ import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import { Box, TextField, Button, Divider, Typography } from '@mui/material';
 import CommentList from '../components/comment/CommentList';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
 
@@ -84,18 +84,15 @@ const CommentPage: React.FC = () => {
 
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
         <title>コメントページ - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content="コメントページ" />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="コメントページ" />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
       {/* 見出しのToolbar */}
       <CustomToolbar title="コメント" />
@@ -142,7 +139,7 @@ const CommentPage: React.FC = () => {
           )}
         </Box>
       </Box>
-    </HelmetProvider>
+    </>
   );
 };
 

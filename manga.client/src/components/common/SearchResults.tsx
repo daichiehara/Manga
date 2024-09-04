@@ -8,7 +8,7 @@ import MangaListItem from '../item/MangaListItem';
 import MyBookModal from '../common/MyBookModal';
 import { useInView } from 'react-intersection-observer';
 import { SERVICE_NAME } from '../../serviceName';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { API_BASE_URL } from '../../apiName';
 
 enum SellStatus {
@@ -195,18 +195,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       const description = `[${SERVICE_NAME}] "${query}" に関連する出品の検索結果です。出品をクリックして詳細を確認してみましょう！`;
       
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
         <title>検索結果 - {query} | {SERVICE_NAME}</title>
         <meta name="description" content={description} />
         <meta property="og:title" content={`検索結果 - ${query} | ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`検索結果 - ${query} | ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
 
       <Box sx={{ pt: 11, mb: 2 }}>
@@ -299,7 +296,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
 
         <MyBookModal isOpen={isModalOpen} onClose={handleModalToggle} />
       </Box>
-    </HelmetProvider>
+    </>
   );
 };
 

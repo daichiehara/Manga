@@ -10,7 +10,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import LoadingComponent from '../components/common/LoadingComponent';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
 
@@ -77,21 +77,18 @@ const MainMpFavoList: React.FC = () => {
         </>
       );
     }
-    const description = `[${SERVICE_NAME}]あなたが「いいね！」した商品の一覧をご覧いただけます。`;
+    const description = `[${SERVICE_NAME}]あなたが「いいね！」した出品の一覧をご覧いただけます。`;
 
   return (
-    <HelmetProvider>
+    <>
       <Helmet>
-        <title>{SERVICE_NAME} - いいね！一覧</title>
+        <title>いいね！一覧 - {SERVICE_NAME}</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={`${SERVICE_NAME} - いいね！一覧`} />
+        <meta property="og:title" content={`いいね！一覧 - ${SERVICE_NAME}`} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${SERVICE_NAME} - いいね！一覧`} />
+        <meta name="twitter:title" content={`いいね！一覧 - ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
       </Helmet>
       {/* 見出しのToolbar */}
       <CustomToolbar title='いいね！一覧'/>
@@ -144,7 +141,7 @@ const MainMpFavoList: React.FC = () => {
         )}
         {selectedTab === 1 && <Box>MyList content goes here...</Box>}
       </Box>
-    </HelmetProvider>
+    </>
   );
 };
 
