@@ -612,7 +612,7 @@ namespace Manga.Server.Controllers
             {
                 // 既存の画像をS3から削除
                 var existingImageFileName = Path.GetFileName(user.IdVerificationImage);
-                await _s3Service.DeleteFileFromS3Async(existingImageFileName, "IdVerificationBucketName");
+                await _s3Service.DeleteFileFromS3Async(existingImageFileName, "tocaeru-idverification-image");
             }
 
             if (!string.IsNullOrEmpty(imageUrl))

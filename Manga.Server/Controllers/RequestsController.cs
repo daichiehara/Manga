@@ -437,15 +437,46 @@ namespace Manga.Server.Controllers
         private async Task SendNotificationsAndEmails(Sell requesterSell, Sell responderSell)
         {
             string message = $"「{requesterSell.Title}」と「{responderSell.Title}」の交換が成立しました。内容を確認の上、発送をお願いします。";
-
             await NotificationsController.CreateNotificationAsync(_context, message, Models.Type.Match, requesterSell.UserAccountId, requesterSell.SellId);
             await NotificationsController.CreateNotificationAsync(_context, message, Models.Type.Match, responderSell.UserAccountId, responderSell.SellId);
 
-            var responderbody = string.Format(Resources.EmailTemplates.MatchMessage, responderSell.Title, requesterSell.Title);
-            await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "あなたの出品の交換が成立しました。", responderbody);
+            // requesterの氏名を連結
+            string requesterFullName = string.IsNullOrEmpty(requesterSell.UserAccount.Sei) && string.IsNullOrEmpty(requesterSell.UserAccount.Mei)
+                ? requesterSell.UserAccount.NickName  // SeiとMeiが両方空の場合はNickNameを使用
+                : $"{requesterSell.UserAccount.Sei} {requesterSell.UserAccount.Mei}".Trim();
 
-            var requesterbody = string.Format(Resources.EmailTemplates.MatchMessage, requesterSell.Title, responderSell.Title);
-            await _emailSender.SendEmailAsync(requesterSell.UserAccount.Email, "あなたの出品の交換が成立しました。", requesterbody);
+            // responderの氏名を連結
+            string responderFullName = string.IsNullOrEmpty(responderSell.UserAccount.Sei) && string.IsNullOrEmpty(responderSell.UserAccount.Mei)
+                ? responderSell.UserAccount.NickName  // SeiとMeiが両方空の場合はNickNameを使用
+                : $"{responderSell.UserAccount.Sei} {responderSell.UserAccount.Mei}".Trim();
+
+            var responderBody = string.Format(
+                Resources.EmailTemplates.MatchMessage,
+                HttpUtility.HtmlEncode(responderSell.UserAccount.NickName),
+                HttpUtility.HtmlEncode(responderSell.Title),
+                HttpUtility.HtmlEncode(requesterSell.UserAccount.NickName),
+                HttpUtility.HtmlEncode(requesterSell.Title),
+                HttpUtility.HtmlEncode(requesterFullName),  // 連結した氏名を使用
+                HttpUtility.HtmlEncode(requesterSell.UserAccount.PostalCode),
+                HttpUtility.HtmlEncode(requesterSell.UserAccount.Prefecture),
+                HttpUtility.HtmlEncode(requesterSell.UserAccount.Address1),
+                HttpUtility.HtmlEncode(requesterSell.UserAccount.Address2)
+            );
+            await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "【トカエル】漫画交換が成立しました！配送手続きのお願い", responderBody);
+
+            var requesterBody = string.Format(
+                Resources.EmailTemplates.MatchMessage,
+                HttpUtility.HtmlEncode(requesterSell.UserAccount.NickName),
+                HttpUtility.HtmlEncode(requesterSell.Title),
+                HttpUtility.HtmlEncode(responderSell.UserAccount.NickName),
+                HttpUtility.HtmlEncode(responderSell.Title),
+                HttpUtility.HtmlEncode(responderFullName),  // 連結した氏名を使用
+                HttpUtility.HtmlEncode(responderSell.UserAccount.PostalCode),
+                HttpUtility.HtmlEncode(responderSell.UserAccount.Prefecture),
+                HttpUtility.HtmlEncode(responderSell.UserAccount.Address1),
+                HttpUtility.HtmlEncode(responderSell.UserAccount.Address2)
+            );
+            await _emailSender.SendEmailAsync(requesterSell.UserAccount.Email, "【トカエル】漫画交換が成立しました！配送手続きのお願い", requesterBody);
         }
 
         [HttpGet("{id}")]
