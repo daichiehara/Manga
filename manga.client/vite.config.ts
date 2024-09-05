@@ -46,12 +46,12 @@ export default defineConfig({
                 "name": "Tocaeru-トカエル",
                 "icons": [
                 {
-                    "src": "TocaeruCircle.png",
+                    "src": "/TocaeruCircle.png",
                     "sizes": "398x398",
                     "type": "image/png"
                 },
                 {
-                    "src": "Tocaeru512Circle.png",
+                    "src": "/Tocaeru512Circle.png",
                     "sizes": "512x512",
                     "type": "image/png"
                 },

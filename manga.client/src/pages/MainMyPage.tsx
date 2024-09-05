@@ -26,13 +26,6 @@ const MainMyPage: React.FC = () => {
   const { authState } = useContext(AuthContext);
   useSnackbar();
 
-  useEffect(() => {
-    if (!authState.isAuthenticated) {
-      // ログインしていない場合の処理
-      return;
-    }
-  }, [authState.isAuthenticated]);
-
   const renderMainIcon = (
     to: string,
     Icon: React.ElementType,
@@ -123,7 +116,10 @@ const MainMyPage: React.FC = () => {
           </Typography>
         )
       ) : (
-        <NavigateToLoginBox height='80vh' />
+        <>
+          <NavigateToLoginBox height='40vh' />
+          <PolicyList />
+        </>
       )}
       <MenuBar />
     </>
