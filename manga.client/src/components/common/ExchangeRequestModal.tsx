@@ -325,6 +325,9 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                     onClose={handleFinalCheckModalClose}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
+                    disableEnforceFocus={false} // フォーカスを強制する
+                    disableRestoreFocus={false} // フォーカスの戻りを管理
+                    
                 >
                     <Box sx={{zIndex:100000, position: 'absolute' as 'absolute',
                         top: '50%',
@@ -397,40 +400,41 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
     return (
         <SwipeableDrawer
             swipeAreaWidth={0}
-            disableSwipeToOpen={false}
-            disableScrollLock // スクロールロックを無効にする
-            disableDiscovery // 
-            disableBackdropTransition //
-            anchor='bottom' // モーダルを下部に配置
-            open={isOpen} // モーダルの開閉状態
+            disableEnforceFocus={false}  // フォーカスをドロワー内に強制する
+            disableScrollLock={false}    // スクロールロックを有効にする
+            disableBackdropTransition={false}
+            aria-hidden={false}
+            anchor='bottom'
+            open={isOpen}
             onClose={() => {
                 onClose();
-                // モーダルが閉じたときにtriggerFetchをリセット
                 setTriggerFetch(false);
             }}
             onOpen={() => { }}
             ModalProps={{
-                keepMounted: true,  // 一度表示された後もコンポーネントを保持
+                keepMounted: true,
                 BackdropProps: {
-                    style: {
-                        pointerEvents: 'none' // バックドロップをクリック不可にする
-                    }
+                style: {
+                    pointerEvents: 'none'
+                }
                 }
             }}
             sx={{
                 '& .MuiDrawer-paper': {
-                    borderTopLeftRadius: 15,
-                    borderTopRightRadius: 15,
-                    height: '90vh',
-                    width: '100vw', // 画面の幅にフルで広げる
-                    maxWidth: '640px',  // 最大幅を640pxに設定
-                    mx: 'auto',
-                    zIndex: 30000,
+                borderTopLeftRadius: 15,
+                borderTopRightRadius: 15,
+                height: '90vh',
+                width: '100vw',
+                maxWidth: '640px',
+                mx: 'auto',
+                zIndex: 30000,
                 }
             }}
-        >
+            >
             {authState.isAuthenticated ? renderAuthenticatedContent() : renderUnauthenticatedContent()}
-        </SwipeableDrawer>
+            </SwipeableDrawer>
+
+
     );
 });
 
