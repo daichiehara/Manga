@@ -15,4 +15,8 @@ body, html {
 
 .grecaptcha-badge {
     visibility: hidden !important;
-  }
+}
+
+.safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
