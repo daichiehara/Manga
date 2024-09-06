@@ -171,58 +171,63 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
 
         {/* 共有用ドロワー */}
         <Drawer anchor='bottom' 
-          open={drawerOpen} 
-          onClose={handleDrawerClose} 
-          sx={{
-            '& .MuiDrawer-paper': {
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
-              height: '30vh',
-              maxWidth: '640px',  // 最大幅を640pxに設定
-              mx: 'auto',
-              zIndex: 30000,
-              display: 'flex',
-              alignItems: 'flex-start',  // 上寄せ
-              justifyContent: 'flex-start',  // コンテンツを上に寄せる
-              paddingTop: 0,  // 余白を削除
-            }
-          }}
-        >
-          <Box sx={{mt:'20px', textAlign: 'center', width: '100%' }}>
-            <Typography variant='subtitle1' sx={{fontWeight:'bold'}}>この出品を共有する</Typography>
-            <Divider variant='middle' sx={{ mt: 1, mb: 2 }} />  {/* Dividerの上の余白を調整 */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 4, ml:2 }}>  {/* 左寄せとギャップの調整 */}
-              <IconButton onClick={copyToClipboard}>
-                <ContentCopyIcon sx={{ fontSize: '30px' }} />
-              </IconButton>
+        open={drawerOpen} 
+        onClose={handleDrawerClose} 
+        sx={{
+          '& .MuiDrawer-paper': {
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            height: '30vh',
+            maxWidth: '640px',
+            mx: 'auto',
+            zIndex: 30000,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            paddingTop: 0,
+          }
+        }}
+      >
+        <Box sx={{mt:'20px', textAlign: 'center', width: '100%' }}>
+          <Typography variant='subtitle1' sx={{fontWeight:'bold'}}>この出品を共有する</Typography>
+          <Divider variant='middle' sx={{ mt: 1, mb: 2 }} />
 
+          {/* アイコンボタンエリア */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-start', ml: 2 }}>
+            
+            {/* リンクをコピー */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: '12px' }}>
+              <IconButton onClick={copyToClipboard} sx={{pb:2}}>
+                <ContentCopyIcon sx={{ fontSize: '33px' }} />
+              </IconButton>
+              <Typography variant="caption">リンクをコピー</Typography>
+            </Box>
+
+            {/* X (Twitter Share) */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mr: `30px` }}>
               <TwitterShareButton 
                 url={window.location.href}
                 title={description}
               >
                 <XIcon round size={50} />
               </TwitterShareButton>
-              
-              {/*　
-              <FacebookShareButton 
-                url={window.location.href}
-                title={description}
-              >
-                <FacebookIcon round size={50} />
-              </FacebookShareButton>
-              Facebookは開発者用IDを取得する必要あり，詳しくはこちらhttps://tcd-theme.com/2018/01/facebook_app_id.html */}
+              <Typography variant="caption">X</Typography>
+            </Box>
 
+            {/* LINE Share */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <LineShareButton 
                 url={window.location.href}
                 title={description}
               >
                 <LineIcon round size={50} />
               </LineShareButton>
+              <Typography variant="caption">LINE</Typography>
             </Box>
-
-
           </Box>
-        </Drawer>
+        </Box>
+      </Drawer>
+
 
         {/* 通報ダイアログ */}
         <ReportDialog
