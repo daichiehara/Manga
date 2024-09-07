@@ -15,6 +15,7 @@ import { AuthContext } from '../context/AuthContext';
 import { AppContext } from '../context/AppContext';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, LineShareButton, LineIcon, XIcon } from 'react-share';
 import { API_BASE_URL } from '../../apiName';
+import { SnackbarContext } from '../context/SnackbarContext';
 
 interface MangaDetailInfoProps {
   title: string;
@@ -52,6 +53,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   const { sellId } = useParams();
   const navigate = useNavigate();
   const { refreshMyFavorite } = useContext(AppContext);
+  const { showSnackbar } = useContext(SnackbarContext);
 
   const handleCommentNavigate = () => {
     navigate(`/item/${sellId}/comment`);
@@ -97,9 +99,13 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   const copyToClipboard = () => {
     const textToCopy = `${window.location.href}\n${description}`;
     navigator.clipboard.writeText(textToCopy).then(() => {
-      alert('リンクと説明文をコピーしました');
+      //alert('リンクと説明文をコピーしました');
+      handleDrawerClose();
+      showSnackbar('リンクと説明文をコピーしました', 'success');
     }).catch(err => {
-      console.error('コピーに失敗しました', err);
+      //console.error('コピーに失敗しました', err);
+      handleDrawerClose();
+      showSnackbar('コピーに失敗しました', 'error');
     });
   };
   
