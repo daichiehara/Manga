@@ -344,7 +344,7 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
                             選択された漫画で交換を希望することが伝えられます。相手が承認した場合、<Box component="span" sx={{ color: "red" }}>交換が決定します。</Box>交換が決定する前ならば、キャンセルが可能です。
                         </Typography>
                         <Typography sx={{px:2, py: 1.5, color: '#454545', fontSize: '0.8rem' }}>
-                            <Link to="/terms-of-service" style={{ color: '#0F9ED5', textDecoration: 'underline'  }}>
+                            <Link to="/terms" style={{ color: '#0F9ED5', textDecoration: 'underline'  }}>
                                 利用規約
                             </Link>
                             に同意の上、ボタンを押してください。
