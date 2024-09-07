@@ -101,9 +101,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
                 setIsInitialized(true);
             };
             
-            if (!isInitialized) {
-                initializeNotifications();
-            }
+            initializeNotifications();
         }
     }, [authState.isAuthenticated, isInitialized]);
 
