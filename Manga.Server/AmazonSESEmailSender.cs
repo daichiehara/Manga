@@ -21,13 +21,13 @@ namespace Manga.Server
         public async Task SendEmailAsync(string receiverAddress, string subject, string htmlBody)
         {
             // Change to your from email
-            string senderAddress = "support@changey.net";
+            string formattedSenderAddress = $"\"{_fromName}\" <{_fromEmail}>";
             // Change to your region
-            using (var client = new AmazonSimpleEmailServiceClient(RegionEndpoint.USWest2))
+            using (var client = new AmazonSimpleEmailServiceClient(RegionEndpoint.APNortheast1))
             {
                 var sendRequest = new SendEmailRequest
                 {
-                    Source = senderAddress,
+                    Source = formattedSenderAddress,
                     Destination = new Destination
                     {
                         ToAddresses =

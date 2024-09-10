@@ -139,7 +139,7 @@
 
     &lt;p&gt;アプリケーションにログインして詳細をご確認ください。&lt;/p&gt;
 
-    &lt;a href="#" style="display: inline-block; background-color: #3498db; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px;"&gt;アプリを開く&lt;/a&gt;
+    &lt;a href="https://tocaeru.com" style="display: inline-block; background-color: #3498db; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px;"&gt;アプリを開く&lt;/a&gt;
 
     &lt;p style="margin-top: 20px;"&gt;ご不明な点がございましたら、お気軽にお問い合わせください。&lt;/p&gt;
 
@@ -148,8 +148,8 @@
     &lt;div style="border-top: 1px solid #e0e0e0; margin-top: 20px; padding-top: 20px; font-size: 0.9em; color: #888888;"&gt;
         &lt;p style="margin-bottom: 5px;"&gt;トカエルサポートチーム&lt;/p&gt;
         &lt;p style="margin-top: 0;"&gt;
-            &lt;a href="#" style="color: #3498db; text-decoration: none;"&gt;ウェブサイト&lt;/a&gt; |
-            &lt;a href="#" style="color: #3498db; text-decoration: none;"&gt;お問い合わせ&lt;/a&gt;
+            &lt;a href="https://tocaeru.com" style="color: #3498db; text-decoration: none;"&gt;ウェブサイト&lt;/a&gt; |
+            &lt;a href="https://tocaeru.com/mypage/contact" style="color: #3498db; text-decoration: none;"&gt;お問い合わせ&lt;/a&gt;
         &lt;/p&gt;
     &lt;/div&gt;
 &lt;/body&gt;
@@ -192,36 +192,36 @@
     &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
     &lt;title&gt;【トカエル】漫画交換が成立しました！配送手続きのお願い&lt;/title&gt;
     &lt;style&gt;
-        body {
+        body {{
             font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-        }
-        .container {
+        }}
+        .container {{
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-        }
-        h1 {
+        }}
+        h1 {{
             color: #E97032;
-        }
-        .important {
+        }}
+        .important {{
             font-weight: bold;
             color: #E97032;
-        }
-        .address {
+        }}
+        .address {{
             background-color: #f0f0f0;
             padding: 10px;
             border-radius: 5px;
-        }
-        ul {
+        }}
+        ul {{
             padding-left: 20px;
-        }
-        .footer {
+        }}
+        .footer {{
             margin-top: 20px;
             font-size: 0.9em;
             color: #666;
-        }
+        }}
     &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -230,9 +230,7 @@
         
         &lt;p&gt;{0}様&lt;/p&gt;
         
-        &lt;p&gt;お世話になっております。トカエル運営事務局です。&lt;/p&gt;
-        
-        &lt;p&gt;素晴らしいニュースがあります！あなたの出品した漫画「&lt;span class="important"&gt;{1}&lt;/span&gt;」と、
+        &lt;p&gt;おめでとうございます！あなたの出品した漫画「&lt;span class="important"&gt;{1}&lt;/span&gt;」と、
         {2}様の「&lt;span class="important"&gt;{3}&lt;/span&gt;」のマッチングが成立しました。&lt;/p&gt;
         
         &lt;h2&gt;【配送手続きのお願い】&lt;/h2&gt;
@@ -254,13 +252,7 @@
             &lt;li&gt;可能であれば、防水対策も行ってください。&lt;/li&gt;
         &lt;/ul&gt;
         
-        &lt;h3&gt;3. 発送:&lt;/h3&gt;
-        &lt;ul&gt;
-            &lt;li&gt;配送方法はお任せしますが、追跡番号がある方法をおすすめします。&lt;/li&gt;
-            &lt;li&gt;発送後、マイページから追跡番号を入力してください。&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;h3&gt;4. 注意事項:&lt;/h3&gt;
+        &lt;h3&gt;3. 注意事項:&lt;/h3&gt;
         &lt;ul&gt;
             &lt;li&gt;個人情報の取り扱いには十分ご注意ください。&lt;/li&gt;
             &lt;li&gt;配送トラブルを避けるため、速やかな発送にご協力ください。&lt;/li&gt;
@@ -275,7 +267,7 @@
         &lt;p&gt;今後ともトカエルをよろしくお願いいたします。&lt;/p&gt;
         
         &lt;div class="footer"&gt;
-            &lt;p&gt;トカエル運営事務局&lt;/p&gt;
+            &lt;p&gt;トカエルサポートチーム&lt;/p&gt;
         &lt;/div&gt;
     &lt;/div&gt;
 &lt;/body&gt;
@@ -386,7 +378,7 @@
 申請を受け入れると相手の出品「{2}」と交換することができます。
 
 詳細を確認してほしい作品を手に入れましょう！
-&lt;a href="https://localhost:5173/notification"&gt;https://localhost:5173/notification&lt;/a&gt;
+&lt;a href="https://tocaeru.com/notification"&gt;https://tocaeru.com/notification&lt;/a&gt;
 
 トカエルサポートチーム</value>
   </data>
