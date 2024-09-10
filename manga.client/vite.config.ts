@@ -7,6 +7,7 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 import { VitePWA } from 'vite-plugin-pwa'
+import mkcert from 'vite-plugin-mkcert'
 
 const baseFolder =
     env.APPDATA !== undefined && env.APPDATA !== ''
@@ -38,6 +39,7 @@ const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_H
 export default defineConfig({
     plugins: [
         plugin(),
+        mkcert(),
         VitePWA({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
@@ -84,9 +86,11 @@ export default defineConfig({
             }
         },
         port: 5173,
+        //https: true
+        /*
         https: {
             key: fs.readFileSync(keyFilePath),
             cert: fs.readFileSync(certFilePath),
-        }
+        }*/
     }
 })
