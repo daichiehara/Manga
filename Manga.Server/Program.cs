@@ -44,7 +44,7 @@ static async Task<string> GetApiKeyFromAWSSecretsManager(string keyName)
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSingleton<IEmailSender, AmazonSESEmailSender>(provider =>
-    new AmazonSESEmailSender("support@changey.net", "Changey"));
+    new AmazonSESEmailSender("support@tocaeru.com", "トカエル"));
 
 builder.Services.AddSingleton<S3Service>();
 
@@ -56,7 +56,7 @@ builder.Services.AddCors(options =>
         "AllowSpecificOrigins",
         builder =>
         {
-            builder.WithOrigins("https://localhost:5173", "https://localhost:7103")
+            builder.WithOrigins("https://tocaeru.com", "https://localhost:5173", "https://localhost:7103")
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();

@@ -111,20 +111,19 @@ namespace Manga.Server.Resources {
         ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
         ///    &lt;title&gt;【トカエル】漫画交換が成立しました！配送手続きのお願い&lt;/title&gt;
         ///    &lt;style&gt;
-        ///        body {
+        ///        body {{
         ///            font-family: Arial, sans-serif;
         ///            line-height: 1.6;
         ///            color: #333;
-        ///        }
-        ///        .container {
+        ///        }}
+        ///        .container {{
         ///            max-width: 600px;
         ///            margin: 0 auto;
         ///            padding: 20px;
-        ///        }
-        ///        h1 {
+        ///        }}
+        ///        h1 {{
         ///            color: #E97032;
-        ///        }
-        /// [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///       [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MatchMessage {
             get {
@@ -185,7 +184,7 @@ namespace Manga.Server.Resources {
         ///申請を受け入れると相手の出品「{2}」と交換することができます。
         ///
         ///詳細を確認してほしい作品を手に入れましょう！
-        ///&lt;a href=&quot;https://localhost:5173/notification&quot;&gt;https://localhost:5173/notification&lt;/a&gt;
+        ///&lt;a href=&quot;https://tocaeru.com/notification&quot;&gt;https://tocaeru.com/notification&lt;/a&gt;
         ///
         ///トカエルサポートチーム に類似しているローカライズされた文字列を検索します。
         /// </summary>
