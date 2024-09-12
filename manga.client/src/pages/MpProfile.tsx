@@ -22,6 +22,7 @@ const MpProfile: React.FC = () => {
   const customNavigate = useCustomNavigate();
   const { showSnackbar } = useContext(SnackbarContext);
   const { refreshUserInfo } = useContext(UserContext);
+  const [processedImage, setProcessedImage] = useState<Blob | null>(null);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     nickName: '',
@@ -58,13 +59,56 @@ const MpProfile: React.FC = () => {
     }));
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const resizeAndConvertToWebP = (
+    img: HTMLImageElement,
+    maxSize: number
+  ): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      let size = Math.min(img.width, img.height);
+      if (size > maxSize) {
+        size = maxSize;
+      }
+
+      const startX = (img.width - size) / 2;
+      const startY = (img.height - size) / 2;
+
+      canvas.width = size;
+      canvas.height = size;
+
+      ctx?.drawImage(
+        img,
+        startX, startY, size, size,
+        0, 0, size, size
+      );
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        }
+      }, 'image/webp');
+    });
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     if (file) {
-      setFormData((prevData) => ({
-        ...prevData,
-        profileIcon: URL.createObjectURL(file), // 一時的に表示するためのURLを生成
-      }));
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const img = new Image();
+        img.onload = async () => {
+          const processedBlob = await resizeAndConvertToWebP(img, 2500);
+          setProcessedImage(processedBlob);
+          setFormData((prevData) => ({
+            ...prevData,
+            profileIcon: URL.createObjectURL(processedBlob),
+          }));
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -75,8 +119,8 @@ const MpProfile: React.FC = () => {
     if (formData.nickName) {
       formDataToSend.append('nickName', formData.nickName);
     }
-    if (fileInputRef.current?.files?.[0]) {
-      formDataToSend.append('profileIcon', fileInputRef.current.files[0]);
+    if (fileInputRef.current?.files?.[0] && processedImage) {
+      formDataToSend.append('profileIcon', processedImage);
     }
 
     try {
