@@ -6,6 +6,7 @@ import LoadingComponent from '../components/common/LoadingComponent';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { UserContext } from '../components/context/UserContext';
+import imageCompression from 'browser-image-compression';
 import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
@@ -75,37 +76,49 @@ const MpProfile: React.FC = () => {
     maxSize: number,
     quality: number
   ): Promise<Blob> => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-  
-    let size = Math.min(img.width, img.height);
-    if (size > maxSize) {
-      size = maxSize;
-    }
-  
-    const startX = (img.width - size) / 2;
-    const startY = (img.height - size) / 2;
-  
-    canvas.width = size;
-    canvas.height = size;
-  
-    ctx?.drawImage(
-      img,
-      startX, startY, size, size,
-      0, 0, size, size
-    );
-  
-    const isWebPEncodingSupported = await checkWebPEncodingSupport();
-    const mimeType = isWebPEncodingSupported ? 'image/webp' : 'image/jpeg';
-    console.log(`isMimeType: ${mimeType}`)
-  
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(blob);
+    try {
+      const isWebPEncodingSupported = await checkWebPEncodingSupport();
+      if (isWebPEncodingSupported) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+      
+        let size = Math.min(img.width, img.height);
+        if (size > maxSize) {
+          size = maxSize;
         }
-      }, mimeType, quality);
-    });
+      
+        const startX = (img.width - size) / 2;
+        const startY = (img.height - size) / 2;
+      
+        canvas.width = size;
+        canvas.height = size;
+      
+        ctx?.drawImage(
+          img,
+          startX, startY, size, size,
+          0, 0, size, size
+        );
+      
+        return new Promise((resolve) => {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            }
+          }, 'image/webp', quality);
+        });
+      } else {
+        const file = await fetch(img.src).then(r => r.blob()).then(blobFile => new File([blobFile], "image.jpg", { type: "image/jpeg" }));
+        return imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: Math.max(img.width, img.height),
+          useWebWorker: true,
+          fileType: 'webp'
+        });
+      }
+    } catch (error) {
+      console.error('Error processing image:', error);
+      throw error;
+    }
   };
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
