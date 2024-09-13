@@ -97,6 +97,7 @@ const MpProfile: React.FC = () => {
   
     const isWebPEncodingSupported = await checkWebPEncodingSupport();
     const mimeType = isWebPEncodingSupported ? 'image/webp' : 'image/jpeg';
+    console.log(`isMimeType: ${mimeType}`)
   
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
