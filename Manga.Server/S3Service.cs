@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace Manga.Server
 {
@@ -94,14 +95,27 @@ namespace Manga.Server
         {
             if (file.Length > 0)
             {
-                using var image = await Image.LoadAsync(file.OpenReadStream());
                 var newFileName = Guid.NewGuid().ToString() + ".webp";
 
-                using var memoryStream = new MemoryStream();
-                await image.SaveAsWebpAsync(memoryStream);
-                memoryStream.Position = 0;
-
-                return await UploadMangaImageToS3Async(memoryStream, newFileName);
+                if (file.ContentType == "image/webp")
+                {
+                    // ファイルがすでにWebP形式の場合、直接アップロード
+                    using var stream = file.OpenReadStream();
+                    return await UploadMangaImageToS3Async(stream, newFileName);
+                }
+                else
+                {
+                    // WebP以外の形式の場合、変換を行う
+                    using var image = await Image.LoadAsync(file.OpenReadStream());
+                    using var memoryStream = new MemoryStream();
+                    await image.SaveAsWebpAsync(memoryStream, new WebpEncoder
+                    {
+                        Quality = 75,
+                        Method = WebpEncodingMethod.BestQuality
+                    });
+                    memoryStream.Position = 0;
+                    return await UploadMangaImageToS3Async(memoryStream, newFileName);
+                }
             }
             return null;
         }

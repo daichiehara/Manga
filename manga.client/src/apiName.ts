@@ -1,4 +1,5 @@
 export const BASE_URL = 'https://api.tocaeru.com';
+//export const BASE_URL = 'https://localhost:7103';
 
 export const API_BASE_URL = `${BASE_URL}/api`;
 
