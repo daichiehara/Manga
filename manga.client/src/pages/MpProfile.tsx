@@ -59,39 +59,54 @@ const MpProfile: React.FC = () => {
     }));
   };
 
-  const resizeAndConvertToWebP = (
-    img: HTMLImageElement,
-    maxSize: number
-  ): Promise<Blob> => {
+  const checkWebPEncodingSupport = (): Promise<boolean> => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      let size = Math.min(img.width, img.height);
-      if (size > maxSize) {
-        size = maxSize;
-      }
-
-      const startX = (img.width - size) / 2;
-      const startY = (img.height - size) / 2;
-
-      canvas.width = size;
-      canvas.height = size;
-
-      ctx?.drawImage(
-        img,
-        startX, startY, size, size,
-        0, 0, size, size
-      );
-
+      canvas.width = 1;
+      canvas.height = 1;
+      canvas.toBlob((blob) => {
+        resolve(blob?.type === 'image/webp');
+      }, 'image/webp');
+    });
+  };
+  
+  const resizeAndConvertImage = async (
+    img: HTMLImageElement,
+    maxSize: number,
+    quality: number
+  ): Promise<Blob> => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+  
+    let size = Math.min(img.width, img.height);
+    if (size > maxSize) {
+      size = maxSize;
+    }
+  
+    const startX = (img.width - size) / 2;
+    const startY = (img.height - size) / 2;
+  
+    canvas.width = size;
+    canvas.height = size;
+  
+    ctx?.drawImage(
+      img,
+      startX, startY, size, size,
+      0, 0, size, size
+    );
+  
+    const isWebPEncodingSupported = await checkWebPEncodingSupport();
+    const mimeType = isWebPEncodingSupported ? 'image/webp' : 'image/jpeg';
+  
+    return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         if (blob) {
           resolve(blob);
         }
-      }, 'image/webp');
+      }, mimeType, quality);
     });
   };
-
+  
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     if (file) {
@@ -99,7 +114,7 @@ const MpProfile: React.FC = () => {
       reader.onload = async (e) => {
         const img = new Image();
         img.onload = async () => {
-          const processedBlob = await resizeAndConvertToWebP(img, 2500);
+          const processedBlob = await resizeAndConvertImage(img, 2500, 0.75);
           setProcessedImage(processedBlob);
           setFormData((prevData) => ({
             ...prevData,
