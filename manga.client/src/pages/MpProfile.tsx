@@ -6,6 +6,7 @@ import LoadingComponent from '../components/common/LoadingComponent';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { UserContext } from '../components/context/UserContext';
+import imageCompression from 'browser-image-compression';
 import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
@@ -22,6 +23,7 @@ const MpProfile: React.FC = () => {
   const customNavigate = useCustomNavigate();
   const { showSnackbar } = useContext(SnackbarContext);
   const { refreshUserInfo } = useContext(UserContext);
+  const [processedImage, setProcessedImage] = useState<Blob | null>(null);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     nickName: '',
@@ -58,15 +60,124 @@ const MpProfile: React.FC = () => {
     }));
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    if (file) {
-      setFormData((prevData) => ({
-        ...prevData,
-        profileIcon: URL.createObjectURL(file), // 一時的に表示するためのURLを生成
-      }));
+  const checkWebPEncodingSupport = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1;
+      canvas.height = 1;
+      canvas.toBlob((blob) => {
+        resolve(blob?.type === 'image/webp');
+      }, 'image/webp');
+    });
+  };
+  /*
+  const resizeAndConvertImage = async (
+    img: HTMLImageElement,
+    maxSize: number,
+    quality: number
+  ): Promise<Blob> => {
+    try {
+      const isWebPEncodingSupported = await checkWebPEncodingSupport();
+      if (isWebPEncodingSupported) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+      
+        let size = Math.min(img.width, img.height);
+        if (size > maxSize) {
+          size = maxSize;
+        }
+      
+        const startX = (img.width - size) / 2;
+        const startY = (img.height - size) / 2;
+      
+        canvas.width = size;
+        canvas.height = size;
+      
+        ctx?.drawImage(
+          img,
+          startX, startY, size, size,
+          0, 0, size, size
+        );
+      
+        return new Promise((resolve) => {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            }
+          }, 'image/webp', quality);
+        });
+      } else {
+        const file = await fetch(img.src).then(r => r.blob()).then(blobFile => new File([blobFile], "image.jpg", { type: "image/jpeg" }));
+        return imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: Math.max(img.width, img.height),
+          useWebWorker: true,
+          fileType: 'webp'
+        });
+      }
+    } catch (error) {
+      console.error('Error processing image:', error);
+      throw error;
     }
   };
+  
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const img = new Image();
+        img.onload = async () => {
+          const processedBlob = await resizeAndConvertImage(img, 2500, 0.75);
+          setProcessedImage(processedBlob);
+          setFormData((prevData) => ({
+            ...prevData,
+            profileIcon: URL.createObjectURL(processedBlob),
+          }));
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+*/
+const convertToWebP = async (
+  file: File,
+  maxSizeMB: number = 1,
+  maxWidthOrHeight: number = 2500
+): Promise<File> => {
+  const options = {
+    maxSizeMB: maxSizeMB,
+    maxWidthOrHeight: maxWidthOrHeight,
+    useWebWorker: true,
+    fileType: 'webp'
+  };
+
+  try {
+    const compressedFile = await imageCompression(file, options);
+    return compressedFile;
+  } catch (error) {
+    console.error('Error compressing image:', error);
+    throw error;
+  }
+};
+
+const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const file = event.target.files?.[0] || null;
+  if (file) {
+    try {
+      const webpFile = await convertToWebP(file);
+      setProcessedImage(webpFile);
+      setFormData((prevData) => ({
+        ...prevData,
+        profileIcon: URL.createObjectURL(webpFile),
+      }));
+    } catch (error) {
+      console.error('WebP conversion failed:', error);
+      showSnackbar('画像の変換に失敗しました。別の画像を試してください。', 'error');
+    }
+  }
+};
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -75,8 +186,8 @@ const MpProfile: React.FC = () => {
     if (formData.nickName) {
       formDataToSend.append('nickName', formData.nickName);
     }
-    if (fileInputRef.current?.files?.[0]) {
-      formDataToSend.append('profileIcon', fileInputRef.current.files[0]);
+    if (fileInputRef.current?.files?.[0] && processedImage) {
+      formDataToSend.append('profileIcon', processedImage);
     }
 
     try {
