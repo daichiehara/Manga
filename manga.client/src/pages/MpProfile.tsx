@@ -150,11 +150,18 @@ const convertToWebP = async (
     maxSizeMB: maxSizeMB,
     maxWidthOrHeight: maxWidthOrHeight,
     useWebWorker: true,
-    fileType: 'webp'
+    fileType: 'webp',
+    quality: 0.8
   };
 
   try {
+    console.log(`Original file size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`);
+
     const compressedFile = await imageCompression(file, options);
+
+    console.log(`Compressed WebP file size: ${(compressedFile.size / (1024 * 1024)).toFixed(2)} MB`);
+    console.log(`Compression ratio: ${((1 - compressedFile.size / file.size) * 100).toFixed(2)}%`);
+
     return compressedFile;
   } catch (error) {
     console.error('Error compressing image:', error);

@@ -128,8 +128,8 @@ const SellCamera: React.FC<SellCameraProps> = ({ capturedImages, onCapturedImage
         reader.onload = (e) => {
           const imageUrl = e.target?.result as string;
           onCapturedImagesChange([...capturedImages, imageUrl]);
-          if (capturedImages.length + 1 === 10) {
-            setSelectedImageIndex(9);
+          if (capturedImages.length + 1 === 6) {
+            setSelectedImageIndex(5);
           }
         };
         reader.readAsDataURL(file);
@@ -166,8 +166,8 @@ const SellCamera: React.FC<SellCameraProps> = ({ capturedImages, onCapturedImage
   
         const capturedImage = canvas.toDataURL('image/webp');
         onCapturedImagesChange([...capturedImages, capturedImage]);
-        if (capturedImages.length + 1 === 10) {
-          setSelectedImageIndex(9);
+        if (capturedImages.length + 1 === 6) {
+          setSelectedImageIndex(5);
         }
       }
     }
@@ -228,16 +228,16 @@ const SellCamera: React.FC<SellCameraProps> = ({ capturedImages, onCapturedImage
 
   return (
     <Box sx={{ pb: '7rem' }}>
-      <Box sx={{ display: selectedImageIndex !== null && capturedImages.length < 11 ? 'block' : 'none' }}>
+      <Box sx={{ display: selectedImageIndex !== null && capturedImages.length < 7 ? 'block' : 'none' }}>
         {selectedImageIndex !== null && (
           <ImageShow selectedImage={capturedImages[selectedImageIndex]} />
         )}
       </Box>
-      <Box sx={{ display: selectedImageIndex === null && capturedImages.length < 10 ? 'block' : 'none' }}>
+      <Box sx={{ display: selectedImageIndex === null && capturedImages.length < 6 ? 'block' : 'none' }}>
         <CameraVideoComponent showFrame={false} videoRef={videoRef} />
       </Box>
       <Box sx={{ overflowX: 'auto', display: 'flex', flexWrap: 'nowrap', py: 2, px: 2 }}>
-        {Array.from({ length: 10 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
           <Box
             key={index}
             sx={{
@@ -300,7 +300,7 @@ const SellCamera: React.FC<SellCameraProps> = ({ capturedImages, onCapturedImage
         style={{ display: 'none' }}
         ref={fileInputRef}
       />
-      {selectedImageIndex === null && capturedImages.length < 10 ? (
+      {selectedImageIndex === null && capturedImages.length < 6 ? (
         <CameraButton onCameraClick={handleCapture} onAlbumClick={handleAlbumClick} />
       ) : isReorderMode ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'fixed', bottom: '4vh', left: 0, right: 0, zIndex: 1000 }}>

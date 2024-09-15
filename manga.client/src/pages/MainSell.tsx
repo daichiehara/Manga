@@ -34,9 +34,11 @@ import PreSellDialog from '../components/common/PreSellComfirmation';
 import { prefectures } from '../components/common/Prefectures';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import imageCompression from 'browser-image-compression';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
+import { initial } from 'lodash';
 
 interface FormData {
   title: string;
@@ -146,6 +148,56 @@ const SellForm: React.FC = () => {
     return isValid;
   };
 
+  // 既存のconvertToWebP関数を以下のように修正します
+  const convertToWebP = async (
+    imageUrl: string,
+    maxSizeMB: number = 0.8,
+    maxWidthOrHeight: number = 1920
+  ): Promise<File> => {
+    const baseOptions = {
+      maxSizeMB: maxSizeMB,
+      maxWidthOrHeight: maxWidthOrHeight,
+      useWebWorker: true,
+      fileType: 'jpeg',
+      initialQuality: 0.7
+    };
+  
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const originalFile = new File([blob], 'image.jpg', { type: blob.type });
+  
+      console.log(`Original file size: ${(originalFile.size / (1024 * 1024)).toFixed(2)} MB`);
+
+      const finalCompressedFile = await imageCompression(originalFile, baseOptions);
+  /*
+      // 1回目の圧縮（quality: 0.7）
+      let firstCompressionOptions = { ...baseOptions, quality: 0.7 };
+      let firstCompressedFile = await imageCompression(originalFile, firstCompressionOptions);
+      console.log(`First compression result (quality 0.7): ${(firstCompressedFile.size / (1024 * 1024)).toFixed(2)} MB`);
+  
+      let finalCompressedFile = firstCompressedFile;
+  
+      // 必要に応じて2回目の圧縮（quality: 0.5）
+      if (firstCompressedFile.size > maxSizeMB * 1024 * 1024) {
+        console.log("First compression not sufficient. Trying again with lower quality.");
+        let secondCompressionOptions = { ...baseOptions, quality: 0.5 };
+        finalCompressedFile = await imageCompression(originalFile, secondCompressionOptions);
+        console.log(`Second compression result (quality 0.5): ${(finalCompressedFile.size / (1024 * 1024)).toFixed(2)} MB`);
+      }
+  */
+      const webpFile = new File([finalCompressedFile], `image.jpg`, { type: 'image/jpeg' });
+  
+      console.log(`Final WebP file size: ${(webpFile.size / (1024 * 1024)).toFixed(2)} MB`);
+      console.log(`Overall compression ratio: ${((1 - webpFile.size / originalFile.size) * 100).toFixed(2)}%`);
+  
+      return webpFile;
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      throw error;
+    }
+  };
+
   const onSubmit = async (data: FormData) => {
     if (!validateForm(data)) {
       setIsLoading(false);
@@ -164,10 +216,10 @@ const SellForm: React.FC = () => {
           };
         } else {
           // 新しい画像の場合
-          const response = await fetch(image);
-          const blob = await response.blob();
+          console.log(`Processing image ${index + 1}`);
+          const webpFile = await convertToWebP(image);
           return {
-            imageBlob: new File([blob], `image${index}.webp`, { type: 'image/webp' }),
+            imageBlob: webpFile,
             order: index + 1,
           };
         }

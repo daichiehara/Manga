@@ -55,7 +55,7 @@ const ImageList: React.FC<ImageListProps> = ({ capturedImages, onCapturedImagesC
           scrollbarColor: 'rgba(0,0,0,.2) transparent',
         }
        }}>
-        {Array.from({ length: 10 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
           <Box
             key={index}
             sx={{
