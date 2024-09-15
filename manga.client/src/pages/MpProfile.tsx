@@ -70,7 +70,7 @@ const MpProfile: React.FC = () => {
       }, 'image/webp');
     });
   };
-  /*
+  
   const resizeAndConvertImage = async (
     img: HTMLImageElement,
     maxSize: number,
@@ -140,44 +140,6 @@ const MpProfile: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-*/
-const convertToWebP = async (
-  file: File,
-  maxSizeMB: number = 1,
-  maxWidthOrHeight: number = 2500
-): Promise<File> => {
-  const options = {
-    maxSizeMB: maxSizeMB,
-    maxWidthOrHeight: maxWidthOrHeight,
-    useWebWorker: true,
-    fileType: 'webp'
-  };
-
-  try {
-    const compressedFile = await imageCompression(file, options);
-    return compressedFile;
-  } catch (error) {
-    console.error('Error compressing image:', error);
-    throw error;
-  }
-};
-
-const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0] || null;
-  if (file) {
-    try {
-      const webpFile = await convertToWebP(file);
-      setProcessedImage(webpFile);
-      setFormData((prevData) => ({
-        ...prevData,
-        profileIcon: URL.createObjectURL(webpFile),
-      }));
-    } catch (error) {
-      console.error('WebP conversion failed:', error);
-      showSnackbar('画像の変換に失敗しました。別の画像を試してください。', 'error');
-    }
-  }
-};
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
