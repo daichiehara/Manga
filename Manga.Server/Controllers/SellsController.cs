@@ -591,48 +591,65 @@ namespace Manga.Server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var sell = new Sell
+            var uploadedImageUrls = new List<string>();  // ここでリストを初期化
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                Title = sellCreateDto.Title,
-                SendPrefecture = sellCreateDto.SendPrefecture,
-                SendDay = sellCreateDto.SendDay,
-                BookState = sellCreateDto.BookState,
-                NumberOfBooks = sellCreateDto.NumberOfBooks,
-                SellMessage = sellCreateDto.SellMessage,
-                SellStatus = sellCreateDto.SellStatus,
-                SellTime = DateTime.UtcNow,
-                UserAccountId = userId
-            };
-
-            _context.Sell.Add(sell);
-            await _context.SaveChangesAsync();
-
-            var sellImages = new List<SellImage>();
-
-            if (sellCreateDto.SellImages != null)
-            {
-
-                foreach (var imageDto in sellCreateDto.SellImages)
+                var sell = new Sell
                 {
-                    var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
-                    sellImages.Add(new SellImage
+                    Title = sellCreateDto.Title,
+                    SendPrefecture = sellCreateDto.SendPrefecture,
+                    SendDay = sellCreateDto.SendDay,
+                    BookState = sellCreateDto.BookState,
+                    NumberOfBooks = sellCreateDto.NumberOfBooks,
+                    SellMessage = sellCreateDto.SellMessage,
+                    SellStatus = sellCreateDto.SellStatus,
+                    SellTime = DateTime.UtcNow,
+                    UserAccountId = userId
+                };
+
+                _context.Sell.Add(sell);
+                await _context.SaveChangesAsync();
+
+                var sellImages = new List<SellImage>();
+
+                if (sellCreateDto.SellImages != null)
+                {
+                    foreach (var imageDto in sellCreateDto.SellImages)
                     {
-                        ImageUrl = imageUrl,
-                        Order = (int)imageDto.Order,
-                    });
+                        var imageUrl = await _s3Service.ProcessMangaImageAsync(imageDto.ImageBlob);
+                        uploadedImageUrls.Add(imageUrl);  // アップロードしたURLをリストに追加
+                        sellImages.Add(new SellImage
+                        {
+                            ImageUrl = imageUrl,
+                            Order = (int)imageDto.Order,
+                            SellId = sell.SellId
+                        });
+                    }
                 }
+
+                _context.SellImage.AddRange(sellImages);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, new { id = sell.SellId, status = sell.SellStatus });
             }
-
-            sell.SellImages = sellImages;
-
-            foreach (var sellImage in sellImages)
+            catch (Exception ex)
             {
-                sellImage.SellId = sell.SellId;
-                _context.SellImage.Add(sellImage);
-            }
-            await _context.SaveChangesAsync();
+                await transaction.RollbackAsync();
 
-            return CreatedAtAction(nameof(GetSellDetails), new { id = sell.SellId }, new { id = sell.SellId, status = sell.SellStatus });
+                // S3にアップロードされた画像を削除
+                foreach (var imageUrl in uploadedImageUrls)
+                {
+                    var fileName = Path.GetFileName(imageUrl);
+                    await _s3Service.DeleteFileFromS3Async(fileName, "manga-img-bucket");
+                }
+
+                _logger.LogError(ex, "Sellの作成中にエラーが発生しました。");
+                return StatusCode(500, "Sellの作成中にエラーが発生しました。");
+            }
         }
 
         [HttpGet("Drafts")]
@@ -775,10 +792,21 @@ namespace Manga.Server.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var sell = await _context.Sell.FindAsync(id);
+                var sell = await _context.Sell
+                    .Include(s => s.SellImages)
+                    .FirstOrDefaultAsync(s => s.SellId == id);
+
                 if (sell == null)
                 {
                     return NotFound();
+                }
+
+                // S3から画像を削除
+                foreach (var image in sell.SellImages)
+                {
+                    var fileName = Path.GetFileName(image.ImageUrl);
+                    await _s3Service.DeleteFileFromS3Async(fileName, "manga-img-bucket");
+                    _logger.LogInformation("Deleted image from S3: {FileName}", fileName);
                 }
 
                 // この Sell に関連する保留中のRequestを取得
@@ -805,17 +833,17 @@ namespace Manga.Server.Controllers
                     }
                 }
 
-                // Sellを削除
+                // Sellを削除（関連するSellImagesも自動的に削除されます）
                 _context.Sell.Remove(sell);
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
                 return NoContent();
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                // ログにエラー詳細を記録
                 _logger.LogError(ex, "Sellの削除中にエラーが発生しました。SellId: {SellId}", id);
                 return StatusCode(500, "Sellの削除中にエラーが発生しました。");
             }
