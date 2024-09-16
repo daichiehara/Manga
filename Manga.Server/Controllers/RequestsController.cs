@@ -283,12 +283,48 @@ namespace Manga.Server.Controllers
                     return NotFound("相手の出品は現在非公開です。");
                 }
 
+                /*
                 // 既存のリクエストを確認
                 var existingRequests = await _context.Request
                     .Where(r => r.RequesterId == userId && r.ResponderSellId == exchangeRequestDto.ResponderSellId)
                     .ToListAsync();
 
                 // Withdrawn以外のステータスがある場合はエラー
+                if (existingRequests.Any(r => r.Status != RequestStatus.Withdrawn))
+                {
+                    return BadRequest("この出品に対して既に有効な交換申請が存在します。");
+                }
+                */
+                List<Request> existingRequests = new List<Request>();  // 初期化を行う
+                bool isReciprocal = false;
+
+                foreach (var requesterSellId in exchangeRequestDto.RequesterSellIds)
+                {
+                    var reciprocalRequest = await _context.Request
+                        .FirstOrDefaultAsync(r => r.RequesterId == responderSell.UserAccountId
+                            && r.ResponderId == userId
+                            && r.RequesterSellId == exchangeRequestDto.ResponderSellId
+                            && r.ResponderSellId == requesterSellId
+                            && r.Status == RequestStatus.Pending);
+
+                    if (reciprocalRequest != null)
+                    {
+                        isReciprocal = true;
+                        existingRequests = await _context.Request
+                            .Where(r => r.RequesterId == userId && r.RequesterSellId == requesterSellId)
+                            .ToListAsync();
+                        break;
+                    }
+                }
+
+                if (!isReciprocal)
+                {
+                    existingRequests = await _context.Request
+                        .Where(r => r.RequesterId == userId && r.ResponderSellId == exchangeRequestDto.ResponderSellId)
+                        .ToListAsync();
+                }
+
+                // ここで existingRequests を使用しても、必ず初期化されているためエラーは発生しない
                 if (existingRequests.Any(r => r.Status != RequestStatus.Withdrawn))
                 {
                     return BadRequest("この出品に対して既に有効な交換申請が存在します。");
