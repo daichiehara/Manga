@@ -1191,24 +1191,41 @@ namespace Manga.Server.Controllers
         public async Task<IActionResult> SearchManga([FromQuery] string query)
         {
             var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
-            var mangaTitles = await _context.MangaTitles
-                .FromSqlRaw(@"
-                    SELECT main_title
-                        FROM (
-                            SELECT DISTINCT ON (main_title) main_title, count
-                            FROM (
-                                (SELECT main_title, count FROM manga_titles WHERE main_title =% {0} ORDER BY count DESC LIMIT 10)
-                                UNION ALL
-                                (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1} ORDER BY count DESC LIMIT 10)
-                            ) AS combined
-                            ORDER BY main_title, count DESC
-                        ) AS distinct_titles
-                        ORDER BY count DESC
-                        LIMIT 20",
-                query, katakanaQuery)
-                .Select(m => m.MainTitle)
-                .ToListAsync();
-            var normalizedTitles = NormalizeTitles(mangaTitles);
+            var searchResults = new List<string>();
+            using (var command = _context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = @"
+                SELECT main_title, count
+                FROM (
+                    SELECT DISTINCT ON (main_title) main_title, count
+                    FROM (
+                        (SELECT main_title, count FROM manga_titles WHERE main_title ILIKE @p0 LIMIT 5)
+                        UNION ALL
+                        (SELECT main_title, count FROM manga_titles WHERE main_title =% @p1 ORDER BY count DESC LIMIT 10)
+                        UNION ALL
+                        (SELECT main_title, count FROM manga_titles WHERE yomi_title =% @p2 ORDER BY count DESC LIMIT 10)
+                    ) AS combined
+                    ORDER BY main_title, count DESC
+                ) AS distinct_titles
+                ORDER BY count DESC
+                LIMIT 25";
+
+                command.Parameters.Add(new NpgsqlParameter("p0", $"%{query}%"));
+                command.Parameters.Add(new NpgsqlParameter("p1", query));
+                command.Parameters.Add(new NpgsqlParameter("p2", katakanaQuery));
+
+                await _context.Database.OpenConnectionAsync();
+
+                using (var result = await command.ExecuteReaderAsync())
+                {
+                    while (await result.ReadAsync())
+                    {
+                        searchResults.Add(result.GetString(0));
+                    }
+                }
+            }
+
+            var normalizedTitles = SortNormalizeTitles(searchResults, query);
             return Ok(normalizedTitles);
         }
 
@@ -1216,28 +1233,71 @@ namespace Manga.Server.Controllers
         public async Task<IActionResult> SearchMangaAndAuthor([FromQuery] string query)
         {
             var katakanaQuery = JapaneseUtils.HiraganaToKatakana(query);
-            var mangaTitles = await _context.MangaTitles
-                .FromSqlRaw(@"
-                    SELECT main_title
+            var searchResults = new List<string>();
+            using (var command = _context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = @"
+                SELECT main_title
+                FROM (
+                    SELECT DISTINCT ON (main_title) main_title, count
                     FROM (
-                        SELECT DISTINCT ON (main_title) main_title, count
-                        FROM (
-                            (SELECT main_title, count FROM manga_titles WHERE main_title =% {0} ORDER BY count DESC)
-                            UNION ALL
-                            (SELECT main_title, count FROM manga_titles WHERE yomi_title =% {1} ORDER BY count DESC)
-                            UNION ALL
-                            (SELECT main_title, count FROM manga_titles WHERE author ILIKE {2} ORDER BY count DESC LIMIT 5)
-                        ) AS combined
-                        ORDER BY main_title, count DESC
-                    ) AS distinct_titles
-                    ORDER BY count DESC
-                    LIMIT 20",
-                query, katakanaQuery, $"%{query}%")
-                .Select(m => m.MainTitle)
-                .ToListAsync();
-
-            var normalizedTitles = NormalizeTitles(mangaTitles);
+                        (SELECT main_title, count FROM manga_titles WHERE main_title ILIKE @p0 LIMIT 5)
+                        UNION ALL
+                        (SELECT main_title, count FROM manga_titles WHERE main_title =% @p1 ORDER BY count DESC)
+                        UNION ALL
+                        (SELECT main_title, count FROM manga_titles WHERE yomi_title =% @p2 ORDER BY count DESC)
+                        UNION ALL
+                        (SELECT main_title, count FROM manga_titles WHERE author ILIKE @p0 ORDER BY count DESC LIMIT 5)
+                    ) AS combined
+                    ORDER BY main_title, count DESC
+                ) AS distinct_titles
+                ORDER BY count DESC
+                LIMIT 25";
+                command.Parameters.Add(new NpgsqlParameter("p0", $"%{query}%"));
+                command.Parameters.Add(new NpgsqlParameter("p1", query));
+                command.Parameters.Add(new NpgsqlParameter("p2", katakanaQuery));
+                await _context.Database.OpenConnectionAsync();
+                using (var result = await command.ExecuteReaderAsync())
+                {
+                    while (await result.ReadAsync())
+                    {
+                        searchResults.Add(result.GetString(0));
+                    }
+                }
+            }
+            var normalizedTitles = SortNormalizeTitles(searchResults, query);
             return Ok(normalizedTitles);
+        }
+
+        private List<string> SortNormalizeTitles(List<string> titles, string query)
+        {
+            var normalizedResults = new List<(string Title, int Priority)>();
+            var seenResults = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var title in titles)
+            {
+                var normalizedTitle = NormalizeTitle(title);
+                if (!seenResults.Contains(normalizedTitle))
+                {
+                    int priority = 0;
+                    if (normalizedTitle.Equals(query, StringComparison.OrdinalIgnoreCase))
+                        priority = 3;
+                    else if (normalizedTitle.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+                        priority = 2;
+                    else if (normalizedTitle.Contains(query, StringComparison.OrdinalIgnoreCase))
+                        priority = 1;
+
+                    normalizedResults.Add((normalizedTitle, priority));
+                    seenResults.Add(normalizedTitle);
+                }
+            }
+
+            return normalizedResults
+                .OrderByDescending(x => x.Priority)
+                .ThenBy(x => x.Title)
+                .Select(x => x.Title)
+                .Take(20)
+                .ToList();
         }
 
         [HttpGet("All")]
@@ -1254,6 +1314,8 @@ namespace Manga.Server.Controllers
                            CASE WHEN author_match THEN TRUE ELSE FALSE END as is_exact_author_match
                     FROM (
                         (SELECT author AS result, count, TRUE as author_match FROM manga_titles WHERE author ILIKE @p0 LIMIT 1)
+                        UNION ALL
+                        (SELECT main_title AS result, count, FALSE as author_match FROM manga_titles WHERE main_title ILIKE @p0)
                         UNION ALL
                         (SELECT main_title AS result, count, FALSE as author_match FROM manga_titles WHERE main_title =% @p1)
                         UNION ALL
@@ -1322,7 +1384,7 @@ namespace Manga.Server.Controllers
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
         }
-
+        /*
         private static List<string> NormalizeTitles(List<string> titles)
         {
             var normalizedTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -1335,7 +1397,7 @@ namespace Manga.Server.Controllers
 
             return normalizedTitles.ToList();
         }
-
+        */
         private static string NormalizeTitle(string title)
         {
             if (string.IsNullOrWhiteSpace(title))

@@ -13,3 +13,9 @@ public partial class MangaTitle
 
     public string? Author { get; set; }
 }
+
+public class MangaTitleResult
+{
+    public string MainTitle { get; set; }
+    public int Count { get; set; }
+}

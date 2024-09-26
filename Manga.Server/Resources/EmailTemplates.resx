@@ -239,20 +239,27 @@
         &lt;h3&gt;1. 配送先情報:&lt;/h3&gt;
         &lt;div class="address"&gt;
             &lt;p&gt;
-                {4}様&lt;br&gt;
+                {4} 様&lt;br&gt;
                 〒{5}&lt;br&gt;
                 {6}{7}&lt;br&gt;
                 {8}
             &lt;/p&gt;
         &lt;/div&gt;
         
-        &lt;h3&gt;2. 梱包:&lt;/h3&gt;
+        &lt;h3&gt;2. 発送予定:&lt;/h3&gt;
+        &lt;p&gt;あなたの発送予定: &lt;span class="important"&gt;{9}&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;相手の発送予定: &lt;span class="important"&gt;{10}&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;h3&gt;3. 送料について:&lt;/h3&gt;
+        &lt;p&gt;&lt;span class="important"&gt;送料は発払い（発送者負担）&lt;/span&gt;となります。必ずご確認ください。&lt;/p&gt;
+        
+        &lt;h3&gt;4. 梱包:&lt;/h3&gt;
         &lt;ul&gt;
             &lt;li&gt;漫画を丁寧に梱包し、破損しないようご注意ください。&lt;/li&gt;
             &lt;li&gt;可能であれば、防水対策も行ってください。&lt;/li&gt;
         &lt;/ul&gt;
         
-        &lt;h3&gt;3. 注意事項:&lt;/h3&gt;
+        &lt;h3&gt;5. 注意事項:&lt;/h3&gt;
         &lt;ul&gt;
             &lt;li&gt;個人情報の取り扱いには十分ご注意ください。&lt;/li&gt;
             &lt;li&gt;配送トラブルを避けるため、速やかな発送にご協力ください。&lt;/li&gt;

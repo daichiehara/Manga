@@ -311,7 +311,7 @@ namespace Manga.Server.Controllers
                     {
                         isReciprocal = true;
                         existingRequests = await _context.Request
-                            .Where(r => r.RequesterId == userId && r.RequesterSellId == requesterSellId)
+                            .Where(r => r.RequesterId == userId && r.ResponderSellId == requesterSellId)
                             .ToListAsync();
                         break;
                     }
@@ -477,14 +477,13 @@ namespace Manga.Server.Controllers
             await NotificationsController.CreateNotificationAsync(_context, message, Models.Type.Match, responderSell.UserAccountId, responderSell.SellId);
 
             // requesterの氏名を連結
-            string requesterFullName = string.IsNullOrEmpty(requesterSell.UserAccount.Sei) && string.IsNullOrEmpty(requesterSell.UserAccount.Mei)
-                ? requesterSell.UserAccount.NickName  // SeiとMeiが両方空の場合はNickNameを使用
-                : $"{requesterSell.UserAccount.Sei} {requesterSell.UserAccount.Mei}".Trim();
+            string requesterFullName = GetFullName(requesterSell.UserAccount);
 
             // responderの氏名を連結
-            string responderFullName = string.IsNullOrEmpty(responderSell.UserAccount.Sei) && string.IsNullOrEmpty(responderSell.UserAccount.Mei)
-                ? responderSell.UserAccount.NickName  // SeiとMeiが両方空の場合はNickNameを使用
-                : $"{responderSell.UserAccount.Sei} {responderSell.UserAccount.Mei}".Trim();
+            string responderFullName = GetFullName(responderSell.UserAccount);
+
+            string requesterSendDayDisplay = requesterSell.SendDay.GetDisplayName();
+            string responderSendDayDisplay = responderSell.SendDay.GetDisplayName();
 
             var responderBody = string.Format(
                 Resources.EmailTemplates.MatchMessage,
@@ -496,7 +495,9 @@ namespace Manga.Server.Controllers
                 HttpUtility.HtmlEncode(requesterSell.UserAccount.PostalCode),
                 HttpUtility.HtmlEncode(requesterSell.UserAccount.Prefecture),
                 HttpUtility.HtmlEncode(requesterSell.UserAccount.Address1),
-                HttpUtility.HtmlEncode(requesterSell.UserAccount.Address2)
+                HttpUtility.HtmlEncode(requesterSell.UserAccount.Address2 ?? string.Empty),
+                HttpUtility.HtmlEncode(responderSendDayDisplay),
+                HttpUtility.HtmlEncode(requesterSendDayDisplay)
             );
             await _emailSender.SendEmailAsync(responderSell.UserAccount.Email, "【トカエル】漫画交換が成立しました！配送手続きのお願い", responderBody);
 
@@ -510,9 +511,23 @@ namespace Manga.Server.Controllers
                 HttpUtility.HtmlEncode(responderSell.UserAccount.PostalCode),
                 HttpUtility.HtmlEncode(responderSell.UserAccount.Prefecture),
                 HttpUtility.HtmlEncode(responderSell.UserAccount.Address1),
-                HttpUtility.HtmlEncode(responderSell.UserAccount.Address2)
+                HttpUtility.HtmlEncode(responderSell.UserAccount.Address2 ?? string.Empty),
+                HttpUtility.HtmlEncode(requesterSendDayDisplay),
+                HttpUtility.HtmlEncode(responderSendDayDisplay)
             );
             await _emailSender.SendEmailAsync(requesterSell.UserAccount.Email, "【トカエル】漫画交換が成立しました！配送手続きのお願い", requesterBody);
+        }
+
+        private string GetFullName(UserAccount userAccount)
+        {
+            if (string.IsNullOrEmpty(userAccount.Sei) && string.IsNullOrEmpty(userAccount.Mei))
+            {
+                return userAccount.NickName;  // SeiとMeiが両方空の場合はNickNameを使用
+            }
+            else
+            {
+                return $"{userAccount.Sei.Trim()} {userAccount.Mei.Trim()}".Trim();  // SeiとMeiの間に半角スペースを入れる
+            }
         }
 
         [HttpGet("{id}")]

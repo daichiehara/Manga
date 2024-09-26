@@ -90,6 +90,29 @@ namespace Manga.Server.Controllers
             }
         }
 
+        [HttpPost("SendConfirmationEmail")]
+        public async Task<IActionResult> SendConfirmationEmail()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (user.EmailConfirmed)
+            {
+                return BadRequest("Email is already confirmed.");
+            }
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = Url.Action("ConfirmEmail", "Users",
+                new { userId = user.Id, token = token }, Request.Scheme);
+            var body = string.Format(Resources.EmailTemplates.RegisterEmailMessage, confirmationLink);
+            await _emailSender.SendEmailAsync(user.Email, "トカエルのメールアドレス確認", body);
+
+            return Ok("Confirmation email sent.");
+        }
+
         [HttpGet("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
@@ -428,7 +451,8 @@ namespace Manga.Server.Controllers
             {
                 NickName = user.NickName,
                 ProfileIcon = user.ProfileIcon,
-                HasIdVerificationImage = !string.IsNullOrEmpty(user.IdVerificationImage)
+                HasIdVerificationImage = !string.IsNullOrEmpty(user.IdVerificationImage),
+                EmailConfirmed = user.EmailConfirmed,
             };
 
             return Ok(myPageInfo);
