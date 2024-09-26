@@ -452,7 +452,6 @@ namespace Manga.Server.Controllers
                 NickName = user.NickName,
                 ProfileIcon = user.ProfileIcon,
                 HasIdVerificationImage = !string.IsNullOrEmpty(user.IdVerificationImage),
-                EmailConfirmed = user.EmailConfirmed,
             };
 
             return Ok(myPageInfo);
@@ -714,6 +713,18 @@ namespace Manga.Server.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpGet("EmailConfirmationStatus")]
+        public async Task<IActionResult> GetEmailConfirmationStatus()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new { isConfirmed = user.EmailConfirmed });
         }
 
         [HttpGet("protected")]
