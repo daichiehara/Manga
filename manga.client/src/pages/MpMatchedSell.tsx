@@ -99,7 +99,14 @@ const MpMatchedSellComponent: React.FC = () => {
         <meta name="twitter:description" content={description} />
       </Helmet>
       <CustomToolbar title="交換した漫画" />
-      <Grid container sx={{ pt: { xs: '3.5rem', sm: '4rem', mb: 10  } }}>
+      <Box mt={7} onClick={() => navigate('/deliverymethod')} style={{ cursor: 'pointer' }}>
+        <img 
+          src='/public/PackingDescription.webp'
+          alt="アプリの使い方の説明画像" 
+          style={{ width: '100%', borderRadius: '10px' }} 
+        />
+      </Box>
+      <Grid container sx={{ pt: '1rem'}}>
       <Grid container>
                 <Grid item xs={6}>
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr:'2rem', pt:'1rem' , pb:'0.5rem' }}>

@@ -8,6 +8,7 @@ import CustomToolbar from '../components/common/CustumToolbar';
 import { useNavigate } from 'react-router-dom';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { useSnackbar } from '../hooks/useSnackbar';
+import ImageSlider from '../components/common/ImageSlider';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 
@@ -55,20 +56,27 @@ const MSell: React.FC= () => {
       }}
 
     >
-    </Button>
+    </Button>/howtouse
     */}
 
       {/* メインコンテンツエリア */}
       {/* 見出し */}
       <CustomToolbar title="出品" showBackButton={false} />
       {/* メインボタンエリア */}
-      <Box sx={{ mt: '3rem', pt: '4rem', ml: 4, mr: 4, mb: 6 }}>
+      <Box sx={{ mt: '3rem', pt: '2rem', ml: 4, mr: 4, mb: 6 }}>
+        <ImageSlider 
+          images={[
+            { url: '/public/AppDescription.webp', path: '/howtouse' },
+            { url: '/public/PackingDescription.webp', path: '/deliverymethod' }
+          ]}
+        />
         {/* 出品するボタン */}
         <Button
           variant="contained"
           color="primary"
           onClick={() => navigate('/sell')}
           sx={{
+            mt:'1rem',
             width: '100%',
             height: 70,
             backgroundColor: '#EB4848',

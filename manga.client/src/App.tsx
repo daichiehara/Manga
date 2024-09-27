@@ -38,6 +38,8 @@ import ForgotPassword from './pages/ForgotPassword.tsx';
 import ResetPassword from './pages/ResetPassword.tsx';
 import TermsOfService from './pages/TermsOfService.tsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
+import MangaDeliveryMethodPage from './pages/MangaDeliveryMethod.tsx';
+import HowToUsePage from './pages/HowToUsePage.tsx';
 
 import path from 'path';
 
@@ -91,6 +93,8 @@ const router = createBrowserRouter(
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/deliverymethod" element={<MangaDeliveryMethodPage />} />
+      <Route path="/howtouse" element={<HowToUsePage />} />
     </Route>
   )
 );
