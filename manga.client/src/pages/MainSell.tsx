@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import CustomToolbar from '../components/common/CustumToolbar';
 import ImageList from '../components/common/SellImageList';
 import BookAutocomplete from '../components/common/BookAutocomplete';
+import CircularProgressWithLabel from '../components/common/CircularProgressWithLabel';
 import {
   TextField,
   Select,
@@ -34,6 +35,9 @@ import PreSellDialog from '../components/common/PreSellComfirmation';
 import { prefectures } from '../components/common/Prefectures';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import CheckModal from '../components/common/CheckModal';
+import { AuthContext } from '../components/context/AuthContext';
+import { UserContext } from '../components/context/UserContext';
 import imageCompression from 'browser-image-compression';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
@@ -75,6 +79,13 @@ const SellForm: React.FC = () => {
   const from = location.state?.from || '/main-sell';
   const { showSnackbar } = useContext(SnackbarContext);
   const customNavigate = useCustomNavigate();
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isCheckModalOpen, setIsCheckModalOpen] = useState(false);
+  const [isEmailConfirmModalOpen, setIsEmailConfirmModalOpen] = useState(false);
+  const [isEmailConfirmed, setIsEmailConfirmed] = useState<boolean | null>(null);
+  const { authState } = useContext(AuthContext);
 
   const handleCapturedImagesChange = (images: string[]) => {
     setCapturedImages(images);
@@ -198,6 +209,26 @@ const SellForm: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (uploadProgress >= 90 && uploadProgress < 100) {
+      progressIntervalRef.current = setInterval(() => {
+        setUploadProgress((prevProgress) => {
+          if (prevProgress >= 99) {
+            clearInterval(progressIntervalRef.current!);
+            return 100;
+          }
+          return prevProgress + 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, [uploadProgress]);
+
   const onSubmit = async (data: FormData) => {
     if (!validateForm(data)) {
       setIsLoading(false);
@@ -205,19 +236,21 @@ const SellForm: React.FC = () => {
       setIsDraftLoading(false);
       return;
     }
+
+    setIsUploading(true);
+    setUploadProgress(0);
   
     const sellImages = await Promise.all(
       capturedImages.map(async (image, index) => {
         if (image.startsWith('http')) {
-          // 既存の画像の場合
+          setUploadProgress((prev) => prev + (40 / capturedImages.length));
           return {
             imageUrl: image,
             order: index + 1,
           };
         } else {
-          // 新しい画像の場合
-          console.log(`Processing image ${index + 1}`);
           const webpFile = await convertToWebP(image);
+          setUploadProgress((prev) => prev + (40 / capturedImages.length));
           return {
             imageBlob: webpFile,
             order: index + 1,
@@ -263,6 +296,10 @@ const SellForm: React.FC = () => {
           'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 50) / progressEvent.total!) + 40;
+          setUploadProgress(Math.min(percentCompleted, 90));
+        },
       });
     
       console.log('Form submitted successfully:', response.data);
@@ -285,6 +322,7 @@ const SellForm: React.FC = () => {
     
       if (response.data.status === 1) {
         if (from === '/main-sell') {
+          setUploadProgress(100);
           navigate(`/item/${response.data.id}`, { 
             state: { 
               openWishlistDrawer: true 
@@ -293,10 +331,12 @@ const SellForm: React.FC = () => {
           });
           showSnackbar('出品に成功しました。', 'success');
         } else {
+          setUploadProgress(100);
           customNavigate();
           showSnackbar('出品に成功しました。', 'success');
         }
       } else if (response.data.status === 2 || response.data.status === 4) {
+        setUploadProgress(100);
         customNavigate();
         showSnackbar(snackMessage, 'success');
       }
@@ -306,6 +346,17 @@ const SellForm: React.FC = () => {
       } else {
         console.error('Error submitting form:', error);
       }
+    } finally {
+      setTimeout(() => {
+        setIsUploading(false);
+        setIsLoading(false);
+        setIsSellLoading(false);
+        setIsDraftLoading(false);
+        setUploadProgress(0);
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+        }
+      }, 1000);
     }
   };
   
@@ -448,11 +499,67 @@ const SellForm: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (authState.isInitialized && !authState.isAuthenticated) {
+      const timer = setTimeout(() => {
+        setIsCheckModalOpen(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    } else if (authState.isAuthenticated) {
+      checkEmailConfirmation();
+    }
+  }, [authState.isInitialized, authState.isAuthenticated]);
+
+  const checkEmailConfirmation = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/Users/EmailConfirmationStatus`, {
+        withCredentials: true
+      });
+      setIsEmailConfirmed(response.data.isConfirmed);
+      if (!response.data.isConfirmed) {
+        setIsEmailConfirmModalOpen(true);
+      }
+    } catch (error) {
+      console.error('Failed to check email confirmation status:', error);
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/signup');
+  };
+
+  const handleSendConfirmationEmail = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/Users/SendConfirmationEmail`, {}, {
+        withCredentials: true
+      });
+      setIsEmailConfirmModalOpen(false);
+      showSnackbar('確認メールを送信しました。', 'success');
+      // ここでユーザーに確認メールが送信されたことを通知するスナックバーなどを表示できます
+    } catch (error) {
+      console.error('Failed to send confirmation email:', error);
+    }
+  };
+
+  if (!authState.isInitialized) {
+    return <CircularProgress />;
+  }
   
   const handleCancelDelete = () => {
     setIsDialogOpen(false);
   };
   const description = `[トカエル]出品の情報を入力してください`;
+
+  if (loading) {
+    return (
+      <>
+        <CustomToolbar title="出品情報を入力" />
+        <LoadingComponent />
+      </>
+    );
+  }
 
   return (
     <>
@@ -466,7 +573,6 @@ const SellForm: React.FC = () => {
         <meta name="twitter:description" content={description} />
       </Helmet>
       <CustomToolbar title="出品情報を入力" />
-      {loading && <LoadingComponent />}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box sx={{ pt: '4rem', mb: 3 }}>
             <ImageList
@@ -676,13 +782,12 @@ const SellForm: React.FC = () => {
               onClick={handleSell}
               disabled={isLoading}
             >
-              {isSellLoading ? <CircularProgress size={24} /> : 
               <>
                 {!sellId && '出品する'}
                 {draftData?.sellStatus === 1 && '変更する'}
                 {draftData?.sellStatus === 2 && '出品を再開する'}
                 {draftData?.sellStatus === 4 && '出品する'}
-              </>}
+              </>
             </Button>
           </Grid>
           <Grid item xs={12} mb={3}>
@@ -719,6 +824,7 @@ const SellForm: React.FC = () => {
           )}
         </Grid>
       </form>
+      <CircularProgressWithLabel value={uploadProgress} open={isUploading} />
       <Dialog open={isDialogOpen} onClose={handleCancelDelete}>
         <DialogTitle>{draftData?.sellStatus === 4 ? '下書きの削除' : '出品の削除'}</DialogTitle>
         <DialogContent>
@@ -741,6 +847,33 @@ const SellForm: React.FC = () => {
         onClose={() => setIsPreSellDialogOpen(false)}
         onConfirm={handleConfirmListing}
       />
+      <CheckModal
+        open={isCheckModalOpen}
+        onClose={() => setIsCheckModalOpen(false)}
+        questionText="ログインが必要です"
+        agreeText="会員登録・ログイン"
+        onAgree={handleLoginRedirect}
+      >
+        <Typography variant="body1" sx={{ marginBottom: 2, textAlign: 'center' }}>
+          出品するにはログインが必要です。会員登録またはログインを行ってください。
+        </Typography>
+      </CheckModal>
+      <CheckModal
+        open={isEmailConfirmModalOpen}
+        onClose={() => setIsEmailConfirmModalOpen(false)}
+        questionText="メールアドレスの確認"
+        agreeText="確認メールを再送信"
+        onAgree={handleSendConfirmationEmail}
+      >
+        <Typography variant="body1" sx={{ marginBottom: 2, textAlign: 'center' }}>
+          出品するにはメールアドレスの確認が必要です。<br />
+          確認メールを再送信して、<br />
+          メール本文のリンクをクリックしてアカウントを有効化してください。
+        </Typography>
+        <Typography variant='caption'>
+          メールが届かない場合は迷惑メールに分類されていないかご確認ください。
+        </Typography>
+      </CheckModal>
     </>
   );
 };

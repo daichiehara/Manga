@@ -3,6 +3,7 @@ import { TextField, Button, Avatar, IconButton, Box, Typography, CircularProgres
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import CustomToolbar from '../components/common/CustumToolbar';
 import LoadingComponent from '../components/common/LoadingComponent';
+import CircularProgressWithLabel from '../components/common/CircularProgressWithLabel';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import { UserContext } from '../components/context/UserContext';
@@ -24,6 +25,9 @@ const MpProfile: React.FC = () => {
   const { showSnackbar } = useContext(SnackbarContext);
   const { refreshUserInfo } = useContext(UserContext);
   const [processedImage, setProcessedImage] = useState<Blob | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     nickName: '',
@@ -33,6 +37,28 @@ const MpProfile: React.FC = () => {
   useEffect(() => {
     fetchUserProfile();
   }, []);
+
+  useEffect(() => {
+    if (uploadProgress >= 90 && uploadProgress < 100) {
+      progressIntervalRef.current = setInterval(() => {
+        setUploadProgress((prevProgress) => {
+          if (prevProgress >= 99) {
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current);
+            }
+            return 100;
+          }
+          return prevProgress + 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, [uploadProgress]);
 
   const fetchUserProfile = async () => {
     try {
@@ -197,8 +223,14 @@ const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     }
 
     try {
-        setIsLoading(true);
-      const response = await axios.put(`${API_BASE_URL}/Users/UpdateProfile`, formDataToSend, { withCredentials: true });
+      setIsUploading(true);
+      const response = await axios.put(`${API_BASE_URL}/Users/UpdateProfile`, formDataToSend, {
+        withCredentials: true,
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 90) / progressEvent.total!);
+          setUploadProgress(Math.min(percentCompleted, 90));
+        },
+      });
 
       if (response.status === 200) {
         await refreshUserInfo();
@@ -212,7 +244,10 @@ const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     } catch (error) {
       console.error('Error updating profile:', error);
     } finally {
-        setIsLoading(false);
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }, 1000); // Delay hiding the progress for 1 second after completion
     }
   };
 
@@ -221,7 +256,18 @@ const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
       fileInputRef.current.click();
     }
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <CustomToolbar title='プロフィール設定' />
+        <LoadingComponent />
+      </>
+    );
+  }
+
   const description = `[${SERVICE_NAME}]プロフィール設定ページです。`;
+  
   return (
     <>
       <Helmet>
@@ -232,9 +278,8 @@ const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         <meta property="og:url" content={window.location.href} />
         <meta name="twitter:title" content={`プロフィール設定 - ${SERVICE_NAME}`} />
         <meta name="twitter:description" content={description} />
-  </Helmet>
+      </Helmet>
       <CustomToolbar title="プロフィール設定" />
-      {loading && <LoadingComponent />}
       <Box sx={{ px: 2, pt: '5rem' }}>
         <form onSubmit={handleSubmit}>
           <Typography variant="body2" fontWeight="bold">
@@ -278,8 +323,13 @@ const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
             }}
           />
           <Button type="submit" variant="contained" color="primary" fullWidth size='large' disabled={isLoading}>
-          {isLoading ? <CircularProgress size={24} /> : '更新する'}
+            更新する
           </Button>
+          {isUploading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <CircularProgressWithLabel value={uploadProgress} open={isUploading} size={55} />
+            </Box>
+          )}
         </form>
       </Box>
     </>

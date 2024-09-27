@@ -11,6 +11,8 @@ import { useSnackbar } from '../hooks/useSnackbar';
 import ImageSlider from '../components/common/ImageSlider';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
+import img1 from '../assets/images/AppDescription.webp';
+import img2 from '../assets/images/PackingDescription.webp';
 
 interface MSell {
   title: string; 
@@ -22,7 +24,7 @@ const MSell: React.FC= () => {
     console.log('Button clicked!');
     // Add your logic here
   };
-  
+
   useSnackbar();
   const description = `[${SERVICE_NAME}]簡単な数ステップで漫画を出品できます。交換成立のために、まずは出品してみましょう！`;
 
@@ -66,8 +68,8 @@ const MSell: React.FC= () => {
       <Box sx={{ mt: '3rem', pt: '2rem', ml: 4, mr: 4, mb: 6 }}>
         <ImageSlider 
           images={[
-            { url: '/public/AppDescription.webp', path: '/howtouse' },
-            { url: '/public/PackingDescription.webp', path: '/deliverymethod' }
+            { url: `${img1}`, path: '/howtouse' },
+            { url: `${img2}`, path: '/deliverymethod' }
           ]}
         />
         {/* 出品するボタン */}

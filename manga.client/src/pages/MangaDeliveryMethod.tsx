@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material';
 import CustomToolbar from '../components/common/CustumToolbar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import HeadImg from '../assets/images/PackingDescription.webp';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 
@@ -300,7 +301,7 @@ export default function MangaDeliveryMethodPage() {
       <Container maxWidth="lg" sx={{ backgroundColor: 'background.default', py: 5 }}>
         <Box mt={4} mb={2}>
               <img 
-              src='/public/PackingDescription.webp'
+              src={`${HeadImg}`}
               alt="アプリの使い方の説明画像" 
               style={{ width: '100%', borderRadius: '10px' }} 
               />

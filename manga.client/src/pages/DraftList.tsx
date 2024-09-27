@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CustomToolbar from '../components/common/CustumToolbar';
 import LoadingComponent from '../components/common/LoadingComponent';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
@@ -56,7 +57,15 @@ const DraftList: React.FC = () => {
       {loading && <LoadingComponent />}
       <Box sx={{pt: { xs: '3.5rem', sm: '4rem' }}}>
         {drafts.length === 0 ? (
-            <Typography>下書きはありません。</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', pt: 9 }}>
+            <BorderColorIcon sx={{ fontSize: 60, color: 'action.active', padding:9}} />  {/* アイコンのサイズと色、下のマージンを調整 */}
+            <Typography variant="subtitle1">
+              現在、下書きはありません。
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1}}>
+              ここでは出品の下書き一覧が表示されます
+            </Typography>
+          </Box>
         ) : (
           <Grid container>
           {drafts.map((draft, index) => (

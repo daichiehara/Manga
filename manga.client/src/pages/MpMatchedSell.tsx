@@ -7,6 +7,7 @@ import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import LoadingComponent from '../components/common/LoadingComponent';
+import HeadImg from '../assets/images/PackingDescription.webp';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
@@ -101,7 +102,7 @@ const MpMatchedSellComponent: React.FC = () => {
       <CustomToolbar title="交換した漫画" />
       <Box mt={7} onClick={() => navigate('/deliverymethod')} style={{ cursor: 'pointer' }}>
         <img 
-          src='/public/PackingDescription.webp'
+          src={`${HeadImg}`}
           alt="アプリの使い方の説明画像" 
           style={{ width: '100%', borderRadius: '10px' }} 
         />
