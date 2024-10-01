@@ -2,6 +2,7 @@ import React, { useState, useEffect, MouseEvent, useCallback, useContext } from 
 import { SwipeableDrawer, Box, Typography, Button, CircularProgress, Card, CardContent, CardMedia, CardActionArea, Chip, IconButton, Alert, Skeleton, Divider } from '@mui/material';
 import axios from 'axios';
 import CloseIcon from '@mui/icons-material/Close';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useNavigate } from 'react-router-dom';
@@ -145,6 +146,16 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
     try {
       const data = await onFetchExchangeRequest(id);
       setSelectedExchange(data);
+
+      if (data.requesterSells.length > 0) {
+        const selectableSell = data.requesterSells.find(sell => 
+          sell.requestStatus === RequestStatus.Pending
+        );
+        if (selectableSell) {
+          onRequesterSellSelect(selectableSell);
+        }
+      }
+
       console.log('fetch requested id')
     } catch (error) {
       console.error('交換リクエストデータの取得に失敗:', error);
@@ -300,8 +311,8 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                   <CardMedia
                     component="img"
                     sx={{
-                      width: 100,
-                      height: 100,
+                      width: 50,
+                      height: 50,
                       objectFit: 'cover',
                       borderRadius: 2,
                       m: 1,
@@ -310,12 +321,12 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                     alt={selectedExchange.responderSellTitle}
                   />
                   <CardContent sx={{ flex: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                      あなたの出品
-                    </Typography>
-                    <Typography variant="subtitle1" component="div" sx={{ fontWeight: 'bold' }}>
-                      {selectedExchange.responderSellTitle}
-                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        あなたの出品
+                      </Typography>
+                      <Typography variant="subtitle1" component="div" sx={{ fontWeight: 'bold' }}>
+                        {selectedExchange.responderSellTitle}
+                      </Typography>
                   </CardContent>
                 </Box>
               </CardActionArea>
@@ -448,7 +459,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                                 交換成立済み
                               </Typography>
                             )}
-                            {sell.requestStatus === RequestStatus.Withdrawn && (
+                            {sell.requestStatus === RequestStatus.Withdrawn && sell.sellStatus != SellStatus.Established && (
                               <Typography 
                                 variant="caption" 
                                 className="status-text"
@@ -500,18 +511,32 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                           >
                             <InfoOutlinedIcon fontSize="small" />
                           </IconButton>
-                          {selectedRequesterSell?.sellId === sell.sellId && (
-                            <CheckCircleIcon
-                              sx={{
-                                position: 'absolute',
-                                top: 4,
-                                left: 4,
-                                color: '#1976d2',
-                                backgroundColor: 'white',
-                                borderRadius: '50%',
-                                fontSize: 24,
-                              }}
-                            />
+                          {sell.requestStatus === RequestStatus.Pending && (
+                            selectedRequesterSell?.sellId === sell.sellId ? (
+                              <CheckCircleIcon
+                                sx={{
+                                  position: 'absolute',
+                                  top: 4,
+                                  left: 4,
+                                  color: '#1976d2',
+                                  backgroundColor: 'white',
+                                  borderRadius: '50%',
+                                  fontSize: 24,
+                                }}
+                              />
+                            ) : (
+                              <RadioButtonUncheckedIcon
+                                sx={{
+                                  position: 'absolute',
+                                  top: 4,
+                                  left: 4,
+                                  color: 'text.secondary',
+                                  //backgroundColor: 'white',
+                                  borderRadius: '50%',
+                                  fontSize: 24,
+                                }}
+                              />
+                            )
                           )}
                         </Card>
                       ))}
@@ -542,8 +567,7 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
                       </Box>
                     </Box>
           </Box>
-          {open && <AddressLink onAddressFetch={handleAddressFetch} />}
-        <Box 
+          <Box 
           sx={{ 
             mb: 3, 
             mt: 2,
@@ -559,7 +583,8 @@ const ExchangeAcceptDrawer: React.FC<ExchangeAcceptDrawerProps> = React.memo(({
             onDelete={() => onRequesterSellSelect(null)}
           />
         </Box>
-        <Typography sx={{fontSize: '0.8rem'}} color='secondary'>この申請を受け入れることで交換が決定します。<br />交換したい漫画の詳細情報をよく確認の上、選択してください。</Typography>
+          {open && <AddressLink onAddressFetch={handleAddressFetch} />}
+        <Typography variant='caption' color='secondary'>この申請を受け入れることで交換が決定します。<br />交換したい漫画の詳細をよく確認の上、選択してください。</Typography>
         {errorMessage && (
           <Alert severity="error" onClose={clearError} sx={{ mt: 2, mb: 2 }}>
             {errorMessage}

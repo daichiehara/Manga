@@ -5,9 +5,11 @@ import {
   Route,
   createRoutesFromElements,
   Outlet,
-  ScrollRestoration
+  ScrollRestoration,
+  useLocation
 } from 'react-router-dom';
 import { Box } from '@mui/material';
+import ReactGA from "react-ga4";
 import MainSearch from './pages/MainSearch';
 import MangaDetail from './pages/MangaDetail';
 import { ThemeProvider } from '@mui/material/styles';
@@ -60,9 +62,20 @@ const AppLayout = () => {
   );
 };
 
+// ページビュー追跡用のカスタムコンポーネント
+const PageViewTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
+
+  return null;
+};
+
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<AxiosInterceptorProvider><AppLayout /></AxiosInterceptorProvider>}>
+    <Route element={<AxiosInterceptorProvider><AppLayout /><PageViewTracker /></AxiosInterceptorProvider>}>
       <Route path="/item/favorite" element={<MainSearch initialTab={0} />} />
       <Route path="/" element={<MainSearch />} />
       <Route path="/item/new" element={<MainSearch initialTab={2} />} />
@@ -100,13 +113,6 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
-  /*
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setNavigateFunction(navigate);
-  }, [navigate]);
-  */
   useEffect(() => {
     const initializeAuth = async () => {
       try {
