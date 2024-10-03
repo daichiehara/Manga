@@ -301,6 +301,7 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
   return  (
     <>
       <Helmet>
+        {/*
         <title>{mangaDetail.title} by {SERVICE_NAME}【漫画の物々交換サービス】</title>
         <meta name="description" content={description} />
         <meta property="og:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}【漫画の物々交換サービス】`} />
@@ -310,6 +311,7 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
         <meta name="twitter:title" content={`${mangaDetail?.title} by ${SERVICE_NAME}【漫画の物々交換サービス】`} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={mangaDetail.imageUrls[0]} />
+        */}
       </Helmet>
       <Box sx={{ p: 0, margin:0 }}>
         {/* 戻るボタン */}      
