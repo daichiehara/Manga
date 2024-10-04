@@ -66,8 +66,8 @@ const MSell: React.FC= () => {
       <Box sx={{ mt: '3rem', pt: '2rem', ml: 4, mr: 4, mb: 6 }}>
         <ImageSlider 
           images={[
-            { url: '/images/AppDescription.webp', path: '/howtouse' },
-            { url: '/images/PackingDescription.webp', path: '/deliverymethod' }
+            { url: 'https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/AppDescription.webp', path: '/howtouse' },
+            { url: 'https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/PackingDescription.webp', path: '/deliverymethod' }
           ]}
         />
         {/* 出品するボタン */}

@@ -73,7 +73,7 @@ const HowToUsePage: React.FC = () => {
             
             <Box mt={4}>
                 <img 
-                src='/images/AppDescription.webp'
+                src='https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/AppDescription.webp'
                 alt="アプリの使い方の説明画像" 
                 style={{ width: '100%', borderRadius: '10px' }} 
                 />
