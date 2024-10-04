@@ -11,8 +11,6 @@ import { useSnackbar } from '../hooks/useSnackbar';
 import ImageSlider from '../components/common/ImageSlider';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
-import img1 from '../assets/images/AppDescription.webp';
-import img2 from '../assets/images/PackingDescription.webp';
 
 interface MSell {
   title: string; 
@@ -68,8 +66,8 @@ const MSell: React.FC= () => {
       <Box sx={{ mt: '3rem', pt: '2rem', ml: 4, mr: 4, mb: 6 }}>
         <ImageSlider 
           images={[
-            { url: `${img1}`, path: '/howtouse' },
-            { url: `${img2}`, path: '/deliverymethod' }
+            { url: '/images/AppDescription.webp', path: '/howtouse' },
+            { url: '/images/PackingDescription.webp', path: '/deliverymethod' }
           ]}
         />
         {/* 出品するボタン */}
