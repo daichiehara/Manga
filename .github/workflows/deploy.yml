@@ -39,15 +39,13 @@ jobs:
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
           args: --delete
-          bucket: tocaeru-app  # 作成したS3バケット名に置き換える
-          region: ap-northeast-1  # S3バケットのリージョンに置き換える
-          source_dir: ./manga.client/build  # ビルド出力ディレクトリに置き換える
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_S3_BUCKET: tocaeru-app  # 実際のS3バケット名
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-northeast-1  # S3バケットのリージョン
-          SOURCE_DIR: ./manga.client/build
+          SOURCE_DIR: ./manga.client/build  # ビルド出力ディレクトリ
+
 
       # 7. CloudFrontのキャッシュ無効化
       - name: Invalidate CloudFront
