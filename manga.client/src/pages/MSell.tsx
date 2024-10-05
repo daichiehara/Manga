@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ImageSlider from '../components/common/ImageSlider';
+import Img1 from '../assets/images/AppDescription.webp';
+import Img2 from '../assets/images/PackingDescription.webp'
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 
@@ -66,8 +68,8 @@ const MSell: React.FC= () => {
       <Box sx={{ mt: '3rem', pt: '2rem', ml: 4, mr: 4, mb: 6 }}>
         <ImageSlider 
           images={[
-            { url: '/images/AppDescription.webp', path: '/howtouse' },
-            { url: '/images/PackingDescription.webp', path: '/deliverymethod' }
+            { url: Img1, path: '/howtouse' },
+            { url: Img2, path: '/deliverymethod' }
           ]}
         />
         {/* 出品するボタン */}

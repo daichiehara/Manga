@@ -26,6 +26,7 @@ import {
   CheckCircle,
 } from '@mui/icons-material';
 import CustomToolbar from '../components/common/CustumToolbar';
+import HeadImage from '../assets/images/AppDescription.webp';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 
@@ -73,7 +74,7 @@ const HowToUsePage: React.FC = () => {
             
             <Box mt={4}>
                 <img 
-                src='/images/AppDescription.webp'
+                src={HeadImage}
                 alt="アプリの使い方の説明画像" 
                 style={{ width: '100%', borderRadius: '10px' }} 
                 />
