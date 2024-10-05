@@ -51,7 +51,7 @@ jobs:
 
       # 7. CloudFrontのキャッシュ無効化
       - name: Invalidate CloudFront
-        uses: aws-actions/cloudfront-invalidate-action@v1
+        uses: chetan/invalidate-cloudfront-action@v1.2
         with:
           distribution-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
           paths: '/*'
