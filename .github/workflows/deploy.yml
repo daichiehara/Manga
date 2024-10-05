@@ -1,0 +1,60 @@
+name: Deploy Frontend to S3 and Invalidate CloudFront
+
+on:
+  push:
+    branches:
+      - main  # デプロイをトリガーするブランチを指定
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. リポジトリのコードをチェックアウト
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Node.jsのセットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # 使用するNode.jsのバージョンを指定
+
+      # 3. Frontendディレクトリに移動
+      - name: Navigate to frontend directory
+        run: cd manga.client
+
+      # 4. 依存関係のインストール
+      - name: Install dependencies
+        working-directory: ./manga.client
+        run: npm install
+
+      # 5. ビルドの実行
+      - name: Build project
+        working-directory: ./manga.client
+        run: npm run build
+
+      # 6. S3へのデプロイ
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --delete
+          bucket: tocaeru-app  # 作成したS3バケット名に置き換える
+          region: ap-northeast-1  # S3バケットのリージョンに置き換える
+          source_dir: ./manga.client/build  # ビルド出力ディレクトリに置き換える
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-northeast-1  # S3バケットのリージョン
+          SOURCE_DIR: ./manga.client/build
+
+      # 7. CloudFrontのキャッシュ無効化
+      - name: Invalidate CloudFront
+        uses: awslabs/aws-cloudfront-invalidate-action@v1
+        with:
+          distribution-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          paths: '/*'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
