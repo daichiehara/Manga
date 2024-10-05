@@ -120,7 +120,7 @@ const MSell: React.FC= () => {
           }}
         >
           <BorderColorIcon sx={{ fontSize: '2rem', mr: '0.5rem' }} />
-          下書き
+          下書き一覧
         </Button>
       </Box>
       <Divider variant="fullWidth" sx={{mx:4, my:3}}/>
