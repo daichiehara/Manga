@@ -3,7 +3,7 @@ name: Deploy Frontend to S3 and Invalidate CloudFront
 on:
   push:
     branches:
-      - main  # デプロイをトリガーするブランチを指定
+      - master  # デプロイをトリガーするブランチを指定
 
 jobs:
   build-and-deploy:
