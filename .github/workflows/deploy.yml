@@ -34,6 +34,10 @@ jobs:
         working-directory: ./manga.client
         run: npm run build
 
+      # 5.5. ビルド出力ディレクトリの確認
+      - name: List build directory
+        run: ls -la ./manga.client/dist
+
       # 6. S3へのデプロイ
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
@@ -44,7 +48,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-northeast-1  # S3バケットのリージョン
-          SOURCE_DIR: ./manga.client/build  # ビルド出力ディレクトリ
+          SOURCE_DIR: ./manga.client/dist  # ビルド出力ディレクトリ
 
 
       # 7. CloudFrontのキャッシュ無効化
