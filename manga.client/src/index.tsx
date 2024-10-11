@@ -30,12 +30,12 @@ if (container) {
         {/*  <meta name="description" content={`${SERVICE_NAME}は日本初の漫画の物々交換を簡単に楽しめるサービスです。`} /> */}
         <meta property="og:title" content={`${SERVICE_NAME} - 日本初の漫画の物々交換サービス`} />
         <meta property="og:description" content={`${SERVICE_NAME}は日本初の漫画の物々交換を簡単に楽しめるサービスです。`} /> 
-        <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+                  <meta property="og:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo1024.png" />
         <meta property="og:url" content="https://tocaeru.com" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${SERVICE_NAME} - 日本初の漫画の物々交換サービス`} />
         <meta name="twitter:description" content={`${SERVICE_NAME}は日本初の漫画の物々交換を簡単に楽しめるサービスです。`} />
-        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo.webp" />
+        <meta name="twitter:image" content="https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/TocaeruLogo1024.png" />
       </Helmet>
 
         <ThemeProvider theme={theme}>
