@@ -21,6 +21,7 @@ import { Helmet } from 'react-helmet-async';
 import { SnackbarContext } from '../components/context/SnackbarContext';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomToolbar from '../components/common/CustumToolbar';
+import ExchangeLabel from '../components/common/ExchangeLabel';
 import theme from '../theme/theme';
 import { replace } from 'lodash';
 import { SERVICE_NAME } from '../serviceName';
@@ -339,9 +340,12 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
               />
 
               <Paper elevation={0} sx={{ pt: 3, pb: 1, pl: 2.0, pr: 2.0, border: 'none' }}>
-                <Typography variant="h6" component="span" sx={{pt:2, color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic' }}>
-                  want<Box component="span" sx={{ color: 'orange' }}>!!</Box><Box component="span" sx={{pl:1.0, color: '#757575', fontSize:'16px', fontWeight:'bold', fontStyle:'normal'}}>この人が欲しい漫画</Box>
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <ExchangeLabel type="want" />
+                  <Typography variant="body2" sx={{ ml: 1, color: theme.palette.text.secondary, fontWeight: 'bold' }}>
+                    このユーザーの欲しい漫画
+                  </Typography>
+                </Box>
                 <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
                 {mangaDetail.wishTitles.length > 0 ? (
                   <WishListDisplay wishTitles={mangaDetail.wishTitles} shouldTruncate={false}/>

@@ -16,6 +16,7 @@ import { AppContext } from '../context/AppContext';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, LineShareButton, LineIcon, XIcon } from 'react-share';
 import { API_BASE_URL } from '../../apiName';
 import { SnackbarContext } from '../context/SnackbarContext';
+import ExchangeLabel from '../common/ExchangeLabel';
 
 interface MangaDetailInfoProps {
   title: string;
@@ -120,7 +121,8 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
         
 
         <Grid container spacing={0} alignItems="center" sx={{ pt: 1 }}>
-          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+          <ExchangeLabel type="give" />
+          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', m: 0 }}>
             {title}
           </Typography>
         </Grid>
