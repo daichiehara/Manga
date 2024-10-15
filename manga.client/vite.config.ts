@@ -52,16 +52,6 @@ export default defineConfig({
                     "sizes": "512x512",
                     "type": "image/png"
                 },
-                {
-                    "src": "/TocaeruCircle.png",
-                    "sizes": "398x398",
-                    "type": "image/png"
-                },
-                {
-                    "src": "/Tocaeru512Circle.png",
-                    "sizes": "512x512",
-                    "type": "image/png"
-                },
                 ],
                 "start_url": "/",
                 "display": "standalone",
