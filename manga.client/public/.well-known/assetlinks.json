@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.tocaeru.twa",
+        "sha256_cert_fingerprints": ["C8:4F:11:93:23:B3:24:8E:3D:FE:07:61:C6:C4:75:B0:A8:F4:C9:90:56:C5:81:54:7A:57:3C:FF:E9:DB:9A:68"]
+      }
+    }]
