@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Grid, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import WishListDisplay from './WishListDisplay';
+import ExchangeLabel from '../common/ExchangeLabel';
 
 // SellStatusの定義
 enum SellStatus {
@@ -144,33 +145,33 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
           overflow: 'hidden' 
         }}>
           <Grid container spacing={0} alignItems="center">
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                display: '-webkit-box',
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                WebkitLineClamp: 2,  
-                textOverflow: 'ellipsis' 
-              }}
-            >
-              {sellTitle}
-            </Typography>
+            <Grid item>
+              <ExchangeLabel type="give" />
+            </Grid>
+            <Grid item xs>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  WebkitLineClamp: 2,  
+                  textOverflow: 'ellipsis' 
+                }}
+              >
+                {sellTitle}
+                <Typography component="span" variant="subtitle2" sx={{color: '#B12704', ml: 1}}>
+                  全巻
+                  <Box component="span" sx={{ color: '#757575', pl: 1 }}>({numberOfBooks}巻)</Box>
+                </Typography>
+              </Typography>
+            </Grid>
           </Grid>
-          <Typography variant="subtitle2"  sx={{color: '#B12704', py:0.1}}>
-              全巻
-            <Box component="span" sx={{ color: '#757575',pl:1 }}>({numberOfBooks}巻)</Box>
-          </Typography>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', pl:0 ,pt:0.5, pb: 0 }}>
-            <Typography variant="subtitle2" component="span" sx={{ color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic' }}>
-              want<Box component="span" sx={{ color: 'orange' }}>!!</Box>
-            </Typography>
-            <Typography variant="subtitle2" component="span" sx={{ml:0.8, color: "#757575", fontSize:'0.7rem' }}>
-              交換希望の漫画
-            </Typography>
-            
+          <Box sx={{ display: 'flex', alignItems: 'center', pl: 0, pt: 0.5, pb: 0 }}>
+            <ExchangeLabel type="want" />
           </Box>
+          
           {wishTitles && <WishListDisplay wishTitles={wishTitles} shouldTruncate={true} />}
         </CardContent>
       </Card>

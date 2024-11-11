@@ -69,7 +69,8 @@ const MSell: React.FC= () => {
         <ImageSlider 
           images={[
             { url: Img1, path: '/howtouse' },
-            { url: Img2, path: '/deliverymethod' }
+            { url: Img2, path: '/deliverymethod' },
+            { url: 'https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/IdVerification.jpg', path: '/mypage/verification'}
           ]}
         />
         {/* 出品するボタン */}
