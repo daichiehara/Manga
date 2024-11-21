@@ -168,11 +168,18 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
             </Grid>
           </Grid>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', pl: 0, pt: 0.5, pb: 0 }}>
-            <ExchangeLabel type="want" />
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'flex-start', 
+            overflow: 'hidden'
+          }}>
+            <Box sx={{pl: 0, pt: 0.5, pb: 0,}}>
+              <ExchangeLabel type="want" />
+            </Box>
+            <Box sx={{ flex: 1, overflow: 'hidden' }}>
+              {wishTitles && <WishListDisplay wishTitles={wishTitles} shouldTruncate={true} />}
+            </Box>
           </Box>
-          
-          {wishTitles && <WishListDisplay wishTitles={wishTitles} shouldTruncate={true} />}
         </CardContent>
       </Card>
     </Link>
