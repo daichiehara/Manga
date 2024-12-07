@@ -49,6 +49,7 @@ import path from 'path';
 const AppLayout = () => {
   return (
     <Box sx={{
+      pb:'env(safe-area-inset-bottom)',
       minHeight: '100vh',
       boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.2), -2px 0 4px -2px rgba(0, 0, 0, 0.2)'
     }}>
