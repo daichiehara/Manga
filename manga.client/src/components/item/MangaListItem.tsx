@@ -144,7 +144,7 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
           justifyContent: 'flex-start',
           overflow: 'hidden' 
         }}>
-          <Grid container spacing={0} alignItems="center">
+          <Grid container spacing={0} alignItems="center" sx={{mb: 1}}>
             <Grid item>
               <ExchangeLabel type="give" />
             </Grid>
