@@ -106,7 +106,7 @@ const CommentPage: React.FC = () => {
         <CommentList replies={replies} />
 
         {/* コメント入力 */}
-        <Box sx={{ position: 'fixed', bottom: 0, width: '100%',maxWidth: '640px', px: '0.7rem', py: '0.5rem', bgcolor: 'background.paper', justifyContent: 'center', alignItems: 'center',boxSizing: 'border-box', }}>
+        <Box sx={{ position: 'fixed', bottom: 0, width: '100%',maxWidth: '640px', px: '0.7rem', py: '0.5rem', bgcolor: 'background.paper', justifyContent: 'center', alignItems: 'center',boxSizing: 'border-box', pb:'env(safe-area-inset-bottom)' }}>
           {isAuthenticated ? (
             <Box sx={{ display: 'flex', alignItems: 'flex-end', width: '100%', maxWidth: '640px', boxSizing: 'border-box' }}>
               <TextField

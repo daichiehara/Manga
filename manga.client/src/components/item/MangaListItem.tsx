@@ -144,7 +144,7 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
           justifyContent: 'flex-start',
           overflow: 'hidden' 
         }}>
-          <Grid container spacing={0} alignItems="center">
+          <Grid container spacing={0} alignItems="center" sx={{mb: 1}}>
             <Grid item>
               <ExchangeLabel type="give" />
             </Grid>
@@ -168,11 +168,18 @@ const MangaListItem: React.FC<MangaListItemProps> = React.memo(({ sellId, sellIm
             </Grid>
           </Grid>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', pl: 0, pt: 0.5, pb: 0 }}>
-            <ExchangeLabel type="want" />
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'flex-start', 
+            overflow: 'hidden'
+          }}>
+            <Box sx={{pl: 0, pt: 0.5, pb: 0,}}>
+              <ExchangeLabel type="want" />
+            </Box>
+            <Box sx={{ flex: 1, overflow: 'hidden' }}>
+              {wishTitles && <WishListDisplay wishTitles={wishTitles} shouldTruncate={true} />}
+            </Box>
           </Box>
-          
-          {wishTitles && <WishListDisplay wishTitles={wishTitles} shouldTruncate={true} />}
         </CardContent>
       </Card>
     </Link>
