@@ -727,6 +727,73 @@ namespace Manga.Server.Controllers
             return Ok(new { isConfirmed = user.EmailConfirmed });
         }
 
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("ユーザーが見つかりません。");
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. ユーザーの出品情報に関連する画像を削除
+                var userSells = await _context.Sell
+                    .Include(s => s.SellImages)
+                    .Where(s => s.UserAccountId == userId)
+                    .ToListAsync();
+
+                foreach (var sell in userSells)
+                {
+                    foreach (var image in sell.SellImages)
+                    {
+                        var fileName = Path.GetFileName(image.ImageUrl);
+                        await _s3Service.DeleteFileFromS3Async(fileName, "manga-img-bucket");
+                    }
+                }
+
+                // 2. プロフィール画像の削除
+                if (!string.IsNullOrEmpty(user.ProfileIcon))
+                {
+                    var profileFileName = Path.GetFileName(user.ProfileIcon);
+                    await _s3Service.DeleteFileFromS3Async(profileFileName, "manga-img-bucket");
+                }
+
+                // 3. 身分証明書画像の削除
+                if (!string.IsNullOrEmpty(user.IdVerificationImage))
+                {
+                    var idFileName = Path.GetFileName(user.IdVerificationImage);
+                    await _s3Service.DeleteFileFromS3Async(idFileName, "manga-img-bucket");
+                }
+
+                // 4. ユーザーアカウントの削除
+                // カスケード削除により、関連する全てのデータが自動的に削除されます
+                var result = await _userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    throw new Exception("ユーザーの削除に失敗しました: " +
+                        string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+
+                await transaction.CommitAsync();
+                return Ok(new { message = "アカウントが正常に削除されました。" });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "アカウント削除中にエラーが発生しました。UserId: {UserId}", userId);
+                return StatusCode(500, "アカウントの削除中にエラーが発生しました。");
+            }
+        }
+
         [HttpGet("protected")]
         [Authorize]
         public IActionResult Protected()
