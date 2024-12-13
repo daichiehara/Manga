@@ -49,7 +49,13 @@ public partial class ApplicationDbContext : IdentityDbContext<UserAccount>
             entity.Property(e => e.MainTitle).HasColumnName("main_title");
             entity.Property(e => e.YomiTitle).HasColumnName("yomi_title");
         });
-        
+
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.Sell)
+            .WithMany()
+            .HasForeignKey(n => n.SellId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         OnModelCreatingPartial(modelBuilder);
     }
 
