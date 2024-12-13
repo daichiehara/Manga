@@ -363,5 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Server
-Program.cs
-appsettings.json
+# Program.cs
+# appsettings.json
