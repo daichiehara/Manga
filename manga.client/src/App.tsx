@@ -42,6 +42,7 @@ import TermsOfService from './pages/TermsOfService.tsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
 import MangaDeliveryMethodPage from './pages/MangaDeliveryMethod.tsx';
 import HowToUsePage from './pages/HowToUsePage.tsx';
+import AccountDelete from './pages/MpAccountDelete.tsx';
 
 import path from 'path';
 
@@ -93,6 +94,7 @@ const router = createBrowserRouter(
       <Route path="/mypage/verification" element={<MpIdVerification />} />
       <Route path="/mypage/verification/camera" element={<IdCamera />} />
       <Route path="/mypage/requestedsell" element={<MpRequestSell />} />
+      <Route path="/mypage/account-delete" element={<AccountDelete />} />
       <Route path='/mypage/contact' element={<MpContact />} />
       <Route path="/sell" element={<SellForm />} />
       <Route path="/sell/:sellId" element={<SellForm />} />

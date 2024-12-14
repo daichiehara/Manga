@@ -641,20 +641,10 @@ const SellForm: React.FC = () => {
           />
             <Alert severity="info" sx={{ mb: 2, mt: 2 }}>
               <AlertTitle sx={{ m: 0 }}>確認事項</AlertTitle>
-              <List sx={{ listStyleType: 'decimal', pl: 2, py: 0 }}>
-                <ListItem sx={{ display: 'list-item', px: 0, py: 0 }}>
-                  <ListItemText
-                    primary="出品には、その作品の発売済みの全巻が必要です。"
-                    primaryTypographyProps={{ variant: 'body2' }}
-                  />
-                </ListItem>
-                <ListItem sx={{ display: 'list-item', px: 0, py: 0 }}>
-                  <ListItemText
-                    primary="不足している巻がないことを確認してください。"
-                    primaryTypographyProps={{ variant: 'body2' }}
-                  />
-                </ListItem>
-              </List>
+              <Box component="ol">
+                <Typography component="li" variant='body2'>出品には、その作品の発売済みの全巻が必要です。</Typography>
+                <Typography component="li" variant='body2'>不足している巻がないことを確認してください。</Typography>
+              </Box>
             </Alert>
           </Grid>
           <Grid item xs={12} mb={2}>

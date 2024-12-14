@@ -14,6 +14,7 @@ const SettingList: React.FC = () => {
     { name: 'メール・パスワード', path: '/mypage/changeemailpassword' },
     { name: '住所', path: '/mypage/addressupdate' },
     { name: '本人確認', path: '/mypage/verification' },
+    { name: 'アカウント設定', path: '/mypage/account-delete' },
   ];
 
   return (
