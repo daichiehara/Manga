@@ -417,7 +417,7 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
             </Grid>
           
         </Box>
-        <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', pb:'env(safe-area-inset-bottom)', }}>
+        <Box sx={{py:2, position: 'fixed', bottom: 0,right: 0, display: 'flex', justifyContent: 'center', background: 'white', boxShadow: 'none' , maxWidth: '640px',width: '100%', left: '50%',transform: 'translateX(-50%)', pb: 2, }}>
           {renderActionButton()}
         </Box>
         <ExchangeRequestModal isOpen={drawerOpen} onClose={handleExchangeRequest} setMessage={showMessage} wishTitles={mangaDetail.wishTitles} onExchangeRequest={fetchMangaDetails} />

@@ -43,7 +43,7 @@ namespace Manga.Server.Controllers
                                            .ToListAsync();
 
             var sells = await _context.Sell
-                                      .Where(s => s.UserAccountId == userId)
+                                      .Where(s => s.UserAccountId == userId && s.SellStatus == SellStatus.Recruiting)
                                       .Select(s => new ItemDto { ItemId = s.SellId, Title = s.Title })
                                       .ToListAsync();
 
