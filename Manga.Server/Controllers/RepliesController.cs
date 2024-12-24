@@ -66,7 +66,7 @@ namespace Manga.Server.Controllers
                     ReplyId = r.ReplyId,
                     Message = r.IsDeleted ? null : r.Message, // 削除された返信の場合は特定のメッセージを表示
                     Created = r.Created,
-                    UserAccount = r.IsDeleted ? null : r.UserAccountId,
+                    UserId = r.IsDeleted ? null : r.UserAccountId,
                     NickName = r.IsDeleted ? null : r.UserAccount.NickName, // 削除された返信の場合はニックネームを隠す
                     ProfileIcon = r.IsDeleted ? null : r.UserAccount.ProfileIcon, // 削除された返信の場合はプロフィールアイコンを隠す
                     IsDeleted = r.IsDeleted,

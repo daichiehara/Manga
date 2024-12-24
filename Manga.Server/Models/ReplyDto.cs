@@ -13,10 +13,10 @@ namespace Manga.Server.Models
         public DateTime Created { get; set; }
 
         [Display(Name = "ユーザーID")]
-        public string UserAccount { get; set; }
+        public string? UserId { get; set; }
 
         [Display(Name = "ニックネーム")]
-        public string NickName { get; set; }
+        public string? NickName { get; set; }
 
         [Display(Name = "プロフィールアイコン")]
         public string? ProfileIcon { get; set; }
