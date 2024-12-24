@@ -12,6 +12,9 @@ namespace Manga.Server.Models
         [Display(Name = "投稿日時")]
         public DateTime Created { get; set; }
 
+        [Display(Name = "ユーザーID")]
+        public string UserAccount { get; set; }
+
         [Display(Name = "ニックネーム")]
         public string NickName { get; set; }
 

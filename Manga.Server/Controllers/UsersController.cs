@@ -794,6 +794,59 @@ namespace Manga.Server.Controllers
             }
         }
 
+        [HttpGet("Profile/{userId}")]
+        public async Task<ActionResult<ProfileDto>> GetUserProfile(string userId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            var userProfile = await _context.Users
+                .Include(u => u.Sells)
+                    .ThenInclude(s => s.SellImages)
+                .Include(u => u.Sells)
+                    .ThenInclude(s => s.UserAccount.WishLists)
+                .Where(u => u.Id == userId)
+                .Select(u => new ProfileDto
+                {
+                    UserId = u.Id,
+                    NickName = u.NickName,
+                    ProfileIcon = u.ProfileIcon,
+                    HasIdVerification = !string.IsNullOrEmpty(u.IdVerificationImage),
+                    SellList = u.Sells
+                        .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
+                        .OrderByDescending(s => s.SellTime)
+                        .Select(s => new SellListDto
+                        {
+                            SellId = s.SellId,
+                            SellTitle = s.Title,
+                            NumberOfBooks = s.NumberOfBooks,
+                            SellStatus = s.SellStatus,
+                            WishTitles = s.UserAccount.WishLists
+                                .Select(w => new WishTitleInfo
+                                {
+                                    Title = w.Title,
+                                    IsOwned = currentUserId != null &&
+                                        (_context.OwnedList.Any(o => o.UserAccountId == currentUserId && o.Title == w.Title) ||
+                                        _context.Sell.Any(sell => sell.UserAccountId == currentUserId && sell.Title == w.Title))
+                                })
+                                .OrderByDescending(w => w.IsOwned)
+                                .ToList(),
+                            SellImage = s.SellImages
+                                .OrderBy(si => si.Order)
+                                .Select(si => si.ImageUrl)
+                                .FirstOrDefault()
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (userProfile == null)
+            {
+                return NotFound("ユーザーが見つかりません");
+            }
+
+            return userProfile;
+        }
+
+
         [HttpGet("protected")]
         [Authorize]
         public IActionResult Protected()
