@@ -29,8 +29,9 @@ public partial class ApplicationDbContext : IdentityDbContext<UserAccount>
     public virtual DbSet<Match> Match { get; set; }
     public virtual DbSet<Contact> Contact { get; set; }
     public virtual DbSet<MangaTitle> MangaTitles { get; set; }
+    public virtual DbSet<BlockedUser> BlockedUser { get; set; }
 
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);  // この行が重要です
@@ -54,6 +55,18 @@ public partial class ApplicationDbContext : IdentityDbContext<UserAccount>
             .HasOne(n => n.Sell)
             .WithMany()
             .HasForeignKey(n => n.SellId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BlockedUser>()
+            .HasOne(b => b.Blocker)
+            .WithMany(u => u.BlockedUsers)
+            .HasForeignKey(b => b.BlockerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BlockedUser>()
+            .HasOne(b => b.Blocked)
+            .WithMany(u => u.BlockedByUsers)
+            .HasForeignKey(b => b.BlockedId)
             .OnDelete(DeleteBehavior.Cascade);
 
         OnModelCreatingPartial(modelBuilder);

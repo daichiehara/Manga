@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { Typography, Avatar, Box, Stack, Grid } from '@mui/material';
-import BeenhereRoundedIcon from '@mui/icons-material/BeenhereRounded';
-import BeenhereOutlinedIcon from '@mui/icons-material/BeenhereOutlined'; 
 import CustomToolbar from '../components/common/CustumToolbar';
 import LoopIcon from '@mui/icons-material/Loop';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -16,6 +14,7 @@ import PolicyList from '../components/mypage/PolicyList';
 import LogoutList from '../components/mypage/LogoutList';
 import NavigateToLoginBox from '../components/login/NavigateToLoginBox';
 import MenuBar from '../components/menu/MenuBar';
+import VerificationStatus from '../components/common/VerificationStatus';
 import { useSnackbar } from '../hooks/useSnackbar';
 import ForwardToInboxRoundedIcon from '@mui/icons-material/ForwardToInboxRounded';
 import { Helmet } from 'react-helmet-async';
@@ -77,23 +76,7 @@ const MainMyPage: React.FC = () => {
               <Typography variant="subtitle1" sx={{ pb: 1, fontWeight: 'bold' }}>
                 {userInfo.nickName}
               </Typography>
-              <Grid container spacing={0.5} alignItems="center" justifyContent="center" sx={{ pt: 1 }}>
-                {userInfo.hasIdVerificationImage ? (
-                  <>
-                    <BeenhereRoundedIcon color="primary" />
-                    <Typography variant="body1" sx={{ pl: 1 }}>
-                      本人確認済
-                    </Typography>
-                  </>
-                ) : (
-                  <>
-                    <BeenhereOutlinedIcon color="disabled" />
-                    <Typography variant="body1" sx={{ pl: 1 }}>
-                      本人確認前
-                    </Typography>
-                  </>
-                )}
-              </Grid>
+              <VerificationStatus isVerified={userInfo.hasIdVerificationImage} />
             </Grid>
 
             {/* メインアイコン部分 */}

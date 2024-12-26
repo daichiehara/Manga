@@ -46,6 +46,12 @@ namespace Manga.Server.Models
         public virtual ICollection<MyList> MyLists { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<Contact> Contacts { get; set; }
+
+        // ブロックしたユーザー
+        public virtual ICollection<BlockedUser> BlockedUsers { get; set; }
+
+        // ブロックされたユーザー
+        public virtual ICollection<BlockedUser> BlockedByUsers { get; set; }
     }
 
     public class GoogleAuthRequest

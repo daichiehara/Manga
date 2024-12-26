@@ -43,6 +43,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
 import MangaDeliveryMethodPage from './pages/MangaDeliveryMethod.tsx';
 import HowToUsePage from './pages/HowToUsePage.tsx';
 import AccountDelete from './pages/MpAccountDelete.tsx';
+import UserProfile from './pages/UserProfile.tsx';
 
 import path from 'path';
 
@@ -110,6 +111,7 @@ const router = createBrowserRouter(
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/deliverymethod" element={<MangaDeliveryMethodPage />} />
       <Route path="/howtouse" element={<HowToUsePage />} />
+      <Route path="/profile/:userId" element={<UserProfile />} />
     </Route>
   )
 );

@@ -6,6 +6,7 @@
         public string NickName { get; set; }
         public string ProfileIcon { get; set; }
         public bool HasIdVerification { get; set; }
+        public bool IsBlocked { get; set; }
         public List<SellListDto> SellList { get; set; }
     }
 

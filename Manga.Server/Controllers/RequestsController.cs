@@ -283,6 +283,16 @@ namespace Manga.Server.Controllers
                     return NotFound("相手の出品は現在非公開です。");
                 }
 
+                // 相互ブロックのチェック
+                var isBlocked = await _context.BlockedUser.AnyAsync(b =>
+                    (b.BlockerId == userId && b.BlockedId == responderSell.UserAccountId) ||
+                    (b.BlockerId == responderSell.UserAccountId && b.BlockedId == userId));
+
+                if (isBlocked)
+                {
+                    return BadRequest("ブロックされているユーザーとは取引できません。");
+                }
+
                 /*
                 // 既存のリクエストを確認
                 var existingRequests = await _context.Request

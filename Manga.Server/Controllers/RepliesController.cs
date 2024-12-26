@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Manga.Server.Data;
 using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Manga.Server.Controllers
 {
@@ -128,12 +129,32 @@ namespace Manga.Server.Controllers
         */
         
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Reply>> PostReply(ReplyPostDto replyDto)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound("User not found.");
+            }
+
+            // 出品者のIDを取得
+            var sell = await _context.Sell
+                .FirstOrDefaultAsync(s => s.SellId == replyDto.SellId);
+
+            if (sell == null)
+            {
+                return NotFound("出品が見つかりません。");
+            }
+
+            // ブロックチェック
+            var isBlocked = await _context.BlockedUser.AnyAsync(b =>
+                (b.BlockerId == sell.UserAccountId && b.BlockedId == user.Id) ||
+                (b.BlockerId == user.Id && b.BlockedId == sell.UserAccountId));
+
+            if (isBlocked)
+            {
+                return BadRequest("ブロックされているためコメントできません。");
             }
 
             var reply = new Reply

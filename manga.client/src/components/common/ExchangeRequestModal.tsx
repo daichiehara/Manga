@@ -142,7 +142,17 @@ const ExchangeRequestModal: React.FC<ExchangeRequestModalProps> = React.memo(({ 
             showSnackbar("交換申請が成功しました", 'success'); // 成功メッセージをセット
 
         } catch (error) {
-            showSnackbar("交換申請に失敗しました", 'error'); // 失敗メッセージをセット
+            if (axios.isAxiosError(error)) {
+                // ブロック状態のエラーメッセージを確認
+                if (error.response?.status === 400 && 
+                    error.response.data === "ブロックされているユーザーとは取引できません。") {
+                    showSnackbar("ブロックされているユーザーとは取引できません", 'error');
+                } else {
+                    showSnackbar("交換申請に失敗しました", 'error');
+                }
+            } else {
+                showSnackbar("予期せぬエラーが発生しました", 'error');
+            }
             console.error('Error sending exchange request:', error);
         } finally {
             setIsSubmitting(false);

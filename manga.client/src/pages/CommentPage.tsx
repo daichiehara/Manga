@@ -5,6 +5,7 @@ import axios from 'axios';
 import { AuthContext } from '../components/context/AuthContext';
 import { Box, TextField, Button, Divider, Typography } from '@mui/material';
 import CommentList from '../components/comment/CommentList';
+import { SnackbarContext } from '../components/context/SnackbarContext';
 import { Helmet } from 'react-helmet-async';
 import { SERVICE_NAME } from '../serviceName';
 import { API_BASE_URL } from '../apiName';
@@ -14,6 +15,7 @@ interface ReplyDto {
   replyId: number;
   message: string | null;
   created: string;
+  userId: string | null;
   nickName: string | null;
   profileIcon: string | null;
   isDeleted: boolean;
@@ -33,6 +35,7 @@ const CommentPage: React.FC = () => {
   const [newReply, setNewReply] = useState<string>(''); // 新しいコメントの内容を保持するステート
   const [isCurrentUserSeller, setIsCurrentUserSeller] = useState<boolean>(false); // 現在のユーザーが出品者かどうかを保持するステート
   const { sellId } = useParams(); // sellIdをルートパラメータから取得
+  const { showSnackbar } = useContext(SnackbarContext);
 
   // コンポーネントがマウントされた時にコメントを取得する
   useEffect(() => {
@@ -76,6 +79,17 @@ const CommentPage: React.FC = () => {
       setNewReply(''); // コメントを投稿した後に入力フィールドをリセット
       fetchReplies(); // コメントを再取得してリストを更新
     } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // ブロックされている場合のエラーメッセージを確認
+        if (error.response?.status === 400 && 
+            error.response?.data === "ブロックされているためコメントできません。") {
+          showSnackbar("ブロックされているためコメントできません。", "error");
+        } else {
+          showSnackbar("コメントの投稿に失敗しました。", "error");
+        }
+      } else {
+        showSnackbar("予期せぬエラーが発生しました。", "error");
+      }
       console.error('Error posting reply:', error);
     }
   }, [newReply, sellId, fetchReplies]);

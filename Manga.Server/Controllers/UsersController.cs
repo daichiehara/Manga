@@ -798,6 +798,10 @@ namespace Manga.Server.Controllers
         public async Task<ActionResult<ProfileDto>> GetUserProfile(string userId)
         {
             var currentUserId = _userManager.GetUserId(User);
+
+            var isBlocked = await _context.BlockedUser
+                .AnyAsync(b => b.BlockerId == currentUserId && b.BlockedId == userId);
+
             var userProfile = await _context.Users
                 .Include(u => u.Sells)
                     .ThenInclude(s => s.SellImages)
@@ -810,6 +814,7 @@ namespace Manga.Server.Controllers
                     NickName = u.NickName,
                     ProfileIcon = u.ProfileIcon,
                     HasIdVerification = !string.IsNullOrEmpty(u.IdVerificationImage),
+                    IsBlocked = isBlocked,
                     SellList = u.Sells
                         .Where(s => s.SellStatus == SellStatus.Recruiting || s.SellStatus == SellStatus.Established)
                         .OrderByDescending(s => s.SellTime)

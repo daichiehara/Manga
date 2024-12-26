@@ -6,6 +6,7 @@ interface ReplyDto {
   replyId: number;
   message: string | null;
   created: string;
+  userId: string | null;
   nickName: string | null;
   profileIcon: string | null;
   isDeleted: boolean;
