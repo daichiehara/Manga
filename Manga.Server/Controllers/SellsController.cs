@@ -443,6 +443,7 @@ namespace Manga.Server.Controllers
                 NumberOfBooks = sell.NumberOfBooks,
                 SellMessage = sell.SellMessage,
                 SellStatus = sell.SellStatus,
+                UserId = sell.UserAccountId,
                 UserName = sell.UserAccount.NickName,
                 ProfileIcon = sell.UserAccount.ProfileIcon,
                 HasIdVerificationImage = !string.IsNullOrEmpty(sell.UserAccount.IdVerificationImage),

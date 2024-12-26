@@ -49,6 +49,7 @@ interface MangaDetail {
     bookState: string;
     sellTime: string;
     imageUrls: string[];
+    userId: string;
     profileIcon: string;
     userName: string;
     sellMessage: string;
@@ -382,6 +383,7 @@ const description = `[${SERVICE_NAME}] ${mangaDetail?.title || ''}: 全${mangaDe
                     <Box sx={{pb:1.3}}><Divider sx={{pt:1.3}}/></Box>
                   </Grid>
                 <SellerInfo 
+                  userId={mangaDetail.userId}
                   profileIcon={mangaDetail.profileIcon} 
                   userName={mangaDetail.userName} 
                   hasIdVerificationImage={mangaDetail.hasIdVerificationImage} 

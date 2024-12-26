@@ -30,6 +30,9 @@ namespace Manga.Server.Models
         [Display(Name = "出品状態")]
         public SellStatus SellStatus { get; set; }
 
+        [Display(Name = "ユーザーID")]
+        public string UserId { get; set; }
+
         [Display(Name = "ユーザー名")]
         public string UserName { get; set;}
 
