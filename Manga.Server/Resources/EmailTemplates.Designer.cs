@@ -132,6 +132,52 @@ namespace Manga.Server.Resources {
         }
         
         /// <summary>
+        ///       &lt;!DOCTYPE html&gt;
+        ///    &lt;html&gt;
+        ///    &lt;head&gt;
+        ///        &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+        ///        &lt;title&gt;新着コメントのお知らせ&lt;/title&gt;
+        ///        &lt;style&gt;
+        ///            body {{
+        ///                font-family: &apos;Helvetica Neue&apos;, Arial, &apos;Hiragino Kaku Gothic ProN&apos;, &apos;Hiragino Sans&apos;, Meiryo, sans-serif;
+        ///                line-height: 1.6;
+        ///                color: #333333;
+        ///                margin: 0;
+        ///                padding: 20px;
+        ///            }}
+        ///            .con [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NewCommentMessage {
+            get {
+                return ResourceManager.GetString("NewCommentMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///       &lt;!DOCTYPE html&gt;
+        ///    &lt;html&gt;
+        ///    &lt;head&gt;
+        ///        &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+        ///        &lt;title&gt;スレッドの新着コメントのお知らせ&lt;/title&gt;
+        ///        &lt;style&gt;
+        ///            body {{
+        ///                font-family: &apos;Helvetica Neue&apos;, Arial, &apos;Hiragino Kaku Gothic ProN&apos;, &apos;Hiragino Sans&apos;, Meiryo, sans-serif;
+        ///                line-height: 1.6;
+        ///                color: #333333;
+        ///                margin: 0;
+        ///                padding: 20px;
+        ///            }}
+        ///            [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NewCommentOnThreadMessage {
+            get {
+                return ResourceManager.GetString("NewCommentOnThreadMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   トカエルをご利用いただきありがとうございます。&lt;br /&gt;
         ///仮登録が完了しました。&lt;br /&gt;
         ///&lt;br /&gt;

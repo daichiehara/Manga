@@ -280,6 +280,170 @@
 &lt;/body&gt;
 &lt;/html&gt;</value>
   </data>
+  <data name="NewCommentMessage" xml:space="preserve">
+    <value>    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+        &lt;meta charset="utf-8"&gt;
+        &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+        &lt;title&gt;新着コメントのお知らせ&lt;/title&gt;
+        &lt;style&gt;
+            body {{
+                font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+                line-height: 1.6;
+                color: #333333;
+                margin: 0;
+                padding: 20px;
+            }}
+            .container {{
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }}
+            .header {{
+                text-align: center;
+                margin-bottom: 30px;
+            }}
+            .logo {{
+                color: #1976d2;
+                font-size: 24px;
+                font-weight: bold;
+            }}
+            .content {{
+                margin-bottom: 30px;
+            }}
+            .comment-box {{
+                background-color: #f5f5f5;
+                padding: 15px;
+                border-radius: 6px;
+                margin: 15px 0;
+            }}
+            .button {{
+                display: inline-block;
+                padding: 12px 24px;
+                background-color: #1976d2;
+                color: white;
+                text-decoration: none;
+                border-radius: 4px;
+                margin-top: 20px;
+            }}
+            .footer {{
+                text-align: center;
+                color: #666666;
+                font-size: 12px;
+                margin-top: 30px;
+            }}
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class="container"&gt;
+            &lt;div class="header"&gt;
+                &lt;div class="logo"&gt;トカエル&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="content"&gt;
+                &lt;p&gt;{0}様&lt;/p&gt;
+                &lt;p&gt;あなたの出品「{1}」に{2}さんから新しいコメントが届きました。&lt;/p&gt;
+                &lt;div class="comment-box"&gt;
+                    {3}
+                &lt;/div&gt;
+                &lt;p&gt;アプリを開いて確認してください。&lt;/p&gt;
+                &lt;center&gt;
+                    &lt;a href="https://tocaeru.com" class="button"&gt;アプリを開く&lt;/a&gt;
+                &lt;/center&gt;
+            &lt;/div&gt;
+            &lt;div class="footer"&gt;
+                &lt;p&gt;※このメールは送信専用のアドレスから配信されています。&lt;/p&gt;
+                &lt;p&gt;© 2024 トカエル All Rights Reserved.&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;</value>
+  </data>
+  <data name="NewCommentOnThreadMessage" xml:space="preserve">
+    <value>    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+        &lt;meta charset="utf-8"&gt;
+        &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+        &lt;title&gt;スレッドの新着コメントのお知らせ&lt;/title&gt;
+        &lt;style&gt;
+            body {{
+                font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+                line-height: 1.6;
+                color: #333333;
+                margin: 0;
+                padding: 20px;
+            }}
+            .container {{
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }}
+            .header {{
+                text-align: center;
+                margin-bottom: 30px;
+            }}
+            .logo {{
+                color: #1976d2;
+                font-size: 24px;
+                font-weight: bold;
+            }}
+            .content {{
+                margin-bottom: 30px;
+            }}
+            .comment-box {{
+                background-color: #f5f5f5;
+                padding: 15px;
+                border-radius: 6px;
+                margin: 15px 0;
+            }}
+            .button {{
+                display: inline-block;
+                padding: 12px 24px;
+                background-color: #1976d2;
+                color: white;
+                text-decoration: none;
+                border-radius: 4px;
+                margin-top: 20px;
+            }}
+            .footer {{
+                text-align: center;
+                color: #666666;
+                font-size: 12px;
+                margin-top: 30px;
+            }}
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class="container"&gt;
+            &lt;div class="header"&gt;
+                &lt;div class="logo"&gt;トカエル&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="content"&gt;
+                &lt;p&gt;{0}様&lt;/p&gt;
+                &lt;p&gt;あなたがコメントした「{1}」に{2}さんから新しいコメントが届きました。&lt;/p&gt;
+                &lt;div class="comment-box"&gt;
+                    {3}
+                &lt;/div&gt;
+                &lt;p&gt;アプリを開いて確認してください。&lt;/p&gt;
+                &lt;center&gt;
+                    &lt;a href="https://tocaeru.com" class="button"&gt;アプリを開く&lt;/a&gt;
+                &lt;/center&gt;
+            &lt;/div&gt;
+            &lt;div class="footer"&gt;
+                &lt;p&gt;※このメールは送信専用のアドレスから配信されています。&lt;/p&gt;
+                &lt;p&gt;© 2024 トカエル All Rights Reserved.&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;</value>
+  </data>
   <data name="RegisterEmailMessage" xml:space="preserve">
     <value>トカエルをご利用いただきありがとうございます。&lt;br /&gt;
 仮登録が完了しました。&lt;br /&gt;

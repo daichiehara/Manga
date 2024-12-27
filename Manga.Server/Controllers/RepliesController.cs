@@ -9,6 +9,7 @@ using Manga.Server.Data;
 using Manga.Server.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Manga.Server.Controllers
 {
@@ -18,11 +19,13 @@ namespace Manga.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserAccount> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public RepliesController(ApplicationDbContext context, UserManager<UserAccount> userManager)
+        public RepliesController(ApplicationDbContext context, UserManager<UserAccount> userManager, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         // GET: api/Replies
@@ -169,7 +172,7 @@ namespace Manga.Server.Controllers
             _context.Reply.Add(reply);
             await _context.SaveChangesAsync();
 
-            await NotificationsController.CreateNotificationsAsync(_context, replyDto.SellId, user.Id, user.NickName);
+            await NotificationsController.CreateNotificationsAsync(_context, replyDto.SellId, user.Id, user.NickName, replyDto.Message, _emailSender);
 
             return CreatedAtAction(nameof(PostReply), new { id = reply.ReplyId }, "Ok");
         }

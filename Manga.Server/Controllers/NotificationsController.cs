@@ -10,6 +10,9 @@ using Manga.Server.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Web;
+using static Google.Cloud.RecaptchaEnterprise.V1.TransactionData.Types;
 
 namespace Manga.Server.Controllers
 {
@@ -171,24 +174,27 @@ namespace Manga.Server.Controllers
             return NoContent();
         }
 
-        public static async Task CreateNotificationsAsync(ApplicationDbContext context, int sellId, string currentUserId, string currentUserNickName)
+        public static async Task CreateNotificationsAsync(ApplicationDbContext context, int sellId, string currentUserId, string currentUserNickName, string replyMessage, IEmailSender emailSender)
         {
             // 出品者に通知を送信
-            var sell = await context.Sell.FindAsync(sellId);
+            var sell = await context.Sell
+                .Include(s => s.UserAccount)
+                .FirstOrDefaultAsync(s => s.SellId == sellId);
 
             if (sell != null)
             {
                 // すべてのリプライを取得
                 var allReplies = await context.Reply
+                    .Include(r => r.UserAccount)
                     .Where(r => r.SellId == sellId && r.UserAccountId != currentUserId)
                     .ToListAsync();
 
-                var uniqueUserIds = allReplies
-                    .Select(r => r.UserAccountId)
+                var uniqueUsers = allReplies
+                    .Select(r => r.UserAccount)
                     .Distinct()
                     .ToList();
 
-                var otherCommentersCount = uniqueUserIds.Count;
+                var otherCommentersCount = uniqueUsers.Count;
                 var message = otherCommentersCount > 0
                     ? $"{currentUserNickName}さん、他{otherCommentersCount}名が「{sell.Title}」にコメントしました。"
                     : $"{currentUserNickName}さんが「{sell.Title}」にコメントしました。";
@@ -203,19 +209,46 @@ namespace Manga.Server.Controllers
                         sell.UserAccountId,
                         sellId
                     );
+
+                    // 出品者へのメール送信
+                    var sellerEmailBody = string.Format(
+                        Resources.EmailTemplates.NewCommentMessage,
+                        HttpUtility.HtmlEncode(sell.UserAccount.NickName),
+                        HttpUtility.HtmlEncode(sell.Title),
+                        HttpUtility.HtmlEncode(currentUserNickName),
+                        HttpUtility.HtmlEncode(replyMessage)
+                    );
+                    await emailSender.SendEmailAsync(
+                        sell.UserAccount.Email,
+                        "【トカエル】あなたの出品にコメントが届きました",
+                        sellerEmailBody
+                    );
                 }
 
                 // 過去にコメントをしたユーザーに通知を送信
-                foreach (var userId in uniqueUserIds)
+                foreach (var user in uniqueUsers)
                 {
-                    if (userId != sell.UserAccountId)
+                    if (user.Id != sell.UserAccountId && user.Id != currentUserId)
                     {
                         await CreateNotificationAsync(
                             context,
                             message,
                             Models.Type.Reply,
-                            userId,
+                            user.Id,
                             sellId
+                        );
+
+                        var commenterEmailBody = string.Format(
+                            Resources.EmailTemplates.NewCommentOnThreadMessage,
+                            HttpUtility.HtmlEncode(user.NickName),
+                            HttpUtility.HtmlEncode(sell.Title),
+                            HttpUtility.HtmlEncode(currentUserNickName),
+                            HttpUtility.HtmlEncode(replyMessage)
+                        );
+                        await emailSender.SendEmailAsync(
+                            user.Email,
+                            "【トカエル】コメントした出品に新着コメントがあります",
+                            commenterEmailBody
                         );
                     }
                 }
