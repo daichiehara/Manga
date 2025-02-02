@@ -5,6 +5,7 @@ import { EmojiEvents, HowToVote, DateRange, Announcement, Warning, ContactSuppor
 import CustomToolbar from '../components/common/CustumToolbar';
 import Img1 from '../assets/images/present_campain_yellow.webp';
 import Img2 from '../assets/images/Campaign_share_button.webp';
+import Img3 from '../assets/images/Campaign_wantList.webp';
 
 const CampaignPage: React.FC = () => {
   return (
@@ -57,6 +58,8 @@ const CampaignPage: React.FC = () => {
               賞品
             </Typography>
             <Typography variant="body1">欲しい漫画全巻セットを抽選でプレゼント！</Typography>
+            <Typography variant="body1">欲しい漫画リストに登録されている漫画をプレゼントします。</Typography>
+            <img src={Img3} alt="説明画像" style={{ width: '50%', marginTop: '16px', display: 'block', margin: '0 auto' }} />
           </Box>
         </Paper>
         <Paper elevation={3} sx={{ p: 2, mb: 4, borderRadius: 4 }}>
