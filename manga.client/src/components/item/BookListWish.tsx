@@ -9,6 +9,7 @@ import WishSearchModal from '../common/WishSearchModal';
 import WishBookRegistSteps from './WishBookRegistSteps';
 import { AuthContext } from '../context/AuthContext';
 import NavigateToLoginBox from '../login/NavigateToLoginBox';
+import ExchangeLabel from '../common/ExchangeLabel';
 interface Book {
   itemId: number;
   title: string;
@@ -38,9 +39,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Typography variant="h6" component="span" sx={{ mr:'12px',color: "#0F9ED5", fontWeight:`bold`, fontStyle:'italic' }}>
-          want<Box component="span" sx={{ color: 'orange' }}>!!</Box>
-        </Typography>
+        <ExchangeLabel type="want" />
         {/* <RocketLaunchIcon sx={{ fontsize: '1rem', mr: 1, alignSelf: 'center', color: `#0F9ED5` }} /> */}
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#757575' }}>
@@ -100,14 +99,7 @@ const BookListWish: React.FC<BookListWishProps> = ({ title, books, onRemove, onR
       {/* ダイアログ */}
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} aria-hidden={!isDialogOpen} disableEnforceFocus>
       <Box sx={{ py: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Typography
-          variant="h6"
-          component="span"
-          sx={{ mr: '12px', color: "#0F9ED5", fontWeight: 'bold', fontStyle: 'italic' }}
-        >
-          want
-          <Box component="span" sx={{ color: 'orange' }}>!!</Box>
-        </Typography>
+        <ExchangeLabel type="want" />
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#757575' }}>
             {title}

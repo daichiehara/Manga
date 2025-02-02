@@ -6,6 +6,9 @@ import MangaListItem from '../components/item/MangaListItem';
 import Header from '../components/common/Header';
 import SearchResults from '../components/common/SearchResults';
 import MenuBar from '../components/menu/MenuBar';
+import ImageSlider from '../components/common/ImageSlider';
+import Img1 from '../assets/images/present_campain_yellow.webp';
+import Img2 from '../assets/images/Full_guarantee.webp'
 import LoadingComponent from '../components/common/LoadingComponent';
 import ErrorDisplay from '../components/common/ErrorDisplay';
 import { AppContext } from '../components/context/AppContext';
@@ -95,6 +98,69 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab}) => {
     setIsSearchActive(isActive);
   }, []);
 
+  const renderContent = () => {
+    if (selectedTab === 0 && myListData.length === 0) {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 15 }}>
+          <FavoriteIcon sx={{ fontSize: 60, color: 'red', mb:5 }} />
+          <Typography variant="subtitle1">
+            「いいね！」した商品はありません
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1 }}>
+            商品ページから「いいね！」すると、ここで見ることができます。
+          </Typography>
+          <Button
+            component={Link}
+            to="/"
+            variant="outlined"
+            color="primary"
+            sx={{
+              mt: 3,
+              backgroundColor: 'white',
+              width: '80%',
+              height: 40,
+              fontWeight: '700',
+              fontSize: 16,
+              '&:hover': {
+                backgroundColor: '#ffebee',
+                borderColor: 'darkred',
+                color: 'darkred'
+              }
+            }}
+          >
+            商品を検索する
+          </Button>
+        </Box>
+      );
+    }
+
+    return (
+      <>
+        {selectedTab === 1 && (
+          <Box sx={{ mb: 1 }}>
+            <ImageSlider 
+              images={[
+                { url: Img1, path: '/campaign' },
+                { url: Img2, path: '/terms/#section-17' },
+              ]}
+            />
+          </Box>
+        )}
+        {(selectedTab === 0 ? myListData : selectedTab === 1 ? recommendData : mangaData).map((item, index) => (
+          <MangaListItem 
+            key={`tab-${selectedTab}-index-${index}-sellId-${item.sellId}`}
+            sellId={item.sellId}
+            sellImage={item.sellImage} 
+            sellTitle={item.sellTitle} 
+            numberOfBooks={item.numberOfBooks}
+            wishTitles={item.wishTitles}
+            sellStatus={item.sellStatus}
+          />
+        ))}
+      </>
+    );
+  };
+
   return (
     <>
       <Header 
@@ -107,7 +173,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab}) => {
       />
       {searchQuery && <SearchResults query={searchQuery} />}
       <Box sx={{
-        mt: isSearchActive ? '4rem' : '7rem',
+        mt: isSearchActive ? '4rem' : { xs: '6.5rem', sm: '7rem' },
         pt: `1rem`, 
         pb: `6rem`,
       }}>
@@ -116,54 +182,7 @@ const MainSearch: React.FC<MainSearchProps> = ({initialTab}) => {
           <LoadingComponent />
         ) : (
           <>
-            {!searchQuery && (
-              <>
-                {selectedTab === 0 && myListData.length === 0 ? (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 15 }}>
-                    <FavoriteIcon sx={{ fontSize: 60, color: 'red', mb:5 }} />
-                    <Typography variant="subtitle1">
-                      「いいね！」した商品はありません
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ px: 5, mt: 1 }}>
-                      商品ページから「いいね！」すると、ここで見ることができます。
-                    </Typography>
-                    <Button
-                      component={Link}
-                      to="/"
-                      variant="outlined"
-                      color="primary"
-                      sx={{
-                        mt: 3,
-                        backgroundColor: 'white',
-                        width: '80%',
-                        height: 40,
-                        fontWeight: '700',
-                        fontSize: 16,
-                        '&:hover': {
-                          backgroundColor: '#ffebee',
-                          borderColor: 'darkred',
-                          color: 'darkred'
-                        }
-                      }}
-                    >
-                      商品を検索する
-                    </Button>
-                  </Box>
-                ) : (
-                  (selectedTab === 0 ? myListData : selectedTab === 1 ? recommendData : mangaData).map((item, index) => (
-                    <MangaListItem 
-                      key={`tab-${selectedTab}-index-${index}-sellId-${item.sellId}`}
-                      sellId={item.sellId}
-                      sellImage={item.sellImage} 
-                      sellTitle={item.sellTitle} 
-                      numberOfBooks={item.numberOfBooks}
-                      wishTitles={item.wishTitles}
-                      sellStatus={item.sellStatus}
-                    />
-                  ))
-                )}
-              </>
-            )}
+            {!searchQuery && renderContent()}
           </>
         )}
         <div ref={ref} style={{ height: '20px', margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

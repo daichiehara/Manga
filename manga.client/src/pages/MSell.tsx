@@ -64,15 +64,16 @@ const MSell: React.FC= () => {
       {/* メインコンテンツエリア */}
       {/* 見出し */}
       <CustomToolbar title="出品" showBackButton={false} />
+      <Box sx={{ pt: { xs: '3.5rem', sm: '4rem' } }} />
+      <ImageSlider 
+        images={[
+          { url: Img1, path: '/howtouse' },
+          { url: Img2, path: '/deliverymethod' },
+          { url: 'https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/IdVerification.jpg', path: '/mypage/verification'}
+        ]}
+      />
       {/* メインボタンエリア */}
-      <Box sx={{ mt: '3rem', pt: '2rem', ml: 4, mr: 4, mb: 6 }}>
-        <ImageSlider 
-          images={[
-            { url: Img1, path: '/howtouse' },
-            { url: Img2, path: '/deliverymethod' },
-            { url: 'https://manga-img-bucket.s3.ap-northeast-1.amazonaws.com/IdVerification.jpg', path: '/mypage/verification'}
-          ]}
-        />
+      <Box sx={{ pt: '2rem', ml: 4, mr: 4, mb: 6 }}>
         {/* 出品するボタン */}
         <Button
           variant="contained"

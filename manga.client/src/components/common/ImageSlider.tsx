@@ -20,7 +20,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 600, margin: 'auto' }}>
+    <Box sx={{ width: '100%', margin: 'auto' }}>
       <Swiper
         modules={[Pagination, Autoplay]}  // Autoplayモジュールを追加
         spaceBetween={10}
@@ -35,7 +35,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
             <img 
               src={image.url} 
               alt={`slide-${index}`} 
-              style={{ width: '100%', borderRadius: '15px', cursor: 'pointer' }} 
+              style={{ width: '100%', cursor: 'pointer' }} 
               onClick={() => handleImageClick(image.path)} // クリックでアプリ内のページに遷移
             />
           </SwiperSlide>

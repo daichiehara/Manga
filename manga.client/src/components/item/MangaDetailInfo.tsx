@@ -112,7 +112,7 @@ const MangaDetailInfo: React.FC<MangaDetailInfoProps> = ({
   
 
   // メタタグで使用する説明文を生成
-  const description = `[トカエル]${title}: 全${numberOfBooks}巻  無料で漫画がよめるかも！？物々交換してみよう！！`;
+  const description = `[トカエル]${title}: 全${numberOfBooks}巻  無料で漫画がよめるかも！？\n物々交換してみよう！！\n#トカエル \n#トカエルプレゼント企画`;
 
   return (
     <HelmetProvider>

@@ -366,8 +366,15 @@ const TermsOfService: React.FC = () => {
                         当社は、ユーザーや第三者に対していかなる責任も負いません。
                     </Typography>
 
+                    <Typography variant="h6" gutterBottom sx={{ mt: 3 }} id="section-17">
+                        第17条（交換成立時の補償について）
+                    </Typography>
+                    <Typography variant="body2" paragraph>
+                        交換成立時に、自身が発送済みの状態で相手からの発送がされなかった場合、当該商品もしくは当該商品相当の現金を補償いたします（最大2万円相当）。
+                    </Typography>
+
                     <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                        第17条（本サービスの終了）
+                        第18条（本サービスの終了）
                     </Typography>
                     <Typography variant="body2" paragraph>
                         当社は、相当の期間をもってユーザーに通知の上、
@@ -379,7 +386,7 @@ const TermsOfService: React.FC = () => {
                     </Typography>
 
                     <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                        第18条（合意管轄等）
+                        第19条（合意管轄等）
                     </Typography>
                     <Typography variant="body2" paragraph>
                         本利用規約の準拠法は日本法とし、
@@ -391,6 +398,9 @@ const TermsOfService: React.FC = () => {
 
                     <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
                         附則
+                    </Typography>
+                    <Typography variant="body2" paragraph>
+                        2025年02月02日　改定
                     </Typography>
                     <Typography variant="body2" paragraph>
                         2024年09月02日　制定

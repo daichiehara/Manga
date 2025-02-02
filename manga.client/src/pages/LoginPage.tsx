@@ -227,7 +227,7 @@ const Login: React.FC = () => {
             */}
           </Box>
         </Box>
-        {/*
+        {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
@@ -238,7 +238,7 @@ const Login: React.FC = () => {
             shape='rectangular'
           />
         </Box>
-        */}
+        }
         {error && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {error}

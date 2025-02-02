@@ -105,7 +105,7 @@ const SignupPage: React.FC = () => {
             </Typography>
           </ButtonBase>
 
-          {/*
+          {
           <Box sx={{ mt: '1rem' }}>
             {loading ? (
               <CircularProgress />
@@ -121,7 +121,7 @@ const SignupPage: React.FC = () => {
               />
             )}
           </Box>
-          */}
+          }
 
           {error && (
             <Alert severity="error" sx={{ mt: 2 }}>
