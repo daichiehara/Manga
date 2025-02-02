@@ -57,8 +57,7 @@ const CampaignPage: React.FC = () => {
             <Typography variant="h6" gutterBottom fontWeight={"bold"}>
               賞品
             </Typography>
-            <Typography variant="body1">欲しい漫画全巻セットを抽選でプレゼント！</Typography>
-            <Typography variant="body1">欲しい漫画リストに登録されている漫画をプレゼントします。</Typography>
+            <Typography variant="body1" sx={{mb: 2}}>欲しい漫画リストに登録されている漫画をプレゼントします。</Typography>
             <img src={Img3} alt="説明画像" style={{ width: '50%', marginTop: '16px', display: 'block', margin: '0 auto' }} />
           </Box>
         </Paper>
